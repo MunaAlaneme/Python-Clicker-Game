@@ -281,8 +281,8 @@ upgrades = [
     {"num": 4,
     "name": "Double Clicks (X2)",
     "cost": Decimal(0),
-    "startcost": Decimal(1500),
-    "costcoefficient": Decimal(3.2),
+    "startcost": Decimal(10000),
+    "costcoefficient": Decimal(7),
     "bought": Decimal(0)},
     {"num": 5,
     "name": "Auto Clicker +1",
@@ -294,7 +294,7 @@ upgrades = [
     "name": "Double Click Rate (X2)",
     "cost": Decimal(0),
     "startcost": Decimal(10000),
-    "costcoefficient": Decimal(4.5),
+    "costcoefficient": Decimal(9),
     "bought": Decimal(0)},
     {"num": 7,
     "name": "Auto Clicker +10",
@@ -305,19 +305,19 @@ upgrades = [
     {"num": 8,
     "name": "+10 Per Click",
     "cost": Decimal(0),
-    "startcost": Decimal(400),
+    "startcost": Decimal(1000),
     "costcoefficient": Decimal(1.06),
     "bought": Decimal(0)},
     {"num": 9,
     "name": "Triple Click Rate (X3)",
     "cost": Decimal(0),
-    "startcost": Decimal(100000),
-    "costcoefficient": Decimal(7.5),
+    "startcost": Decimal(500000),
+    "costcoefficient": Decimal(15),
     "bought": Decimal(0)},
     {"num": 10,
-    "name": "+ CPS*0.01 per click",
+    "name": "+1% CPS per click",
     "cost": Decimal(0),
-    "startcost": Decimal(123000),
+    "startcost": Decimal(1000000),
     "costcoefficient": Decimal(5),
     "bought": Decimal(0)},
 
@@ -436,6 +436,7 @@ delta_time = 0.000001
 game_time = -0.000001
 GameFPS = 1/delta_time
 bulkbuy = 1
+gems = Decimal(0)
 
 def constrain(val, min_val, max_val):
 
@@ -469,6 +470,7 @@ upgrade_sound = pygame.mixer.Sound("./assets/audio/Upgrade SOund 0001.wav")
 Hovering_Buttons = [0,0,0,0,0,0,0,0,0,0]
 
 while running:
+    gemboost = Decimal((50+gems)/50)
     mos_x, mos_y = pygame.mouse.get_pos()
     frames += 1
     (WindowWidth, WindowHeight) = pygame.display.get_surface().get_size()
@@ -562,7 +564,7 @@ while running:
                     if event.type == pygame.MOUSEBUTTONDOWN:
                         target_scale_x[0] = 450
                         scale_x[0] = constrain(scale_x[0]-40, 200, math.inf)
-                        score += Decimal(click_value)*Decimal(random.uniform(0.95, 1.05))*Decimal(click_value_multi) + Decimal(cps_to_cpc)*Decimal(auto_click_value)*Decimal(auto_click_rate)*Decimal(click_rate_multi)
+                        score += Decimal(click_value)*Decimal(random.uniform(0.95, 1.05))*Decimal(click_value_multi)*Decimal(gemboost) + Decimal(cps_to_cpc)*Decimal(auto_click_value)*Decimal(auto_click_rate)*Decimal(click_rate_multi)*Decimal(gemboost)
                         click_sound.play()
                         for i in range(10):
                             particle1.add_particles(pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1], 10, random.randrange(-180, 180), 4)
@@ -679,13 +681,12 @@ while running:
     scale_y[0] = scale_x[0]
     smal = pygame.transform.scale(clicker_button_image, (constrain(scale_x[0]*WindowScale2, 1, math.inf), constrain(scale_y[0]*WindowScale2, 1, math.inf)))
     # Update auto click
-    score += Decimal(auto_click_value) * Decimal(auto_click_rate) * Decimal(click_rate_multi) * Decimal(delta_time)
+    score += Decimal(auto_click_value) * Decimal(auto_click_rate) * Decimal(click_rate_multi) * Decimal(delta_time) * Decimal(gemboost)
 
 
     # Draw screen
     screen.fill((30, 30, 30))
     screen.blit(smal, (button_rect_x[0]-(scale_x[0]/2)*WindowScale2, button_rect_y[0]-(scale_y[0]/2)*WindowScale2))
-
     # Draw text
     font = pygame.font.Font("./assets/fonts/Lato/Lato-Bold.ttf", int(24*WindowScale2))
     def draw_text(text, font, color, x, y, align):
@@ -697,22 +698,23 @@ while running:
             text_rect.center = (x, y)
             screen.blit(text_surface, text_rect)
     draw_text(f"Clicks: {abbreviate(score, "s", 3, 100000, False)}", font, WHITE, 10*WindowScale2, 10*WindowScale2, "left")
-    draw_text(f"Clicks Per Click: {abbreviate(click_value + cps_to_cpc*auto_click_value*auto_click_rate*click_rate_multi/click_value_multi, "s", 3, 100000, True)}", font, WHITE, 10*WindowScale2, 40*WindowScale2, "left")
-    draw_text(f"Click Value Multiplier: x{abbreviate(click_value_multi, "s", 3, 100000, True)}", font, WHITE, 10*WindowScale2, 70*WindowScale2, "left")
-    draw_text(f"Clicks Per Second: {abbreviate(auto_click_value, "s", 3, 100000, True)}/s", font, WHITE, 10*WindowScale2, 100*WindowScale2, "left")
+    draw_text(f"Clicks Per Click: {abbreviate(click_value + cps_to_cpc*auto_click_value*auto_click_rate*click_rate_multi/click_value_multi, "s", 3, 100000, False)}", font, WHITE, 10*WindowScale2, 40*WindowScale2, "left")
+    draw_text(f"Click Value Multiplier: x{abbreviate(click_value_multi, "s", 3, 100000, False)}", font, WHITE, 10*WindowScale2, 70*WindowScale2, "left")
+    draw_text(f"Clicks Per Second: {abbreviate(auto_click_value, "s", 3, 100000, False)}/s", font, WHITE, 10*WindowScale2, 100*WindowScale2, "left")
     if delta_time > 0:
         draw_text(f"FPS: {Decimal(1/delta_time):.2f}", font, WHITE, 10*WindowScale2, 130*WindowScale2, "left")
     else:
         draw_text(f"FPS: INFINITY", font, WHITE, 10*WindowScale2, 130*WindowScale2, "left")
-    draw_text(f"Seconds Per Second: {abbreviate(auto_click_rate, "s", 3, 1000, True)}/s", font, WHITE, 10*WindowScale2, 160*WindowScale2, "left")
-    draw_text(f"Seconds Per Seconds Per Second: {abbreviate(click_rate_multi, "s", 3, 1000, True)}/s", font, WHITE, 10*WindowScale2, 190*WindowScale2, "left")
-    draw_text(f"Total Clicks Per Second: {abbreviate(auto_click_value * auto_click_rate * click_rate_multi, "s", 3, 1000, True)}/s", font, WHITE, 10*WindowScale2, 220*WindowScale2, "left")
-    draw_text(f"Total Clicks Per Click: {abbreviate(click_value * click_value_multi + cps_to_cpc*auto_click_value*auto_click_rate*click_rate_multi, "s", 3, 100000, True)}", font, WHITE, 10*WindowScale2, 250*WindowScale2, "left")
+    draw_text(f"Seconds Per Second: {abbreviate(auto_click_rate, "s", 3, 1000, False)}/s", font, WHITE, 10*WindowScale2, 160*WindowScale2, "left")
+    draw_text(f"Seconds Per Seconds Per Second: {abbreviate(click_rate_multi, "s", 3, 1000, False)}/s", font, WHITE, 10*WindowScale2, 190*WindowScale2, "left")
+    draw_text(f"Gems: {abbreviate(gems, "s", 3, 100000, True)}, {abbreviate(Decimal(gemboost), "s", 3, 100000, False)}x boost", font, WHITE, 10*WindowScale2, 220*WindowScale2, "left")
+    draw_text(f"Total Clicks Per Second: {abbreviate(auto_click_value * auto_click_rate * click_rate_multi, "s", 3, 1000, False)}/s", font, WHITE, 10*WindowScale2, 250*WindowScale2, "left")
+    draw_text(f"Total Clicks Per Click: {abbreviate((click_value*click_value_multi + cps_to_cpc*auto_click_value*auto_click_rate*click_rate_multi)*gemboost, "s", 3, 100000, False)}", font, WHITE, 10*WindowScale2, 280*WindowScale2, "left")
 
     # Draw upgrade buttons
     for i, button in enumerate(Settings_buttons):
         setx = Settings_button_x[i]
-        sety = constrain(Settings_button_y[i] + Settings_Button_Y_scroll + Settings_Button_Y_scroll_vel, WindowHeight*-0.04, WindowHeight*0.5)
+        sety = constrain(Settings_button_y[i] + Settings_Button_Y_scroll + Settings_Button_Y_scroll_vel, screen_height*-0.04, screen_height*0.5)
         if isinstance(Settings[i]["value"], Decimal):
             if Settings[i]["held"] and Settings[i]["holdable"]:
                 if mos_x/WindowXscale <= setx + Settings_button_width[i]/2:
@@ -722,25 +724,24 @@ while running:
             Settings[i]["value"] = constrain(Decimal(Settings[i]["value"]), Decimal(Settings[i]["min"]), Decimal(Settings[i]["max"]))
         if not bulkbuy == "Max": Settings[2]["value"] = "X" + str(bulkbuy)
         else: Settings[2]["value"] = "Max"
-        Settings_buttons[i] = pygame.Rect(setx*WindowScale2, sety*WindowYscale, Settings_button_width[i]*WindowScale2, Settings_button_height[i]*WindowScale2)
-        pygame.draw.rect(screen, (SettingsButtonOutlineColorRed[i], SettingsButtonOutlineColorGreen[i], SettingsButtonOutlineColorBlue[i]), (setx*WindowScale2 - 5*WindowScale2, sety*WindowYscale - 5*WindowScale2, Settings_button_width[i]*WindowScale2 + 10*WindowScale2, Settings_button_height[i]*WindowScale2 + 10*WindowScale2), 30)
-        pygame.draw.rect(screen, (SettingsButtonColorRed[i], SettingsButtonColorGreen[i], SettingsButtonColorBlue[i]), button)
+        Settings_buttons[i] = pygame.Rect(setx*WindowXscale, sety*WindowYscale, Settings_button_width[i]*WindowXscale, Settings_button_height[i]*WindowScale2)
+        pygame.draw.rect(screen, (SettingsButtonOutlineColorRed[i], SettingsButtonOutlineColorGreen[i], SettingsButtonOutlineColorBlue[i]), (setx*WindowXscale - 5*WindowScale2, sety*WindowYscale - 5*WindowScale2, Settings_button_width[i]*WindowXscale + 10*WindowScale2, Settings_button_height[i]*WindowScale2 + 10*WindowScale2), 30)
+        pygame.draw.rect(screen, (SettingsButtonColorRed[i], SettingsButtonColorGreen[i], SettingsButtonColorBlue[i]), (setx*WindowXscale, sety*WindowYscale, Settings_button_width[i]*WindowXscale, Settings_button_height[i]*WindowScale2))
         if Settings[i]["round"]:
             if Settings[i]["percent"]:
-                draw_text(f"{Settings[i]['name']} - {Decimal(round(Settings[i]['value']))}%", font, WHITE, setx*WindowScale2 + Settings_button_width[i]*WindowScale2/2, sety*WindowYscale + Settings_button_height[i]*WindowScale2/2, "center")
+                draw_text(f"{Settings[i]['name']} - {Decimal(round(Settings[i]['value']))}%", font, WHITE, setx*WindowXscale + Settings_button_width[i]*WindowXscale/2, sety*WindowYscale + Settings_button_height[i]*WindowScale2/2, "center")
             else:
-                draw_text(f"{Settings[i]['name']} - {Decimal(round(Settings[i]['value']))}", font, WHITE, setx*WindowScale2 + Settings_button_width[i]*WindowScale2/2, sety*WindowYscale + Settings_button_height[i]*WindowScale2/2, "center")
+                draw_text(f"{Settings[i]['name']} - {Decimal(round(Settings[i]['value']))}", font, WHITE, setx*WindowXscale + Settings_button_width[i]*WindowXscale/2, sety*WindowYscale + Settings_button_height[i]*WindowScale2/2, "center")
         else:
             if Settings[i]["percent"]:
-                draw_text(f"{Settings[i]['name']} - {Decimal(Settings[i]['value'])}%", font, WHITE, setx*WindowScale2 + Settings_button_width[i]*WindowScale2/2, sety*WindowYscale + Settings_button_height[i]*WindowScale2/2, "center")
+                draw_text(f"{Settings[i]['name']} - {Decimal(Settings[i]['value'])}%", font, WHITE, setx*WindowXscale + Settings_button_width[i]*WindowXscale/2, sety*WindowYscale + Settings_button_height[i]*WindowScale2/2, "center")
             else:
-                draw_text(f"{Settings[i]['name']} - {Settings[i]['value']}", font, WHITE, setx*WindowScale2 + Settings_button_width[i]*WindowScale2/2, sety*WindowYscale + Settings_button_height[i]*WindowScale2/2, "center")
+                draw_text(f"{Settings[i]['name']} - {Settings[i]['value']}", font, WHITE, setx*WindowXscale + Settings_button_width[i]*WindowXscale/2, sety*WindowYscale + Settings_button_height[i]*WindowScale2/2, "center")
         pygame.draw.rect(screen, (30, 30, 30), (900*WindowXscale, WindowHeight*0.25, 380*WindowXscale, WindowHeight*1))
         pygame.draw.rect(screen, (30, 30, 30), (900*WindowXscale, WindowHeight*0.0, 380*WindowXscale, WindowHeight*0.05))
     for i, button in enumerate(upgrade_buttons):
         def calcmax():
-            return (Decimal.__floor__( Decimal.log10( (Decimal(score) * (Decimal(upgrades[i]["costcoefficient"]) - 1)) / Decimal(upgrades[i]["startcost"] * (Decimal(upgrades[i]["costcoefficient"]) ** Decimal(upgrades[i]["bought"]))) + 1) / Decimal.log10(Decimal(upgrades[i]["costcoefficient"]))))
-        print(calcmax())
+            return constrain(Decimal.__floor__( Decimal.log10( (Decimal(score) * (Decimal(upgrades[i]["costcoefficient"]) - 1)) / Decimal(upgrades[i]["startcost"] * (Decimal(upgrades[i]["costcoefficient"]) ** Decimal(upgrades[i]["bought"]))) + 1) / Decimal.log10(Decimal(upgrades[i]["costcoefficient"]))), Decimal(1), math.inf)
         if bulkbuy == "Max":
             upgrades[i]["cost"] = Decimal(upgrades[i]["startcost"]) * (((Decimal(upgrades[i]["costcoefficient"])**Decimal(upgrades[i]["bought"])) * (Decimal(upgrades[i]["costcoefficient"])**Decimal(calcmax()) - Decimal(1))) / (Decimal(upgrades[i]["costcoefficient"])-Decimal(1)))
         else:
@@ -766,7 +767,7 @@ while running:
     particle1.emit()
     pygame.display.flip()
     pygame.display.update()
-    # clock.tick(24)
+    clock.tick(24)
 
 # Quit Pygame
 pygame.quit()
