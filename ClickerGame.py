@@ -258,56 +258,63 @@ auto_click_value = Decimal(0)
 auto_click_rate = Decimal(1)
 click_value_multi = Decimal(1)
 click_rate_multi = Decimal(1)
+cps_to_cpc = Decimal(0)
 upgrades = [
     {"num": 1,
     "name": "+1 Per Click",
-    "cost": Decimal(85),
-    "costcoefficient": Decimal(1.06),
+    "cost": Decimal(40),
+    "costcoefficient": Decimal(1.08),
     "bought": Decimal(0)},
     {"num": 2,
     "name": "Auto Clicker +0.1",
-    "cost": Decimal(40),
+    "cost": Decimal(80),
     "costcoefficient": Decimal(1.07),
     "bought": Decimal(0)},
     {"num": 3,
     "name": "Auto Click Rate +0.1",
-    "cost": Decimal(164),
-    "costcoefficient": Decimal(1.065),
+    "cost": Decimal(250),
+    "costcoefficient": Decimal(1.07),
     "bought": Decimal(0)},
     {"num": 4,
     "name": "Double Clicks (X2)",
-    "cost": Decimal(300),
+    "cost": Decimal(1500),
     "costcoefficient": Decimal(3.2),
     "bought": Decimal(0)},
     {"num": 5,
     "name": "Auto Clicker +1",
-    "cost": Decimal(500),
+    "cost": Decimal(800),
     "costcoefficient": Decimal(1.07),
     "bought": Decimal(0)},
     {"num": 6,
     "name": "Double Click Rate (X2)",
-    "cost": Decimal(800),
+    "cost": Decimal(10000),
     "costcoefficient": Decimal(4.5),
     "bought": Decimal(0)},
     {"num": 7,
     "name": "Auto Clicker +10",
-    "cost": Decimal(4500),
+    "cost": Decimal(8000),
     "costcoefficient": Decimal(1.07),
     "bought": Decimal(0)},
     {"num": 8,
     "name": "+10 Per Click",
-    "cost": Decimal(1000),
+    "cost": Decimal(400),
     "costcoefficient": Decimal(1.06),
     "bought": Decimal(0)},
     {"num": 9,
     "name": "Triple Click Rate (X3)",
-    "cost": Decimal(12345),
+    "cost": Decimal(100000),
     "costcoefficient": Decimal(7.5),
     "bought": Decimal(0)},
+    {"num": 10,
+    "name": "+ CPS*0.01 per click",
+    "cost": Decimal(123000),
+    "costcoefficient": Decimal(5),
+    "bought": Decimal(0)},
+
 ]
 upgrade_buttons = []
-upgrade_button_width = [300, 360, 400, 380, 360, 440, 360, 320, 460]
-upgrade_button_height = [50, 50, 50, 50, 50, 50, 50, 50, 50]
+upgrade_button_width = [300, 360, 400, 380, 360, 440, 360, 320, 460, 440]
+upgrade_button_height = [50, 50, 50, 50, 50, 50, 50, 50, 50, 50]
 upgrade_button_x = []
 for __ in range(1):
     a = 40
@@ -341,28 +348,37 @@ Upgrade_Button_X_scroll_vel = 0
 Settings = [
     {"num": 1,
     "name": "SFX",
-    "value": 100,
+    "value": Decimal(100),
     "percent": True,
     "round": True,
     "holdable": True,
     "held": False,
-    "min": 0,
-    "max": 100},
+    "min": Decimal(0),
+    "max": Decimal(100)},
     {"num": 2,
     "name": "Music",
-    "value": 100,
+    "value": Decimal(100),
     "percent": True,
     "round": True,
     "holdable": True,
     "held": False,
-    "min": 0,
-    "max": 100},
+    "min": Decimal(0),
+    "max": Decimal(100)},
+    {"num": 3,
+    "name": "Bulk Buy",
+    "value": "X1",
+    "percent": False,
+    "round": False,
+    "holdable": False,
+    "held": False,
+    "min": "",
+    "max": ""},
 ]
 Settings_buttons = []
-Settings_button_width = [300, 300]
-Settings_button_height = [50, 50]
-Settings_button_x = [960, 960]
-Settings_button_y = [70, 140]
+Settings_button_width = [300, 300, 300]
+Settings_button_height = [50, 50, 50]
+Settings_button_x = [960, 960, 960]
+Settings_button_y = [70, 140, 210]
 (SettingsButtonColorRed, SettingsButtonColorGreen, SettingsButtonColorBlue) = (
     [200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200],
     [200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200],
@@ -409,6 +425,7 @@ start_time = time.time()
 delta_time = 0.000001
 game_time = -0.000001
 GameFPS = 1/delta_time
+bulkbuy = 1
 
 def constrain(val, min_val, max_val):
 
@@ -472,10 +489,10 @@ while running:
             Upgrade_Button_X_scroll_vel += 60*delta_time
     if mos_y > WindowHeight*0.25 and mos_x > WindowWidth*.8 and mos_y < WindowHeight*0.5:
         Settings_Button_Y_scroll_vel -= 60*delta_time
-    elif mos_y < WindowHeight*0.02 and mos_x > WindowWidth*.8:
+    elif mos_y < WindowHeight*0.05 and mos_x > WindowWidth*.8:
         Settings_Button_Y_scroll_vel += 60*delta_time
 
-    Upgrade_Button_X_scroll = constrain(Upgrade_Button_X_scroll+Upgrade_Button_X_scroll_vel, screen_width*-1.9, 0)
+    Upgrade_Button_X_scroll = constrain(Upgrade_Button_X_scroll+Upgrade_Button_X_scroll_vel, screen_width*-2.5, 0)
     Upgrade_Button_X_scroll_vel /= 1.1
     for i, upgrade in enumerate(upgrades):
         x = upgrade_button_x[i] + Upgrade_Button_X_scroll + Upgrade_Button_X_scroll_vel
@@ -493,7 +510,7 @@ while running:
         UpgradeButtonOutlineColorRed[i] = constrain(UpgradeButtonOutlineColorRed[i], 0, 255)
         UpgradeButtonOutlineColorGreen[i] = constrain(UpgradeButtonOutlineColorGreen[i], 0, 255)
         UpgradeButtonOutlineColorBlue[i] = constrain(UpgradeButtonOutlineColorBlue[i], 0, 255)
-    Settings_Button_Y_scroll = constrain(Settings_Button_Y_scroll+Settings_Button_Y_scroll_vel, screen_height*-.1, 0)
+    Settings_Button_Y_scroll = constrain(Settings_Button_Y_scroll+Settings_Button_Y_scroll_vel, screen_height*-.25, screen_height*0.05)
     Settings_Button_Y_scroll_vel /= 1.1
     for i, setting in enumerate(Settings):
         x = Settings_button_x[i]
@@ -535,7 +552,7 @@ while running:
                     if event.type == pygame.MOUSEBUTTONDOWN:
                         target_scale_x[0] = 450
                         scale_x[0] = constrain(scale_x[0]-40, 200, math.inf)
-                        score += Decimal(click_value)*Decimal(random.uniform(0.95, 1.05))*Decimal(click_value_multi)
+                        score += Decimal(click_value)*Decimal(random.uniform(0.95, 1.05))*Decimal(click_value_multi) + Decimal(cps_to_cpc)*Decimal(auto_click_value)*Decimal(auto_click_rate)*Decimal(click_rate_multi)
                         click_sound.play()
                         for i in range(10):
                             particle1.add_particles(pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1], 10, random.randrange(-180, 180), 4)
@@ -593,6 +610,7 @@ while running:
                         score -= Decimal(upgrades[i]["cost"])
                         upgrades[i]["cost"] *= upgrades[i]["costcoefficient"]
                         upgrades[i]["bought"] += Decimal(1)
+                        upgrade_sound.play()
                         if upgrades[i]["num"] == 1:
                             click_value += Decimal(1)
                         elif upgrades[i]["num"] == 2:
@@ -611,6 +629,8 @@ while running:
                             click_value += Decimal(10)
                         elif upgrades[i]["num"] == 9:
                             click_rate_multi *= Decimal(3)
+                        elif upgrades[i]["num"] == 10:
+                            cps_to_cpc += Decimal(0.01)
             for i, button in enumerate(Settings_buttons):
                 if button.collidepoint(event.pos):
                     SettingsTargetButtonColorRed[i] = 150
@@ -620,6 +640,25 @@ while running:
                     SettingsTargetButtonOutlineColorGreen[i] = 128
                     SettingsTargetButtonOutlineColorBlue[i] = 255
                     Settings[i]["held"] = True
+                    if i == 2:
+                        if bulkbuy == 1:
+                            bulkbuy = 5
+                        elif bulkbuy == 5:
+                            bulkbuy = 10
+                        elif bulkbuy == 10:
+                            bulkbuy = 25
+                        elif bulkbuy == 25:
+                            bulkbuy = 50
+                        elif bulkbuy == 50:
+                            bulkbuy = 100
+                        elif bulkbuy == 100:
+                            bulkbuy = 500
+                        elif bulkbuy == 500:
+                            bulkbuy = 1000
+                        elif bulkbuy == 1000:
+                            bulkbuy = "Max"
+                        elif bulkbuy == "Max":
+                            bulkbuy = 1
     scale_x[0] += (target_scale_x[0]-scale_x[0])/(0.15/delta_time)
     scale_y[0] = scale_x[0]
     smal = pygame.transform.scale(clicker_button_image, (constrain(scale_x[0]*WindowScale2, 1, math.inf), constrain(scale_y[0]*WindowScale2, 1, math.inf)))
@@ -642,7 +681,7 @@ while running:
             text_rect.center = (x, y)
             screen.blit(text_surface, text_rect)
     draw_text(f"Clicks: {abbreviate(score, "s", 3, 100000, False)}", font, WHITE, 10*WindowScale2, 10*WindowScale2, "left")
-    draw_text(f"Clicks Per Click: {abbreviate(click_value, "s", 3, 100000, True)}", font, WHITE, 10*WindowScale2, 40*WindowScale2, "left")
+    draw_text(f"Clicks Per Click: {abbreviate(click_value + cps_to_cpc*auto_click_value*auto_click_rate*click_rate_multi/click_value_multi, "s", 3, 100000, True)}", font, WHITE, 10*WindowScale2, 40*WindowScale2, "left")
     draw_text(f"Click Value Multiplier: x{abbreviate(click_value_multi, "s", 3, 100000, True)}", font, WHITE, 10*WindowScale2, 70*WindowScale2, "left")
     draw_text(f"Clicks Per Second: {abbreviate(auto_click_value, "s", 3, 100000, True)}/s", font, WHITE, 10*WindowScale2, 100*WindowScale2, "left")
     if delta_time > 0:
@@ -652,29 +691,32 @@ while running:
     draw_text(f"Seconds Per Second: {abbreviate(auto_click_rate, "s", 3, 1000, True)}/s", font, WHITE, 10*WindowScale2, 160*WindowScale2, "left")
     draw_text(f"Seconds Per Seconds Per Second: {abbreviate(click_rate_multi, "s", 3, 1000, True)}/s", font, WHITE, 10*WindowScale2, 190*WindowScale2, "left")
     draw_text(f"Total Clicks Per Second: {abbreviate(auto_click_value * auto_click_rate * click_rate_multi, "s", 3, 1000, True)}/s", font, WHITE, 10*WindowScale2, 220*WindowScale2, "left")
-    draw_text(f"Total Clicks Per Click: {abbreviate(click_value * click_value_multi, "s", 3, 100000, True)}", font, WHITE, 10*WindowScale2, 250*WindowScale2, "left")
+    draw_text(f"Total Clicks Per Click: {abbreviate(click_value * click_value_multi + cps_to_cpc*auto_click_value*auto_click_rate*click_rate_multi, "s", 3, 100000, True)}", font, WHITE, 10*WindowScale2, 250*WindowScale2, "left")
 
     # Draw upgrade buttons
     for i, button in enumerate(Settings_buttons):
         setx = Settings_button_x[i]
         sety = constrain(Settings_button_y[i] + Settings_Button_Y_scroll + Settings_Button_Y_scroll_vel, WindowHeight*-0.04, WindowHeight*0.5)
-        if Settings[i]["held"] and Settings[i]["holdable"]:
-            if mos_x/WindowXscale <= setx + Settings_button_width[i]/2:
-                Settings[i]["value"] -= Decimal(20*delta_time)
-            if mos_x/WindowXscale >= setx + Settings_button_width[i]/2:
-                Settings[i]["value"] += Decimal(20*delta_time)
-        Settings[i]["value"] = constrain(Settings[i]["value"], Settings[i]["min"], Settings[i]["max"])
+        if isinstance(Settings[i]["value"], Decimal):
+            if Settings[i]["held"] and Settings[i]["holdable"]:
+                if mos_x/WindowXscale <= setx + Settings_button_width[i]/2:
+                    Settings[i]["value"] -= Decimal(20*delta_time)
+                if mos_x/WindowXscale >= setx + Settings_button_width[i]/2:
+                    Settings[i]["value"] += Decimal(20*delta_time)
+            Settings[i]["value"] = constrain(Decimal(Settings[i]["value"]), Decimal(Settings[i]["min"]), Decimal(Settings[i]["max"]))
+        if not bulkbuy == "Max": Settings[2]["value"] = "X" + str(bulkbuy)
+        else: Settings[2]["value"] = "Max"
         Settings_buttons[i] = pygame.Rect(setx*WindowScale2, sety*WindowYscale, Settings_button_width[i]*WindowScale2, Settings_button_height[i]*WindowScale2)
         pygame.draw.rect(screen, (SettingsButtonOutlineColorRed[i], SettingsButtonOutlineColorGreen[i], SettingsButtonOutlineColorBlue[i]), (setx*WindowScale2 - 5*WindowScale2, sety*WindowYscale - 5*WindowScale2, Settings_button_width[i]*WindowScale2 + 10*WindowScale2, Settings_button_height[i]*WindowScale2 + 10*WindowScale2), 30)
         pygame.draw.rect(screen, (SettingsButtonColorRed[i], SettingsButtonColorGreen[i], SettingsButtonColorBlue[i]), button)
         if Settings[i]["round"]:
             if Settings[i]["percent"]:
-                draw_text(f"{Settings[i]['name']} - {round(Settings[i]['value'])}%", font, WHITE, setx*WindowScale2 + Settings_button_width[i]*WindowScale2/2, sety*WindowYscale + Settings_button_height[i]*WindowScale2/2, "center")
+                draw_text(f"{Settings[i]['name']} - {Decimal(round(Settings[i]['value']))}%", font, WHITE, setx*WindowScale2 + Settings_button_width[i]*WindowScale2/2, sety*WindowYscale + Settings_button_height[i]*WindowScale2/2, "center")
             else:
-                draw_text(f"{Settings[i]['name']} - {round(Settings[i]['value'])}", font, WHITE, setx*WindowScale2 + Settings_button_width[i]*WindowScale2/2, sety*WindowYscale + Settings_button_height[i]*WindowScale2/2, "center")
+                draw_text(f"{Settings[i]['name']} - {Decimal(round(Settings[i]['value']))}", font, WHITE, setx*WindowScale2 + Settings_button_width[i]*WindowScale2/2, sety*WindowYscale + Settings_button_height[i]*WindowScale2/2, "center")
         else:
             if Settings[i]["percent"]:
-                draw_text(f"{Settings[i]['name']} - {Settings[i]['value']}%", font, WHITE, setx*WindowScale2 + Settings_button_width[i]*WindowScale2/2, sety*WindowYscale + Settings_button_height[i]*WindowScale2/2, "center")
+                draw_text(f"{Settings[i]['name']} - {Decimal(Settings[i]['value'])}%", font, WHITE, setx*WindowScale2 + Settings_button_width[i]*WindowScale2/2, sety*WindowYscale + Settings_button_height[i]*WindowScale2/2, "center")
             else:
                 draw_text(f"{Settings[i]['name']} - {Settings[i]['value']}", font, WHITE, setx*WindowScale2 + Settings_button_width[i]*WindowScale2/2, sety*WindowYscale + Settings_button_height[i]*WindowScale2/2, "center")
         pygame.draw.rect(screen, (30, 30, 30), (900*WindowXscale, WindowHeight*0.25, 380*WindowXscale, WindowHeight*1))
@@ -687,9 +729,12 @@ while running:
         pygame.draw.rect(screen, (UpgradeButtonOutlineColorRed[i], UpgradeButtonOutlineColorGreen[i], UpgradeButtonOutlineColorBlue[i]), (upgx*WindowScale2 - 5*WindowScale2, upgy*WindowYscale - 5*WindowScale2, upgrade_button_width[i]*WindowScale2 + 10*WindowScale2, upgrade_button_height[i]*WindowScale2 + 10*WindowScale2), 30)
         pygame.draw.rect(screen, (UpgradeButtonColorRed[i], UpgradeButtonColorGreen[i], UpgradeButtonColorBlue[i]), button)
         draw_text(f"{upgrades[i]['name']} - {abbreviate(upgrades[i]['cost'], "s", 3, 10000, False)}", font, WHITE, upgx*WindowScale2 + upgrade_button_width[i]*WindowScale2/2, upgy*WindowYscale + upgrade_button_height[i]*WindowScale2/2, "center")
-        draw_text(f"{abbreviate(upgrades[i]["bought"], "s", 3, 100000, True)}", font, WHITE, upgx*WindowScale2, upgy*WindowYscale - 38*WindowScale2, "left")
+        draw_text(f"{abbreviate(upgrades[i]["bought"], "s", 3, 100000, True)} + {bulkbuy}", font, WHITE, upgx*WindowScale2, upgy*WindowYscale - 38*WindowScale2, "left")
 
     pygame.mixer.music.set_volume(pygamemixermusic * Settings[1]["value"] / 100)
+    upgrade_sound.set_volume(Settings[0]["value"]/100)
+    hover_sound.set_volume(Settings[0]["value"]/100)
+    click_sound.set_volume(Settings[0]["value"]/100)
 
     # Update display
     particle1.emit()
