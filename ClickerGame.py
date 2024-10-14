@@ -636,7 +636,7 @@ while running:
         elif align == "center":
             text_rect.center = (x, y)
             screen.blit(text_surface, text_rect)
-    draw_text(f"Clicks: {abbreviate(score, "s", 3, 100000, True)}", font, WHITE, 10*WindowScale2, 10*WindowScale2, "left")
+    draw_text(f"Clicks: {abbreviate(score, "s", 3, 100000, False)}", font, WHITE, 10*WindowScale2, 10*WindowScale2, "left")
     draw_text(f"Clicks Per Click: {abbreviate(click_value, "s", 3, 100000, True)}", font, WHITE, 10*WindowScale2, 40*WindowScale2, "left")
     draw_text(f"Click Value Multiplier: x{abbreviate(click_value_multi, "s", 3, 100000, True)}", font, WHITE, 10*WindowScale2, 70*WindowScale2, "left")
     draw_text(f"Clicks Per Second: {abbreviate(auto_click_value, "s", 3, 100000, True)}/s", font, WHITE, 10*WindowScale2, 100*WindowScale2, "left")
