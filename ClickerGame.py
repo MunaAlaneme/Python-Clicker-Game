@@ -243,7 +243,7 @@ PARTICLE_EVENT = pygame.USEREVENT + 1
 # pygame.time.set_timer(PARTICLE_EVENT, 20)
 
 # Font
-font = pygame.font.Font("./GameLauncher/assets/games/ClickerGame/assets/fonts/Lato/Lato-Bold.ttf", 24)
+font = pygame.font.Font("./assets/fonts/Lato/Lato-Bold.ttf", 24)
 
 # Colors
 WHITE = (255, 255, 255)
@@ -386,7 +386,7 @@ Settings_button_y = [70, 140]
 Settings_Button_Y_scroll = 0
 Settings_Button_Y_scroll_vel = 0
 # Clicker button
-clicker_button_image = pygame.image.load("./GameLauncher/assets/games/ClickerGame/assets/img/copilot.png").convert_alpha()
+clicker_button_image = pygame.image.load("./assets/img/copilot.png").convert_alpha()
 # clicker_button_rect = clicker_button_image.get_rect(center=(screen_width // 2, screen_height // 2))
 
 # Upgrade button setup
@@ -420,19 +420,19 @@ pygame.mixer.init()
 def PlayMusic(musNum):
     if musNum == 1:
         pygame.mixer.music.set_volume(0.25)
-        pygame.mixer.music.load("./GameLauncher/assets/games/ClickerGame/assets/audio/Debug Menu Unused   Paper Mario  The Thousand Year Door.wav")
+        pygame.mixer.music.load("./assets/audio/Debug Menu Unused   Paper Mario  The Thousand Year Door.wav")
     elif musNum == 2:
         pygame.mixer.music.set_volume(1)
-        pygame.mixer.music.load("./GameLauncher/assets/games/ClickerGame/assets/audio/SpongeBob SquarePants OST - Dombummel (LQ).wav")
+        pygame.mixer.music.load("./assets/audio/SpongeBob SquarePants OST - Dombummel (LQ).wav")
     elif musNum == 3:
         pygame.mixer.music.set_volume(0.7)
-        pygame.mixer.music.load("./GameLauncher/assets/games/ClickerGame/assets/audio/Kevin MacLeod - Hep Cats.mp3")
+        pygame.mixer.music.load("./assets/audio/Kevin MacLeod - Hep Cats.mp3")
     pygame.mixer.music.play(loops=-1)
 PlayMusic(random.randint(1,3))
 
-click_sound = pygame.mixer.Sound("./GameLauncher/assets/games/ClickerGame/assets/audio/Click mouse - Fugitive Simulator - The-Nick-of-Time.wav")
-hover_sound = pygame.mixer.Sound("./GameLauncher/assets/games/ClickerGame/assets/audio/251389__deadsillyrabbit__button_hover-wav.wav")
-upgrade_sound = pygame.mixer.Sound("./GameLauncher/assets/games/ClickerGame/assets/audio/Upgrade SOund 0001.wav")
+click_sound = pygame.mixer.Sound("./assets/audio/Click mouse - Fugitive Simulator - The-Nick-of-Time.wav")
+hover_sound = pygame.mixer.Sound("./assets/audio/251389__deadsillyrabbit__button_hover-wav.wav")
+upgrade_sound = pygame.mixer.Sound("./assets/audio/Upgrade SOund 0001.wav")
 
 Hovering_Buttons = [0,0,0,0,0,0,0,0,0,0]
 
@@ -627,7 +627,7 @@ while running:
     screen.blit(smal, (button_rect_x[0]-(scale_x[0]/2)*WindowScale2, button_rect_y[0]-(scale_y[0]/2)*WindowScale2))
 
     # Draw text
-    font = pygame.font.Font("./GameLauncher/assets/games/ClickerGame/assets/fonts/Lato/Lato-Bold.ttf", int(24*WindowScale2))
+    font = pygame.font.Font("./assets/fonts/Lato/Lato-Bold.ttf", int(24*WindowScale2))
     def draw_text(text, font, color, x, y, align):
         text_surface = font.render(text, True, color)
         text_rect = text_surface.get_rect()
