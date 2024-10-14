@@ -263,51 +263,61 @@ upgrades = [
     {"num": 1,
     "name": "+1 Per Click",
     "cost": Decimal(40),
+    "startcost": Decimal(40),
     "costcoefficient": Decimal(1.08),
     "bought": Decimal(0)},
     {"num": 2,
     "name": "Auto Clicker +0.1",
     "cost": Decimal(80),
+    "startcost": Decimal(80),
     "costcoefficient": Decimal(1.07),
     "bought": Decimal(0)},
     {"num": 3,
     "name": "Auto Click Rate +0.1",
     "cost": Decimal(250),
+    "startcost": Decimal(250),
     "costcoefficient": Decimal(1.07),
     "bought": Decimal(0)},
     {"num": 4,
     "name": "Double Clicks (X2)",
     "cost": Decimal(1500),
+    "startcost": Decimal(1500),
     "costcoefficient": Decimal(3.2),
     "bought": Decimal(0)},
     {"num": 5,
     "name": "Auto Clicker +1",
     "cost": Decimal(800),
+    "startcost": Decimal(800),
     "costcoefficient": Decimal(1.07),
     "bought": Decimal(0)},
     {"num": 6,
     "name": "Double Click Rate (X2)",
     "cost": Decimal(10000),
+    "startcost": Decimal(10000),
     "costcoefficient": Decimal(4.5),
     "bought": Decimal(0)},
     {"num": 7,
     "name": "Auto Clicker +10",
     "cost": Decimal(8000),
+    "startcost": Decimal(8000),
     "costcoefficient": Decimal(1.07),
     "bought": Decimal(0)},
     {"num": 8,
     "name": "+10 Per Click",
     "cost": Decimal(400),
+    "startcost": Decimal(400),
     "costcoefficient": Decimal(1.06),
     "bought": Decimal(0)},
     {"num": 9,
     "name": "Triple Click Rate (X3)",
     "cost": Decimal(100000),
+    "startcost": Decimal(100000),
     "costcoefficient": Decimal(7.5),
     "bought": Decimal(0)},
     {"num": 10,
     "name": "+ CPS*0.01 per click",
     "cost": Decimal(123000),
+    "startcost": Decimal(123000),
     "costcoefficient": Decimal(5),
     "bought": Decimal(0)},
 
@@ -607,30 +617,33 @@ while running:
                     UpgradeTargetButtonOutlineColorGreen[i] = 128
                     UpgradeTargetButtonOutlineColorBlue[i] = 255
                     if Decimal(score) >= Decimal(upgrades[i]["cost"]):
+                        if bulkbuy == "Max":
+                            buy00001 = Decimal(calcmax())
+                        else:
+                            buy00001 = Decimal(bulkbuy)
                         score -= Decimal(upgrades[i]["cost"])
-                        upgrades[i]["cost"] *= upgrades[i]["costcoefficient"]
-                        upgrades[i]["bought"] += Decimal(1)
+                        upgrades[i]["bought"] += Decimal(buy00001)
                         upgrade_sound.play()
                         if upgrades[i]["num"] == 1:
-                            click_value += Decimal(1)
+                            click_value += Decimal(1) * Decimal(buy00001)
                         elif upgrades[i]["num"] == 2:
-                            auto_click_value += Decimal(0.1)
+                            auto_click_value += Decimal(0.1) * Decimal(buy00001)
                         elif upgrades[i]["num"] == 3:
-                            auto_click_rate += Decimal(0.1)
+                            auto_click_rate += Decimal(0.1) * Decimal(buy00001)
                         elif upgrades[i]["num"] == 4:
-                            click_value_multi *= Decimal(2)
+                            click_value_multi *= Decimal(2) ** Decimal(buy00001)
                         elif upgrades[i]["num"] == 5:
-                            auto_click_value += Decimal(1)
+                            auto_click_value += Decimal(1) * Decimal(buy00001)
                         elif upgrades[i]["num"] == 6:
-                            click_rate_multi *= Decimal(2)
+                            click_rate_multi *= Decimal(2) ** Decimal(buy00001)
                         elif upgrades[i]["num"] == 7:
-                            auto_click_value += Decimal(10)
+                            auto_click_value += Decimal(10) * Decimal(buy00001)
                         elif upgrades[i]["num"] == 8:
-                            click_value += Decimal(10)
+                            click_value += Decimal(10) * Decimal(buy00001)
                         elif upgrades[i]["num"] == 9:
-                            click_rate_multi *= Decimal(3)
+                            click_rate_multi *= Decimal(3) ** Decimal(buy00001)
                         elif upgrades[i]["num"] == 10:
-                            cps_to_cpc += Decimal(0.01)
+                            cps_to_cpc += Decimal(0.01) * Decimal(buy00001)
             for i, button in enumerate(Settings_buttons):
                 if button.collidepoint(event.pos):
                     SettingsTargetButtonColorRed[i] = 150
@@ -722,6 +735,13 @@ while running:
         pygame.draw.rect(screen, (30, 30, 30), (900*WindowXscale, WindowHeight*0.25, 380*WindowXscale, WindowHeight*1))
         pygame.draw.rect(screen, (30, 30, 30), (900*WindowXscale, WindowHeight*0.0, 380*WindowXscale, WindowHeight*0.05))
     for i, button in enumerate(upgrade_buttons):
+        def calcmax():
+            return (Decimal.__floor__( Decimal.log10( (Decimal(score) * (Decimal(upgrades[i]["costcoefficient"]) - 1)) / Decimal(upgrades[i]["startcost"] * (Decimal(upgrades[i]["costcoefficient"]) ** Decimal(upgrades[i]["bought"]))) + 1) / Decimal.log10(Decimal(upgrades[i]["costcoefficient"]))))
+        print(calcmax())
+        if bulkbuy == "Max":
+            upgrades[i]["cost"] = Decimal(upgrades[i]["startcost"]) * (((Decimal(upgrades[i]["costcoefficient"])**Decimal(upgrades[i]["bought"])) * (Decimal(upgrades[i]["costcoefficient"])**Decimal(calcmax()) - Decimal(1))) / (Decimal(upgrades[i]["costcoefficient"])-Decimal(1)))
+        else:
+            upgrades[i]["cost"] = Decimal(upgrades[i]["startcost"]) * (((Decimal(upgrades[i]["costcoefficient"])**Decimal(upgrades[i]["bought"])) * (Decimal(upgrades[i]["costcoefficient"])**Decimal(bulkbuy) - Decimal(1))) / (Decimal(upgrades[i]["costcoefficient"])-Decimal(1)))
         upgx = upgrade_button_x[i] + Upgrade_Button_X_scroll + Upgrade_Button_X_scroll_vel
         upgy = (screen_height - upgrade_button_height[i]) - 20
         upgrade_buttons[i] = pygame.Rect(upgx*WindowScale2, upgy*WindowYscale, upgrade_button_width[i]*WindowScale2, upgrade_button_height[i]*WindowScale2)
@@ -729,7 +749,10 @@ while running:
         pygame.draw.rect(screen, (UpgradeButtonOutlineColorRed[i], UpgradeButtonOutlineColorGreen[i], UpgradeButtonOutlineColorBlue[i]), (upgx*WindowScale2 - 5*WindowScale2, upgy*WindowYscale - 5*WindowScale2, upgrade_button_width[i]*WindowScale2 + 10*WindowScale2, upgrade_button_height[i]*WindowScale2 + 10*WindowScale2), 30)
         pygame.draw.rect(screen, (UpgradeButtonColorRed[i], UpgradeButtonColorGreen[i], UpgradeButtonColorBlue[i]), button)
         draw_text(f"{upgrades[i]['name']} - {abbreviate(upgrades[i]['cost'], "s", 3, 10000, False)}", font, WHITE, upgx*WindowScale2 + upgrade_button_width[i]*WindowScale2/2, upgy*WindowYscale + upgrade_button_height[i]*WindowScale2/2, "center")
-        draw_text(f"{abbreviate(upgrades[i]["bought"], "s", 3, 100000, True)} + {bulkbuy}", font, WHITE, upgx*WindowScale2, upgy*WindowYscale - 38*WindowScale2, "left")
+        if bulkbuy == "Max":
+            draw_text(f"{abbreviate(upgrades[i]["bought"], "s", 3, 100000, True)} + Max ({Decimal(calcmax())})", font, WHITE, upgx*WindowScale2, upgy*WindowYscale - 38*WindowScale2, "left")
+        else:
+            draw_text(f"{abbreviate(upgrades[i]["bought"], "s", 3, 100000, True)} + {bulkbuy}", font, WHITE, upgx*WindowScale2, upgy*WindowYscale - 38*WindowScale2, "left")
 
     pygame.mixer.music.set_volume(pygamemixermusic * Settings[1]["value"] / 100)
     upgrade_sound.set_volume(Settings[0]["value"]/100)
