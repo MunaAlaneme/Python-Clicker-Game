@@ -417,18 +417,23 @@ def constrain(val, min_val, max_val):
     return val
 
 pygame.mixer.init()
+pygamemixermusic = 1
 def PlayMusic(musNum):
+    pygamemixermusic = 1
     if musNum == 1:
-        pygame.mixer.music.set_volume(0.25)
+        pygamemixermusic = 0.25
         pygame.mixer.music.load("./assets/audio/Debug Menu Unused   Paper Mario  The Thousand Year Door.wav")
     elif musNum == 2:
-        pygame.mixer.music.set_volume(1)
+        pygamemixermusic = 1
         pygame.mixer.music.load("./assets/audio/SpongeBob SquarePants OST - Dombummel (LQ).wav")
     elif musNum == 3:
-        pygame.mixer.music.set_volume(0.7)
+        pygamemixermusic = 0.7
         pygame.mixer.music.load("./assets/audio/Kevin MacLeod - Hep Cats.mp3")
+    elif musNum == 4:
+        pygamemixermusic = 1
+        pygame.mixer.music.load("./assets/audio/(Object Break) Kevin MacLeod - Padanaya Blokov - loop.wav")
     pygame.mixer.music.play(loops=-1)
-PlayMusic(random.randint(1,3))
+PlayMusic(random.randint(1,4))
 
 click_sound = pygame.mixer.Sound("./assets/audio/Click mouse - Fugitive Simulator - The-Nick-of-Time.wav")
 hover_sound = pygame.mixer.Sound("./assets/audio/251389__deadsillyrabbit__button_hover-wav.wav")
@@ -683,6 +688,8 @@ while running:
         pygame.draw.rect(screen, (UpgradeButtonColorRed[i], UpgradeButtonColorGreen[i], UpgradeButtonColorBlue[i]), button)
         draw_text(f"{upgrades[i]['name']} - {abbreviate(upgrades[i]['cost'], "s", 3, 10000, False)}", font, WHITE, upgx*WindowScale2 + upgrade_button_width[i]*WindowScale2/2, upgy*WindowYscale + upgrade_button_height[i]*WindowScale2/2, "center")
         draw_text(f"{abbreviate(upgrades[i]["bought"], "s", 3, 100000, True)}", font, WHITE, upgx*WindowScale2, upgy*WindowYscale - 38*WindowScale2, "left")
+
+    pygame.mixer.music.set_volume(pygamemixermusic * Settings[1]["value"] / 100)
 
     # Update display
     particle1.emit()
