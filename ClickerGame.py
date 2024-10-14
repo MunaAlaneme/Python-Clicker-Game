@@ -262,37 +262,37 @@ cps_to_cpc = Decimal(0)
 upgrades = [
     {"num": 1,
     "name": "+1 Per Click",
-    "cost": Decimal(40),
+    "cost": Decimal(0),
     "startcost": Decimal(40),
-    "costcoefficient": Decimal(1.08),
+    "costcoefficient": Decimal(1.1),
     "bought": Decimal(0)},
     {"num": 2,
     "name": "Auto Clicker +0.1",
-    "cost": Decimal(80),
+    "cost": Decimal(0),
     "startcost": Decimal(80),
-    "costcoefficient": Decimal(1.07),
+    "costcoefficient": Decimal(1.1),
     "bought": Decimal(0)},
     {"num": 3,
     "name": "Auto Click Rate +0.1",
-    "cost": Decimal(250),
-    "startcost": Decimal(250),
-    "costcoefficient": Decimal(1.07),
+    "cost": Decimal(0),
+    "startcost": Decimal(500),
+    "costcoefficient": Decimal(1.1),
     "bought": Decimal(0)},
     {"num": 4,
     "name": "Double Clicks (X2)",
-    "cost": Decimal(1500),
+    "cost": Decimal(0),
     "startcost": Decimal(1500),
     "costcoefficient": Decimal(3.2),
     "bought": Decimal(0)},
     {"num": 5,
     "name": "Auto Clicker +1",
-    "cost": Decimal(800),
+    "cost": Decimal(0),
     "startcost": Decimal(800),
     "costcoefficient": Decimal(1.07),
     "bought": Decimal(0)},
     {"num": 6,
     "name": "Double Click Rate (X2)",
-    "cost": Decimal(10000),
+    "cost": Decimal(0),
     "startcost": Decimal(10000),
     "costcoefficient": Decimal(4.5),
     "bought": Decimal(0)},
@@ -304,19 +304,19 @@ upgrades = [
     "bought": Decimal(0)},
     {"num": 8,
     "name": "+10 Per Click",
-    "cost": Decimal(400),
+    "cost": Decimal(0),
     "startcost": Decimal(400),
     "costcoefficient": Decimal(1.06),
     "bought": Decimal(0)},
     {"num": 9,
     "name": "Triple Click Rate (X3)",
-    "cost": Decimal(100000),
+    "cost": Decimal(0),
     "startcost": Decimal(100000),
     "costcoefficient": Decimal(7.5),
     "bought": Decimal(0)},
     {"num": 10,
     "name": "+ CPS*0.01 per click",
-    "cost": Decimal(123000),
+    "cost": Decimal(0),
     "startcost": Decimal(123000),
     "costcoefficient": Decimal(5),
     "bought": Decimal(0)},
@@ -623,7 +623,9 @@ while running:
                             buy00001 = Decimal(bulkbuy)
                         score -= Decimal(upgrades[i]["cost"])
                         upgrades[i]["bought"] += Decimal(buy00001)
+                        upgrade_sound.stop()
                         upgrade_sound.play()
+                        click_sound.play()
                         if upgrades[i]["num"] == 1:
                             click_value += Decimal(1) * Decimal(buy00001)
                         elif upgrades[i]["num"] == 2:
@@ -646,6 +648,7 @@ while running:
                             cps_to_cpc += Decimal(0.01) * Decimal(buy00001)
             for i, button in enumerate(Settings_buttons):
                 if button.collidepoint(event.pos):
+                    click_sound.play()
                     SettingsTargetButtonColorRed[i] = 150
                     SettingsTargetButtonColorGreen[i] = 75
                     SettingsTargetButtonColorBlue[i] = 0
@@ -745,7 +748,7 @@ while running:
         upgx = upgrade_button_x[i] + Upgrade_Button_X_scroll + Upgrade_Button_X_scroll_vel
         upgy = (screen_height - upgrade_button_height[i]) - 20
         upgrade_buttons[i] = pygame.Rect(upgx*WindowScale2, upgy*WindowYscale, upgrade_button_width[i]*WindowScale2, upgrade_button_height[i]*WindowScale2)
-        pygame.draw.rect(screen, (UpgradeButtonColorRed[i], UpgradeButtonColorGreen[i], UpgradeButtonColorBlue[i]), (upgx*WindowScale2 - 5*WindowScale2, upgy*WindowYscale - 40*WindowScale2, 150*WindowScale2, upgrade_button_height[i]*WindowScale2 - 15*WindowScale2), 30)
+        pygame.draw.rect(screen, (UpgradeButtonColorRed[i], UpgradeButtonColorGreen[i], UpgradeButtonColorBlue[i]), (upgx*WindowScale2 - 5*WindowScale2, upgy*WindowYscale - 40*WindowScale2, 200*WindowScale2, upgrade_button_height[i]*WindowScale2 - 15*WindowScale2), 30)
         pygame.draw.rect(screen, (UpgradeButtonOutlineColorRed[i], UpgradeButtonOutlineColorGreen[i], UpgradeButtonOutlineColorBlue[i]), (upgx*WindowScale2 - 5*WindowScale2, upgy*WindowYscale - 5*WindowScale2, upgrade_button_width[i]*WindowScale2 + 10*WindowScale2, upgrade_button_height[i]*WindowScale2 + 10*WindowScale2), 30)
         pygame.draw.rect(screen, (UpgradeButtonColorRed[i], UpgradeButtonColorGreen[i], UpgradeButtonColorBlue[i]), button)
         draw_text(f"{upgrades[i]['name']} - {abbreviate(upgrades[i]['cost'], "s", 3, 10000, False)}", font, WHITE, upgx*WindowScale2 + upgrade_button_width[i]*WindowScale2/2, upgy*WindowYscale + upgrade_button_height[i]*WindowScale2/2, "center")
