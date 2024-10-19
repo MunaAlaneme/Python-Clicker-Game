@@ -14,6 +14,7 @@ import sys
 import time
 import os
 import numpy as np
+import svg
 
 GameFPS = 60
 
@@ -264,9 +265,9 @@ upgrades = [
     {"num": 1,
     "name": "+1 Per Click",
     "cost": Decimal(0),
-    "startcost": Decimal(40),
+    "startcost": Decimal(40/1.1),
     "costcoefficient": Decimal(1.1),
-    "bought": Decimal(0)},
+    "bought": Decimal(1)},
     {"num": 2,
     "name": "Auto Clicker +0.1",
     "cost": Decimal(0),
@@ -424,6 +425,8 @@ Settings_Button_Y_scroll_vel = 0
 # Clicker button
 clicker_button_image = pygame.image.load("./assets/img/copilot.png").convert_alpha()
 # clicker_button_rect = clicker_button_image.get_rect(center=(screen_width // 2, screen_height // 2))
+arrow_down_img1 = pygame.image.load("./assets/img/Arrow1-c.png").convert_alpha()
+arrow_up_img1 = pygame.image.load("./assets/img/Arrow1-d.png").convert_alpha()
 
 # Upgrade button setup
 for i, upgrade in enumerate(upgrades):
@@ -509,9 +512,9 @@ while running:
             Upgrade_Button_X_scroll_vel -= 60*delta_time
         elif mos_x < WindowWidth - WindowWidth/1.1:
             Upgrade_Button_X_scroll_vel += 60*delta_time
-    if mos_y > WindowHeight*0.25 and mos_x > WindowWidth*.8 and mos_y < WindowHeight*0.5:
+    if mos_y > WindowHeight*0.35 and mos_x > WindowWidth*.75 and mos_y < WindowHeight*0.5:
         Settings_Button_Y_scroll_vel -= 60*delta_time
-    elif mos_y < WindowHeight*0.05 and mos_x > WindowWidth*.8:
+    elif mos_y < WindowHeight*0.1 and mos_x > WindowWidth*.75:
         Settings_Button_Y_scroll_vel += 60*delta_time
 
     Upgrade_Button_X_scroll = constrain(Upgrade_Button_X_scroll+Upgrade_Button_X_scroll_vel, screen_width*-2.5, 0)
@@ -695,14 +698,16 @@ while running:
                             Settings[3]["value"] = "OFF"
     scale_x[0] += (target_scale_x[0]-scale_x[0])/(0.15/delta_time)
     scale_y[0] = scale_x[0]
-    smal = pygame.transform.scale(clicker_button_image, (constrain(scale_x[0]*WindowScale2, 1, math.inf), constrain(scale_y[0]*WindowScale2, 1, math.inf)))
+    smalclicrimg = pygame.transform.scale(clicker_button_image, (constrain(scale_x[0]*WindowScale2, 1, math.inf), constrain(scale_y[0]*WindowScale2, 1, math.inf)))
+    realarrowdownimg1 = pygame.transform.scale(arrow_down_img1, (32 * WindowScale2, 32 * WindowScale2))
+    realarrowupimg1 = pygame.transform.scale(arrow_up_img1, (32 * WindowScale2, 32 * WindowScale2))
     # Update auto click
     score += Decimal(auto_click_value) * Decimal(auto_click_rate) * Decimal(click_rate_multi) * Decimal(delta_time) * Decimal(gemboost)
 
 
     # Draw screen
     screen.fill((30, 30, 30))
-    screen.blit(smal, (button_rect_x[0]-(scale_x[0]/2)*WindowScale2, button_rect_y[0]-(scale_y[0]/2)*WindowScale2))
+    screen.blit(smalclicrimg, (button_rect_x[0]-(scale_x[0]/2)*WindowScale2, button_rect_y[0]-(scale_y[0]/2)*WindowScale2))
     # Draw text
     font = pygame.font.Font("./assets/fonts/Lato/Lato-Bold.ttf", int(24*WindowScale2))
     def draw_text(text, font, color, x, y, align):
@@ -752,8 +757,10 @@ while running:
             draw_text(f"{Settings[i]['name']} - {Decimal(Settings[i]['value'])}%", font, WHITE, setx*WindowXscale + Settings_button_width[i]*WindowXscale/2, sety*WindowYscale + Settings_button_height[i]*WindowScale2/2, "center")
         else:
             draw_text(f"{Settings[i]['name']} - {Settings[i]['value']}", font, WHITE, setx*WindowXscale + Settings_button_width[i]*WindowXscale/2, sety*WindowYscale + Settings_button_height[i]*WindowScale2/2, "center")
-        pygame.draw.rect(screen, (30, 30, 30), (900*WindowXscale, WindowHeight*0.25, 380*WindowXscale, WindowHeight*1))
-        pygame.draw.rect(screen, (30, 30, 30), (900*WindowXscale, WindowHeight*0.0, 380*WindowXscale, WindowHeight*0.05))
+    pygame.draw.rect(screen, (30, 30, 30), (900*WindowXscale, WindowHeight*0.35, 380*WindowXscale, WindowHeight*1))
+    pygame.draw.rect(screen, (30, 30, 30), (900*WindowXscale, WindowHeight*0.0, 380*WindowXscale, WindowHeight*0.1))
+    draw_text(f"Options", pygame.font.Font("./assets/fonts/Lato/Lato-Bold.ttf", int(36*WindowScale2)), WHITE, 1110*WindowXscale, 18 * WindowYscale, "center")
+    draw_text(f"Upgrades", pygame.font.Font("./assets/fonts/Lato/Lato-Bold.ttf", int(36*WindowScale2)), WHITE, 30*WindowXscale, 540 * WindowYscale, "left")
     for i, button in enumerate(upgrade_buttons):
         def calcmax():
             return constrain(Decimal.__floor__( Decimal.log10( (Decimal(score) * (Decimal(upgrades[i]["costcoefficient"]) - 1)) / Decimal(upgrades[i]["startcost"] * (Decimal(upgrades[i]["costcoefficient"]) ** Decimal(upgrades[i]["bought"]))) + 1) / Decimal.log10(Decimal(upgrades[i]["costcoefficient"]))), Decimal(1), math.inf)
@@ -776,6 +783,12 @@ while running:
             draw_text(f"{abbreviate(upgrades[i]["bought"], "s", 3, 100000, True)} + {Decimal(upgrades[i]["bought"]) - Decimal(upgrades[i]["bought"]) % Decimal(bulkbuy) + Decimal(bulkbuy) - Decimal(upgrades[i]["bought"])}", font, WHITE, upgx*WindowScale2, upgy*WindowYscale - 38*WindowScale2, "left")
         else:
             draw_text(f"{abbreviate(upgrades[i]["bought"], "s", 3, 100000, True)} + {bulkbuy}", font, WHITE, upgx*WindowScale2, upgy*WindowYscale - 38*WindowScale2, "left")
+    def distance_to(ax, ay, bx, by):
+        return math.sqrt((ax - bx)**2 + (ay - by)**2)
+    realarrowdownimg1.set_alpha(200 - distance_to(mos_x, mos_y, 1100*WindowXscale, 252*WindowYscale))
+    screen.blit(realarrowdownimg1, (1100*WindowXscale, 252*WindowYscale))
+    realarrowupimg1.set_alpha(200 - distance_to(mos_x, mos_y, 1100*WindowXscale, 36*WindowYscale))
+    screen.blit(realarrowupimg1, (1100*WindowXscale, 36*WindowYscale))
 
     pygame.mixer.music.set_volume(pygamemixermusic * Settings[1]["value"] / 100)
     upgrade_sound.set_volume(Settings[0]["value"]/100)
