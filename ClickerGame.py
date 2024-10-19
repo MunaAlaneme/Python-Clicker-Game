@@ -15,6 +15,8 @@ import time
 import os
 import numpy as np
 import svg
+import datetime
+import pickle
 
 GameFPS = 60
 
@@ -259,7 +261,6 @@ click_value = Decimal(1)
 auto_click_value = Decimal(0)
 auto_click_rate = Decimal(1)
 click_value_multi = Decimal(1)
-click_rate_multi = Decimal(1)
 cps_to_cpc = Decimal(0)
 upgrades = [
     {"num": 1,
@@ -322,7 +323,6 @@ upgrades = [
     "startcost": Decimal(1000000),
     "costcoefficient": Decimal(5),
     "bought": Decimal(0)},
-
 ]
 upgrade_buttons = []
 upgrade_button_width = [300, 360, 400, 380, 360, 440, 360, 320, 460, 440]
@@ -369,7 +369,7 @@ Settings = [
     "max": Decimal(100)},
     {"num": 2,
     "name": "Music",
-    "value": Decimal(100),
+    "value": Decimal(0),
     "percent": True,
     "round": True,
     "holdable": True,
@@ -460,6 +460,7 @@ def constrain(val, min_val, max_val):
 pygame.mixer.init()
 pygamemixermusic = 1
 def PlayMusic(musNum):
+    global pygamemixermusic
     pygamemixermusic = 1
     if musNum == 1:
         pygamemixermusic = 0.25
@@ -473,15 +474,30 @@ def PlayMusic(musNum):
     elif musNum == 4:
         pygamemixermusic = 1
         pygame.mixer.music.load("./assets/audio/(Object Break) Kevin MacLeod - Padanaya Blokov - loop.wav")
+    pygame.mixer.music.set_volume(Decimal(pygamemixermusic))
     pygame.mixer.music.play(loops=-1)
 PlayMusic(random.randint(1,4))
+pygame.mixer.music.set_volume(Decimal(pygamemixermusic) * (Settings[1]["value"] / 100))
 
 click_sound = pygame.mixer.Sound("./assets/audio/Click mouse - Fugitive Simulator - The-Nick-of-Time.wav")
 hover_sound = pygame.mixer.Sound("./assets/audio/251389__deadsillyrabbit__button_hover-wav.wav")
 upgrade_sound = pygame.mixer.Sound("./assets/audio/Upgrade SOund 0001.wav")
 
 Hovering_Buttons = [0,0,0,0,0,0,0,0,0,0]
-
+def save_game():
+    with open('./save/gamesaveSettings.pkl', 'wb') as file:
+        timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        pickle.dump(f"{Settings}", file)
+    with open('./save/gamesaveUpgrades.pkl', 'wb') as file:
+            timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            pickle.dump(f"{upgrades}", file)
+    #with open('./save/gamesaveUpgrades.pkl', 'wb') as file:
+            #timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            #pickle.dump(f"{gems}\n{score}\n{GameFPS}\n{start_time}\n{delta_time}\n{game_time}", file)
+def load_game():
+    global game_state
+    with open('./save/gamesave.pkl', 'rb') as file:
+        game_state = pickle.load(file)
 while running:
     gemboost = Decimal((50+gems)/50)
     mos_x, mos_y = pygame.mouse.get_pos()
@@ -577,7 +593,8 @@ while running:
                     if event.type == pygame.MOUSEBUTTONDOWN:
                         target_scale_x[0] = 450
                         scale_x[0] = constrain(scale_x[0]-40, 200, math.inf)
-                        score += Decimal(click_value)*Decimal(random.uniform(0.95, 1.05))*Decimal(click_value_multi)*Decimal(gemboost) + Decimal(cps_to_cpc)*Decimal(auto_click_value)*Decimal(auto_click_rate)*Decimal(click_rate_multi)*Decimal(gemboost)
+                        score += Decimal(click_value)*Decimal(random.uniform(0.95, 1.05))*Decimal(click_value_multi)*Decimal(gemboost) + Decimal(cps_to_cpc)*Decimal(auto_click_value)*Decimal(auto_click_rate)*Decimal(gemboost)
+                        save_game()
                         click_sound.play()
                         for i in range(10):
                             particle1.add_particles(pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1], 10, random.randrange(-180, 180), 4)
@@ -642,26 +659,6 @@ while running:
                         upgrade_sound.stop()
                         upgrade_sound.play()
                         click_sound.play()
-                        if upgrades[i]["num"] == 1:
-                            click_value += Decimal(1) * Decimal(buy00001)
-                        elif upgrades[i]["num"] == 2:
-                            auto_click_value += Decimal(0.1) * Decimal(buy00001)
-                        elif upgrades[i]["num"] == 3:
-                            auto_click_rate += Decimal(0.1) * Decimal(buy00001)
-                        elif upgrades[i]["num"] == 4:
-                            click_value_multi *= Decimal(2) ** Decimal(buy00001)
-                        elif upgrades[i]["num"] == 5:
-                            auto_click_value += Decimal(1) * Decimal(buy00001)
-                        elif upgrades[i]["num"] == 6:
-                            click_rate_multi *= Decimal(2) ** Decimal(buy00001)
-                        elif upgrades[i]["num"] == 7:
-                            auto_click_value += Decimal(10) * Decimal(buy00001)
-                        elif upgrades[i]["num"] == 8:
-                            click_value += Decimal(10) * Decimal(buy00001)
-                        elif upgrades[i]["num"] == 9:
-                            click_rate_multi *= Decimal(3) ** Decimal(buy00001)
-                        elif upgrades[i]["num"] == 10:
-                            cps_to_cpc += Decimal(0.01) * Decimal(buy00001)
             for i, button in enumerate(Settings_buttons):
                 if button.collidepoint(event.pos):
                     click_sound.play()
@@ -702,7 +699,12 @@ while running:
     realarrowdownimg1 = pygame.transform.scale(arrow_down_img1, (32 * WindowScale2, 32 * WindowScale2))
     realarrowupimg1 = pygame.transform.scale(arrow_up_img1, (32 * WindowScale2, 32 * WindowScale2))
     # Update auto click
-    score += Decimal(auto_click_value) * Decimal(auto_click_rate) * Decimal(click_rate_multi) * Decimal(delta_time) * Decimal(gemboost)
+    click_value = Decimal(upgrades[0]["bought"]) + (Decimal(upgrades[7]["bought"])*Decimal(10))
+    auto_click_value = (Decimal(upgrades[1]["bought"])*Decimal(0.1)) + Decimal(upgrades[4]["bought"]) + (Decimal(upgrades[6]["bought"])*Decimal(10))
+    cps_to_cpc = (Decimal(upgrades[9]["bought"])*Decimal(0.01))
+    auto_click_rate = (Decimal(upgrades[2]["bought"])*Decimal(0.1)) * (Decimal(2)**Decimal(upgrades[5]["bought"])) * (Decimal(3)**Decimal(upgrades[8]["bought"]))
+    click_value_multi = (Decimal(2)**Decimal(upgrades[3]["bought"]))
+    score += Decimal(auto_click_value) * Decimal(auto_click_rate) * Decimal(delta_time) * Decimal(gemboost)
 
 
     # Draw screen
@@ -719,7 +721,7 @@ while running:
             text_rect.center = (x, y)
             screen.blit(text_surface, text_rect)
     draw_text(f"Clicks: {abbreviate(score, "s", 3, 100000, False)}", font, WHITE, 10*WindowScale2, 10*WindowScale2, "left")
-    draw_text(f"Clicks Per Click: {abbreviate(click_value + cps_to_cpc*auto_click_value*auto_click_rate*click_rate_multi/click_value_multi, "s", 3, 100000, False)}", font, WHITE, 10*WindowScale2, 40*WindowScale2, "left")
+    draw_text(f"Clicks Per Click: {abbreviate(click_value + cps_to_cpc*auto_click_value*auto_click_rate, "s", 3, 100000, False)}", font, WHITE, 10*WindowScale2, 40*WindowScale2, "left")
     draw_text(f"Click Value Multiplier: x{abbreviate(click_value_multi, "s", 3, 100000, False)}", font, WHITE, 10*WindowScale2, 70*WindowScale2, "left")
     draw_text(f"Clicks Per Second: {abbreviate(auto_click_value, "s", 3, 100000, False)}/s", font, WHITE, 10*WindowScale2, 100*WindowScale2, "left")
     if delta_time > 0:
@@ -727,10 +729,9 @@ while running:
     else:
         draw_text(f"FPS: INFINITY", font, WHITE, 10*WindowScale2, 130*WindowScale2, "left")
     draw_text(f"Seconds Per Second: {abbreviate(auto_click_rate, "s", 3, 1000, False)}/s", font, WHITE, 10*WindowScale2, 160*WindowScale2, "left")
-    draw_text(f"Seconds Per Seconds Per Second: {abbreviate(click_rate_multi, "s", 3, 1000, False)}/s", font, WHITE, 10*WindowScale2, 190*WindowScale2, "left")
-    draw_text(f"Gems: {abbreviate(gems, "s", 3, 100000, True)}, {abbreviate(Decimal(gemboost), "s", 3, 100000, False)}x boost", font, WHITE, 10*WindowScale2, 220*WindowScale2, "left")
-    draw_text(f"Total Clicks Per Second: {abbreviate(auto_click_value * auto_click_rate * click_rate_multi, "s", 3, 1000, False)}/s", font, WHITE, 10*WindowScale2, 250*WindowScale2, "left")
-    draw_text(f"Total Clicks Per Click: {abbreviate((click_value*click_value_multi + cps_to_cpc*auto_click_value*auto_click_rate*click_rate_multi)*gemboost, "s", 3, 100000, False)}", font, WHITE, 10*WindowScale2, 280*WindowScale2, "left")
+    draw_text(f"Gems: {abbreviate(gems, "s", 3, 100000, True)}, {abbreviate(Decimal(gemboost), "s", 3, 100000, False)}x boost", font, WHITE, 10*WindowScale2, 190*WindowScale2, "left")
+    draw_text(f"Total Clicks Per Second: {abbreviate(auto_click_value * auto_click_rate, "s", 3, 1000, False)}/s", font, WHITE, 10*WindowScale2, 220*WindowScale2, "left")
+    draw_text(f"Total Clicks Per Click: {abbreviate((click_value*click_value_multi + cps_to_cpc*auto_click_value*auto_click_rate)*gemboost, "s", 3, 100000, False)}", font, WHITE, 10*WindowScale2, 250*WindowScale2, "left")
 
     # Draw upgrade buttons
     for i, button in enumerate(Settings_buttons):
@@ -790,7 +791,7 @@ while running:
     realarrowupimg1.set_alpha(200 - distance_to(mos_x, mos_y, 1100*WindowXscale, 36*WindowYscale))
     screen.blit(realarrowupimg1, (1100*WindowXscale, 36*WindowYscale))
 
-    pygame.mixer.music.set_volume(pygamemixermusic * Settings[1]["value"] / 100)
+    pygame.mixer.music.set_volume(Decimal(pygamemixermusic) * (Settings[1]["value"] / 100))
     upgrade_sound.set_volume(Settings[0]["value"]/100)
     hover_sound.set_volume(Settings[0]["value"]/100)
     click_sound.set_volume(Settings[0]["value"]/100)
