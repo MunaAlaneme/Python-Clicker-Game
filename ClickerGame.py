@@ -523,10 +523,11 @@ hover_sound = pygame.mixer.Sound("./assets/audio/251389__deadsillyrabbit__button
 upgrade_sound = pygame.mixer.Sound("./assets/audio/Upgrade SOund 0001.wav")
 
 Hovering_Buttons = [0,0,0,0,0,0,0,0,0,0]
+framestofixload = 0
 offlineOldTime = time.time()
 offlineCurrentTime = time.time()
-offlineTime = time.time()
 offlineProgressCheck = False
+gemboost = 1
 def save_game():
     global offlineTime, offlineProgressCheck
     for _ in range(len(Settings)):
@@ -535,10 +536,8 @@ def save_game():
     for _ in range(len(upgrades)):
         with open(f'./save/gamesaveUpgrade{_}.txt', 'w') as file2:
             file2.write(f"{upgrades[_]["cost"]}\n{upgrades[_]["startcost"]}\n{upgrades[_]["costcoefficient"]}\n{upgrades[_]["bought"]}")
-    with open('./save/gamesaveGems.txt', 'w') as file3:
-        file3.write(str(gems))
-    with open('./save/gamesaveScore.txt', 'w') as file4:
-        file4.write(str(score))
+    open('./save/gamesaveGems.txt', 'w').write(str(gems))
+    open('./save/gamesaveScore.txt', 'w').write(str(score))
     open('./save/gamesaveGameTimeStuff1.txt', 'w').write(f"{start_time}")
     offlineTime = time.time()
     open('./save/gamesaveGameTimeStuff3.txt', 'w').write(f"{offlineProgressCheck}")
@@ -547,32 +546,51 @@ def save_game():
     open('./save/gamesaveGameTimeStuff2.txt', 'w').write(f"{offlineTime}")
 
 def load_game():
-    global Settings, upgrades, gems, score, start_time, game_time, offlineCurrentTime, offlineOldTime, delta_time, offlineTime, offlineProgressCheck
-    for _ in range(len(Settings)):
-        file1 = open(f'./save/gamesaveSettings{_}.txt', 'r')
-        if (_ >= 0 and _ <= 1):
-            Settings[_]["value"] = Decimal(file1.read())
-        else:
-            Settings[_]["value"] = file1.read()
-    for _ in range(len(upgrades)):
-        file2 = open(f'./save/gamesaveUpgrade{_}.txt', 'r')
-        file2a = file2.read().split('\n')
-        upgrades[_]["cost"] = Decimal(file2a[0])
-        upgrades[_]["startcost"] = Decimal(file2a[1])
-        upgrades[_]["costcoefficient"] = Decimal(file2a[2])
-        upgrades[_]["bought"] = Decimal(file2a[3])
-    with open('./save/gamesaveGems.txt', 'r') as file3:
-        gems = Decimal(file3.read())
-    with open('./save/gamesaveScore.txt', 'r') as file4:
-        score = Decimal(file4.read())
-    start_time = float(open(f'./save/gamesaveGameTimeStuff1.txt', 'r').read())
-    tempOfflineTime = float(open(f'./save/gamesaveGameTimeStuff2.txt', 'r').read())
-    offlineOldTime = tempOfflineTime
-    offlineCurrentTime = time.time()
-    differenceTimeOffline = offlineCurrentTime - offlineOldTime
-    newOfflineTime = differenceTimeOffline * .1
-    score += Decimal(newOfflineTime) * Decimal(auto_click_value) * Decimal(auto_click_rate) * Decimal(gemboost)
+    try:
+        global Settings, upgrades, gems, score, start_time, game_time, offlineCurrentTime, offlineOldTime, delta_time, offlineTime, offlineProgressCheck, framestofixload, auto_click_rate, auto_click_value, click_value, click_value_multi, cps_to_cpc
+        score = Decimal(open('./save/gamesaveScore.txt', 'r').read())
+        for _ in range(len(Settings)):
+            file1 = open(f'./save/gamesaveSettings{_}.txt', 'r')
+            if (_ >= 0 and _ <= 1):
+                Settings[_]["value"] = Decimal(file1.read())
+            else:
+                Settings[_]["value"] = file1.read()
+        for _ in range(len(upgrades)):
+            file2 = open(f'./save/gamesaveUpgrade{_}.txt', 'r')
+            file2a = file2.read().split('\n')
+            upgrades[_]["cost"] = Decimal(file2a[0])
+            upgrades[_]["startcost"] = Decimal(file2a[1])
+            upgrades[_]["costcoefficient"] = Decimal(file2a[2])
+            upgrades[_]["bought"] = Decimal(file2a[3])
+        click_value = Decimal(upgrades[0]["bought"]) + (Decimal(upgrades[7]["bought"])*Decimal(10))
+        auto_click_value = (Decimal(upgrades[1]["bought"])*Decimal(0.1)) + Decimal(upgrades[4]["bought"]) + (Decimal(upgrades[6]["bought"])*Decimal(10))
+        cps_to_cpc = (Decimal(upgrades[9]["bought"])*Decimal(0.01))
+        auto_click_rate = 1 + ((Decimal(upgrades[2]["bought"])*Decimal(0.1)) * (Decimal(2)**Decimal(upgrades[5]["bought"])) * (Decimal(3)**Decimal(upgrades[8]["bought"])))
+        click_value_multi = (Decimal(2)**Decimal(upgrades[3]["bought"]))
+        start_time = float(open(f'./save/gamesaveGameTimeStuff1.txt', 'r').read())
+        gems = Decimal(open('./save/gamesaveGems.txt', 'r').read())
+        delta_time = (time.time() - start_time) - game_time
+        game_time = time.time() - start_time
+        tempOfflineTime = float(open(f'./save/gamesaveGameTimeStuff2.txt', 'r').read())
+        offlineOldTime = tempOfflineTime
+        offlineCurrentTime = time.time()
+        differenceTimeOffline = (offlineCurrentTime - offlineOldTime) * .1
+        framestofixload = 0
+        offlineProgressCheck = False
+        score += (Decimal(differenceTimeOffline) * Decimal(auto_click_value) * Decimal(auto_click_rate) * Decimal(gemboost))
+    except FileNotFoundError:
+        save_game()
+try:
+    offlineTime = float(open(f'./save/gamesaveGameTimeStuff2.txt', 'r').read())
+except FileNotFoundError:
+    open('./save/gamesaveGameTimeStuff1.txt', 'w').write(f"{start_time}")
+    offlineTime = time.time()
+    open('./save/gamesaveGameTimeStuff3.txt', 'w').write(f"{offlineProgressCheck}")
+    if not offlineProgressCheck:
+        offlineProgressCheck = True
+    open('./save/gamesaveGameTimeStuff2.txt', 'w').write(f"{offlineTime}")
 while running:
+    framestofixload += 1
     gemboost = Decimal((50+gems)/50)
     mos_x, mos_y = pygame.mouse.get_pos()
     frames += 1
@@ -779,9 +797,10 @@ while running:
     click_value = Decimal(upgrades[0]["bought"]) + (Decimal(upgrades[7]["bought"])*Decimal(10))
     auto_click_value = (Decimal(upgrades[1]["bought"])*Decimal(0.1)) + Decimal(upgrades[4]["bought"]) + (Decimal(upgrades[6]["bought"])*Decimal(10))
     cps_to_cpc = (Decimal(upgrades[9]["bought"])*Decimal(0.01))
-    auto_click_rate = (Decimal(upgrades[2]["bought"])*Decimal(0.1)) * (Decimal(2)**Decimal(upgrades[5]["bought"])) * (Decimal(3)**Decimal(upgrades[8]["bought"]))
+    auto_click_rate = 1 + ((Decimal(upgrades[2]["bought"])*Decimal(0.1)) * (Decimal(2)**Decimal(upgrades[5]["bought"])) * (Decimal(3)**Decimal(upgrades[8]["bought"])))
     click_value_multi = (Decimal(2)**Decimal(upgrades[3]["bought"]))
-    score += Decimal(auto_click_value) * Decimal(auto_click_rate) * Decimal(delta_time) * Decimal(gemboost)
+    if framestofixload >= 1:
+        score += Decimal(auto_click_value) * Decimal(auto_click_rate) * Decimal(delta_time) * Decimal(gemboost)
 
     # Draw screen
     screen.fill((30, 30, 30))
