@@ -394,12 +394,30 @@ Settings = [
     "held": False,
     "min": "",
     "max": ""},
+    {"num": 5,
+    "name": "Save Game",
+    "value": "",
+    "percent": False,
+    "round": False,
+    "holdable": False,
+    "held": False,
+    "min": "",
+    "max": ""},
+    {"num": 6,
+    "name": "Load Game",
+    "value": "",
+    "percent": False,
+    "round": False,
+    "holdable": False,
+    "held": False,
+    "min": "",
+    "max": ""},
 ]
 Settings_buttons = []
-Settings_button_width = [300, 300, 300, 300]
-Settings_button_height = [50, 50, 50, 50]
-Settings_button_x = [960, 960, 960, 960]
-Settings_button_y = [70, 140, 210, 280]
+Settings_button_width = [300, 300, 300, 300, 300, 300]
+Settings_button_height = [50, 50, 50, 50, 50, 50]
+Settings_button_x = [960, 960, 960, 960, 960, 960]
+Settings_button_y = [70, 140, 210, 280, 350, 420, 490]
 (SettingsButtonColorRed, SettingsButtonColorGreen, SettingsButtonColorBlue) = (
     [200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200],
     [200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200],
@@ -485,19 +503,24 @@ upgrade_sound = pygame.mixer.Sound("./assets/audio/Upgrade SOund 0001.wav")
 
 Hovering_Buttons = [0,0,0,0,0,0,0,0,0,0]
 def save_game():
-    with open('./save/gamesaveSettings.pkl', 'wb') as file:
-        timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        pickle.dump(f"{Settings}", file)
-    with open('./save/gamesaveUpgrades.pkl', 'wb') as file:
-            timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-            pickle.dump(f"{upgrades}", file)
-    #with open('./save/gamesaveUpgrades.pkl', 'wb') as file:
-            #timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-            #pickle.dump(f"{gems}\n{score}\n{GameFPS}\n{start_time}\n{delta_time}\n{game_time}", file)
+    with open('./save/gamesaveSettings.txt', 'w') as file:
+        file.write(f"{Settings}")
+    with open('./save/gamesaveUpgrades.txt', 'w') as file:
+        file.write(f"{upgrades}")
+    with open('./save/gamesaveGems.txt', 'w') as file:
+        file.write(f"{Decimal(gems)}")
+    with open('./save/gamesaveScore.txt', 'w') as file:
+        file.write(f"{Decimal(score)}")
 def load_game():
-    global game_state
-    with open('./save/gamesave.pkl', 'rb') as file:
-        game_state = pickle.load(file)
+    global Settings, upgrades, gems, score
+    with open('./save/gamesaveSettings.txt', 'r') as file:
+        Settings = file.read()
+    with open('./save/gamesaveUpgrades.txt', 'r') as file:
+        upgrades = str(file.read())
+    with open('./save/gamesaveGems.txt', 'r') as file:
+        gems = Decimal(file.read())
+    with open('./save/gamesaveScore.txt', 'r') as file:
+        score = Decimal(file.read())
 while running:
     gemboost = Decimal((50+gems)/50)
     mos_x, mos_y = pygame.mouse.get_pos()
@@ -551,7 +574,7 @@ while running:
         UpgradeButtonOutlineColorRed[i] = constrain(UpgradeButtonOutlineColorRed[i], 0, 255)
         UpgradeButtonOutlineColorGreen[i] = constrain(UpgradeButtonOutlineColorGreen[i], 0, 255)
         UpgradeButtonOutlineColorBlue[i] = constrain(UpgradeButtonOutlineColorBlue[i], 0, 255)
-    Settings_Button_Y_scroll = constrain(Settings_Button_Y_scroll+Settings_Button_Y_scroll_vel, screen_height*-.25, screen_height*0.05)
+    Settings_Button_Y_scroll = constrain(Settings_Button_Y_scroll+Settings_Button_Y_scroll_vel, screen_height*-.45, screen_height*0.05)
     Settings_Button_Y_scroll_vel /= 1.1
     for i, setting in enumerate(Settings):
         x = Settings_button_x[i]
@@ -594,7 +617,6 @@ while running:
                         target_scale_x[0] = 450
                         scale_x[0] = constrain(scale_x[0]-40, 200, math.inf)
                         score += Decimal(click_value)*Decimal(random.uniform(0.95, 1.05))*Decimal(click_value_multi)*Decimal(gemboost) + Decimal(cps_to_cpc)*Decimal(auto_click_value)*Decimal(auto_click_rate)*Decimal(gemboost)
-                        save_game()
                         click_sound.play()
                         for i in range(10):
                             particle1.add_particles(pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1], 10, random.randrange(-180, 180), 4)
@@ -693,6 +715,10 @@ while running:
                             Settings[3]["value"] = "ON"
                         elif Settings[3]["value"] == "ON":
                             Settings[3]["value"] = "OFF"
+                    if i == 4:
+                        save_game()
+                    if i == 5:
+                        load_game()
     scale_x[0] += (target_scale_x[0]-scale_x[0])/(0.15/delta_time)
     scale_y[0] = scale_x[0]
     smalclicrimg = pygame.transform.scale(clicker_button_image, (constrain(scale_x[0]*WindowScale2, 1, math.inf), constrain(scale_y[0]*WindowScale2, 1, math.inf)))
@@ -756,8 +782,10 @@ while running:
                 draw_text(f"{Settings[i]['name']} - {Decimal(round(Settings[i]['value']))}", font, WHITE, setx*WindowXscale + Settings_button_width[i]*WindowXscale/2, sety*WindowYscale + Settings_button_height[i]*WindowScale2/2, "center")
         elif Settings[i]["percent"]:
             draw_text(f"{Settings[i]['name']} - {Decimal(Settings[i]['value'])}%", font, WHITE, setx*WindowXscale + Settings_button_width[i]*WindowXscale/2, sety*WindowYscale + Settings_button_height[i]*WindowScale2/2, "center")
-        else:
+        elif Settings[i]['value'] != "":
             draw_text(f"{Settings[i]['name']} - {Settings[i]['value']}", font, WHITE, setx*WindowXscale + Settings_button_width[i]*WindowXscale/2, sety*WindowYscale + Settings_button_height[i]*WindowScale2/2, "center")
+        else:
+            draw_text(f"{Settings[i]['name']}", font, WHITE, setx*WindowXscale + Settings_button_width[i]*WindowXscale/2, sety*WindowYscale + Settings_button_height[i]*WindowScale2/2, "center")
     pygame.draw.rect(screen, (30, 30, 30), (900*WindowXscale, WindowHeight*0.35, 380*WindowXscale, WindowHeight*1))
     pygame.draw.rect(screen, (30, 30, 30), (900*WindowXscale, WindowHeight*0.0, 380*WindowXscale, WindowHeight*0.1))
     draw_text(f"Options", pygame.font.Font("./assets/fonts/Lato/Lato-Bold.ttf", int(36*WindowScale2)), WHITE, 1110*WindowXscale, 18 * WindowYscale, "center")
