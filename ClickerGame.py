@@ -523,7 +523,12 @@ hover_sound = pygame.mixer.Sound("./assets/audio/251389__deadsillyrabbit__button
 upgrade_sound = pygame.mixer.Sound("./assets/audio/Upgrade SOund 0001.wav")
 
 Hovering_Buttons = [0,0,0,0,0,0,0,0,0,0]
+offlineOldTime = time.time()
+offlineCurrentTime = time.time()
+offlineTime = time.time()
+offlineProgressCheck = False
 def save_game():
+    global offlineTime, offlineProgressCheck
     for _ in range(len(Settings)):
         with open(f'./save/gamesaveSettings{_}.txt', 'w') as file1:
             file1.write(f"{Settings[_]["value"]}")
@@ -534,10 +539,15 @@ def save_game():
         file3.write(str(gems))
     with open('./save/gamesaveScore.txt', 'w') as file4:
         file4.write(str(score))
-    open('./save/gamesaveGameTimeStuff.txt', 'w').write(f"{start_time}")
+    open('./save/gamesaveGameTimeStuff1.txt', 'w').write(f"{start_time}")
+    offlineTime = time.time()
+    open('./save/gamesaveGameTimeStuff3.txt', 'w').write(f"{offlineProgressCheck}")
+    if not offlineProgressCheck:
+        offlineProgressCheck = True
+    open('./save/gamesaveGameTimeStuff2.txt', 'w').write(f"{offlineTime}")
 
 def load_game():
-    global Settings, upgrades, gems, score, start_time
+    global Settings, upgrades, gems, score, start_time, game_time, offlineCurrentTime, offlineOldTime, delta_time, offlineTime, offlineProgressCheck
     for _ in range(len(Settings)):
         file1 = open(f'./save/gamesaveSettings{_}.txt', 'r')
         if (_ >= 0 and _ <= 1):
@@ -555,10 +565,14 @@ def load_game():
         gems = Decimal(file3.read())
     with open('./save/gamesaveScore.txt', 'r') as file4:
         score = Decimal(file4.read())
-    start_time = float(open(f'./save/gamesaveGameTimeStuff.txt', 'r').read())
-    game_time = time.time() - start_time
+    start_time = float(open(f'./save/gamesaveGameTimeStuff1.txt', 'r').read())
+    tempOfflineTime = float(open(f'./save/gamesaveGameTimeStuff2.txt', 'r').read())
+    offlineOldTime = tempOfflineTime
+    offlineCurrentTime = time.time()
+    differenceTimeOffline = offlineCurrentTime - offlineOldTime
+    newOfflineTime = differenceTimeOffline * .1
+    score += Decimal(newOfflineTime) * Decimal(auto_click_value) * Decimal(auto_click_rate) * Decimal(gemboost)
 while running:
-    print(game_time)
     gemboost = Decimal((50+gems)/50)
     mos_x, mos_y = pygame.mouse.get_pos()
     frames += 1
@@ -769,7 +783,6 @@ while running:
     click_value_multi = (Decimal(2)**Decimal(upgrades[3]["bought"]))
     score += Decimal(auto_click_value) * Decimal(auto_click_rate) * Decimal(delta_time) * Decimal(gemboost)
 
-
     # Draw screen
     screen.fill((30, 30, 30))
     screen.blit(smalclicrimg, (button_rect_x[0]-(scale_x[0]/2)*WindowScale2, button_rect_y[0]-(scale_y[0]/2)*WindowScale2))
@@ -793,7 +806,7 @@ while running:
         draw_text(f"FPS: INFINITY", font, WHITE, 10*WindowScale2, 130*WindowScale2, "left")
     draw_text(f"Seconds Per Second: {abbreviate(auto_click_rate, "s", 3, 1000, False)}/s", font, WHITE, 10*WindowScale2, 160*WindowScale2, "left")
     draw_text(f"Gems: {abbreviate(gems, "s", 3, 100000, True)}, {abbreviate(Decimal(gemboost), "s", 3, 100000, False)}x boost", font, WHITE, 10*WindowScale2, 190*WindowScale2, "left")
-    draw_text(f"Total Clicks Per Second: {abbreviate(auto_click_value * auto_click_rate, "s", 3, 1000, False)}/s", font, WHITE, 10*WindowScale2, 220*WindowScale2, "left")
+    draw_text(f"Total Clicks Per Second: {abbreviate(auto_click_value * auto_click_rate * gemboost, "s", 3, 1000, False)}/s", font, WHITE, 10*WindowScale2, 220*WindowScale2, "left")
     draw_text(f"Total Clicks Per Click: {abbreviate((click_value*click_value_multi + cps_to_cpc*auto_click_value*auto_click_rate)*gemboost, "s", 3, 100000, False)}", font, WHITE, 10*WindowScale2, 250*WindowScale2, "left")
 
     # Draw upgrade buttons
