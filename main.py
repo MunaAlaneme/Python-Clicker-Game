@@ -13,7 +13,7 @@ import math
 import sys
 import time
 import os
-import numpy as np
+# import numpy as np UGLY!
 import svg
 import datetime
 import pickle
@@ -552,7 +552,7 @@ def load_game():
         score = Decimal(open('./save/gamesaveScore.txt', 'r').read())
         for _ in range(len(Settings)):
             file1 = open(f'./save/gamesaveSettings{_}.txt', 'r')
-            if (_ >= 0 and _ <= 1):
+            if (_ == 0 or _ == 1):
                 Settings[_]["value"] = Decimal(file1.read())
             else:
                 Settings[_]["value"] = file1.read()
