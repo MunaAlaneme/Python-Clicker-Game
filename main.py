@@ -666,8 +666,8 @@ while running:
         SettingsButtonOutlineColorBlue[i] = constrain(SettingsButtonOutlineColorBlue[i], 0, 255)
     x_inside = [0,0,0,0,0,0,0,0,0,0]
     y_inside = [0,0,0,0,0,0,0,0,0,0]
-    button_rect_x = [(WindowWidth/1) // 2   + CamPos[0]*WindowXscale, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-    button_rect_y = [((WindowHeight/1) // 2) + (math.sin(game_time*5)) * 30 * WindowScale2, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    button_rect_x = [(WindowWidth//2) + CamPos[0]*WindowXscale, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    button_rect_y = [(WindowHeight//2) + (math.sin(game_time*5))*30*WindowScale2 + CamPos[1]*WindowYscale, 0, 0, 0, 0, 0, 0, 0, 0, 0]
     # clicker_button_rect = clicker_button_image.get_rect(center=(scale_x[0], scale_y[0]))
     mos_x, mos_y = pygame.mouse.get_pos()
     target_scale_x[0] = 500
@@ -875,18 +875,18 @@ while running:
         else:
             upgrades[i]["cost"] = Decimal(upgrades[i]["startcost"]) * (((Decimal(upgrades[i]["costcoefficient"])**Decimal(upgrades[i]["bought"])) * (Decimal(upgrades[i]["costcoefficient"])**Decimal(bulkbuy) - Decimal(1))) / (Decimal(upgrades[i]["costcoefficient"])-Decimal(1)))
         upgx = upgrade_button_x[i] + Upgrade_Button_X_scroll + Upgrade_Button_X_scroll_vel + CamPos[0]*WindowXscale/WindowScale2
-        upgy = (screen_height - upgrade_button_height[i]) - 20 + CamPos[1]*WindowYscale/WindowScale2
-        upgrade_buttons[i] = pygame.Rect(upgx*WindowScale2, upgy*WindowScale2, upgrade_button_width[i]*WindowScale2, upgrade_button_height[i]*WindowScale2)
-        pygame.draw.rect(screen, (UpgradeButtonColorRed[i], UpgradeButtonColorGreen[i], UpgradeButtonColorBlue[i]), (upgx*WindowScale2 - 5*WindowScale2, upgy*WindowScale2 - 40*WindowScale2, 200*WindowScale2, upgrade_button_height[i]*WindowScale2 - 15*WindowScale2), 30)
-        pygame.draw.rect(screen, (UpgradeButtonOutlineColorRed[i], UpgradeButtonOutlineColorGreen[i], UpgradeButtonOutlineColorBlue[i]), (upgx*WindowScale2 - 5*WindowScale2, upgy*WindowScale2 - 5*WindowScale2, upgrade_button_width[i]*WindowScale2 + 10*WindowScale2, upgrade_button_height[i]*WindowScale2 + 10*WindowScale2), 30)
-        pygame.draw.rect(screen, (UpgradeButtonColorRed[i], UpgradeButtonColorGreen[i], UpgradeButtonColorBlue[i]), (upgx*WindowScale2, upgy*WindowScale2, upgrade_button_width[i]*WindowScale2, upgrade_button_height[i]*WindowScale2))
-        draw_text(f"{upgrades[i]['name']} - {abbreviate(upgrades[i]['cost'], "s", 3, 10000, False)}", font, WHITE, upgx*WindowScale2 + upgrade_button_width[i]*WindowScale2/2, upgy*WindowScale2 + upgrade_button_height[i]*WindowScale2/2, "center")
+        upgy = (screen_height - upgrade_button_height[i])*WindowYscale - 20*WindowYscale + CamPos[1]*WindowYscale
+        upgrade_buttons[i] = pygame.Rect(upgx*WindowScale2, upgy, upgrade_button_width[i]*WindowScale2, upgrade_button_height[i]*WindowScale2)
+        pygame.draw.rect(screen, (UpgradeButtonColorRed[i], UpgradeButtonColorGreen[i], UpgradeButtonColorBlue[i]), (upgx*WindowScale2 - 5*WindowScale2, upgy - 40*WindowScale2, 200*WindowScale2, upgrade_button_height[i]*WindowScale2 - 15*WindowScale2), 30)
+        pygame.draw.rect(screen, (UpgradeButtonOutlineColorRed[i], UpgradeButtonOutlineColorGreen[i], UpgradeButtonOutlineColorBlue[i]), (upgx*WindowScale2 - 5*WindowScale2, upgy - 5*WindowScale2, upgrade_button_width[i]*WindowScale2 + 10*WindowScale2, upgrade_button_height[i]*WindowScale2 + 10*WindowScale2), 30)
+        pygame.draw.rect(screen, (UpgradeButtonColorRed[i], UpgradeButtonColorGreen[i], UpgradeButtonColorBlue[i]), (upgx*WindowScale2, upgy, upgrade_button_width[i]*WindowScale2, upgrade_button_height[i]*WindowScale2))
+        draw_text(f"{upgrades[i]['name']} - {abbreviate(upgrades[i]['cost'], "s", 3, 10000, False)}", font, WHITE, upgx*WindowScale2 + upgrade_button_width[i]*WindowScale2/2, upgy + upgrade_button_height[i]*WindowScale2/2, "center")
         if bulkbuy == "Max":
-            draw_text(f"{abbreviate(upgrades[i]["bought"], "s", 3, 100000, True)} + Max ({Decimal(calcmax())})", font, WHITE, upgx*WindowScale2, upgy*WindowScale2 - 38*WindowScale2, "left")
+            draw_text(f"{abbreviate(upgrades[i]["bought"], "s", 3, 100000, True)} + Max ({Decimal(calcmax())})", font, WHITE, upgx*WindowScale2, upgy - 38*WindowScale2, "left")
         elif Settings[3]["value"] == "ON":
-            draw_text(f"{abbreviate(upgrades[i]["bought"], "s", 3, 100000, True)} + {Decimal(upgrades[i]["bought"]) - Decimal(upgrades[i]["bought"]) % Decimal(bulkbuy) + Decimal(bulkbuy) - Decimal(upgrades[i]["bought"])}", font, WHITE, upgx*WindowScale2, upgy*WindowScale2 - 38*WindowScale2, "left")
+            draw_text(f"{abbreviate(upgrades[i]["bought"], "s", 3, 100000, True)} + {Decimal(upgrades[i]["bought"]) - Decimal(upgrades[i]["bought"]) % Decimal(bulkbuy) + Decimal(bulkbuy) - Decimal(upgrades[i]["bought"])}", font, WHITE, upgx*WindowScale2, upgy - 38*WindowScale2, "left")
         else:
-            draw_text(f"{abbreviate(upgrades[i]["bought"], "s", 3, 100000, True)} + {bulkbuy}", font, WHITE, upgx*WindowScale2, upgy*WindowScale2 - 38*WindowScale2, "left")
+            draw_text(f"{abbreviate(upgrades[i]["bought"], "s", 3, 100000, True)} + {bulkbuy}", font, WHITE, upgx*WindowScale2, upgy - 38*WindowScale2, "left")
     def distance_to(ax, ay, bx, by):
         return math.sqrt((ax - bx)**2 + (ay - by)**2)
     realarrowdownimg1.set_alpha(200 - distance_to(mos_x, mos_y, 1100*WindowXscale + CamPos[0]*WindowXscale, 252*WindowYscale + CamPos[1]*WindowYscale))
@@ -906,6 +906,24 @@ while running:
     pygame.display.flip()
     pygame.display.update()
     #clock.tick(24)
-    CamPos[1] = game_time * -33
+    keys = pygame.key.get_pressed()
+    if keys[pygame.K_a]:
+        CamPos = [1280, 0]
+    if keys[pygame.K_s]:
+        CamPos = [0, 0]
+    if keys[pygame.K_d]:
+        CamPos = [-1280, 0]
+    if keys[pygame.K_q]:
+        CamPos = [1280, 720]
+    if keys[pygame.K_w]:
+        CamPos = [0, 720]
+    if keys[pygame.K_e]:
+        CamPos = [-1280, 720]
+    if keys[pygame.K_z]:
+        CamPos = [1280, -720]
+    if keys[pygame.K_x]:
+        CamPos = [0, -720]
+    if keys[pygame.K_c]:
+        CamPos = [-1280, -720]
 # Quit Pygame
 pygame.quit()
