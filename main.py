@@ -900,7 +900,10 @@ while running:
         upgrade_sound.set_volume(Decimal(Settings[0]["value"]/100))
         hover_sound.set_volume(Decimal(Settings[0]["value"]/100))
         click_sound.set_volume(Decimal(Settings[0]["value"]/100))
-
+    pygame.draw.rect(screen, (128, 192, 255), (640*WindowScale2 - 5*WindowScale2, 360*WindowScale2 - 5*WindowScale2, 210*WindowScale2, 210*WindowScale2), 30)
+    pygame.draw.rect(screen, (0, 64, 128), (640*WindowScale2, 360*WindowScale2, 200*WindowScale2, 200*WindowScale2))
+    pygame.draw.rect(screen, (128, 64, 0), (640*WindowScale2 - 35*WindowScale2, 360*WindowScale2 - 35*WindowScale2, 270*WindowScale2, 270*WindowScale2), 30)
+    
     # Update display
     particle1.emit()
     pygame.display.flip()
