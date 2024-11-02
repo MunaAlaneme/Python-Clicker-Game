@@ -485,6 +485,7 @@ scale_x = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 scale_y = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 target_scale_x = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 target_scale_y = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+offlineBoxAlpha = 0
 start_time = time.time()
 delta_time = 0.000001
 game_time = -0.000001
@@ -580,6 +581,7 @@ def load_game():
         differenceTimeOffline = (offlineCurrentTime - offlineOldTime) * .1
         framestofixload = 0
         offlineProgressCheck = False
+        offlineBoxAlpha = 1
         score += (Decimal(differenceTimeOffline) * Decimal(auto_click_value) * Decimal(auto_click_rate) * Decimal(gemboost))
     except FileNotFoundError:
         save_game()
@@ -900,9 +902,8 @@ while running:
         upgrade_sound.set_volume(Decimal(Settings[0]["value"]/100))
         hover_sound.set_volume(Decimal(Settings[0]["value"]/100))
         click_sound.set_volume(Decimal(Settings[0]["value"]/100))
-    pygame.draw.rect(screen, (128, 192, 255), (640*WindowScale2 - 5*WindowScale2, 360*WindowScale2 - 5*WindowScale2, 210*WindowScale2, 210*WindowScale2), 30)
-    pygame.draw.rect(screen, (0, 64, 128), (640*WindowScale2, 360*WindowScale2, 200*WindowScale2, 200*WindowScale2))
-    pygame.draw.rect(screen, (128, 64, 0), (640*WindowScale2 - 35*WindowScale2, 360*WindowScale2 - 35*WindowScale2, 270*WindowScale2, 270*WindowScale2), 30)
+    pygame.draw.rect(screen, (128, 192, 255, offlineBoxAlpha), (160*WindowXscale - 5*WindowScale2, 180*WindowYscale - 5*WindowScale2, 960*WindowXscale + 10*WindowScale2, 360*WindowYscale + 10*WindowScale2), 30)
+    pygame.draw.rect(screen, (0, 64, 128, offlineBoxAlpha), (160*WindowXscale, 180*WindowYscale, 960*WindowXscale, 360*WindowYscale))
     
     # Update display
     particle1.emit()
