@@ -837,7 +837,7 @@ while running:
 
     # Draw upgrade buttons
     for i, button in enumerate(Settings_buttons):
-        setx = Settings_button_x[i] + CamPos[0]*WindowXscale/WindowXscale
+        setx = Settings_button_x[i] + CamPos[0]*WindowXscale
         sety = constrain(Settings_button_y[i] + Settings_Button_Y_scroll + Settings_Button_Y_scroll_vel, screen_height*0.05, screen_height*0.5) + CamPos[1]*WindowYscale/WindowYscale
         if isinstance(Settings[i]["value"], Decimal):
             if Settings[i]["held"] and Settings[i]["holdable"]:
@@ -850,8 +850,8 @@ while running:
             Settings[2]["value"] = "X" + str(bulkbuy)
         else:
             Settings[2]["value"] = "Max"
-        Settings_buttons[i] = pygame.Rect(setx*WindowXscale, sety*WindowYscale, Settings_button_width[i]*WindowXscale, Settings_button_height[i]*WindowScale2)
-        pygame.draw.rect(screen, (SettingsButtonOutlineColorRed[i], SettingsButtonOutlineColorGreen[i], SettingsButtonOutlineColorBlue[i]), (setx*WindowXscale - 5*WindowScale2, sety*WindowYscale - 5*WindowScale2, Settings_button_width[i]*WindowXscale + 10*WindowScale2, Settings_button_height[i]*WindowScale2 + 10*WindowScale2), 30)
+        Settings_buttons[i] = pygame.Rect(setx*WindowXscale, sety*WindowYscale, Settings_button_width[i]*WindowXscale, Settings_button_height[i]*WindowYscale)
+        pygame.draw.rect(screen, (SettingsButtonOutlineColorRed[i], SettingsButtonOutlineColorGreen[i], SettingsButtonOutlineColorBlue[i]), (setx*WindowXscale - 5*WindowScale2, sety*WindowYscale - 5*WindowScale2, Settings_button_width[i]*WindowXscale + 10*WindowScale2, Settings_button_height[i]*WindowYscale + 10*WindowScale2), 30)
         pygame.draw.rect(screen, (SettingsButtonColorRed[i], SettingsButtonColorGreen[i], SettingsButtonColorBlue[i]), (Settings_buttons[i]))
         if Settings[i]["round"] and not isinstance(Settings[i]["value"], str):
             if Settings[i]["percent"]:
