@@ -240,7 +240,7 @@ def abbreviate(number, suffixes, decimals, greaterthan, rounda):
 # Screen and clock
 screen_width = 1280
 screen_height = 720
-screen = pygame.display.set_mode((screen_width, screen_height), pygame.RESIZABLE)
+screen = pygame.display.set_mode((screen_width, screen_height), pygame.RESIZABLE, pygame.SRCALPHA)
 pygame.display.set_caption("Clicker Game")
 clock = pygame.time.Clock()
 
@@ -902,12 +902,12 @@ while running:
         upgrade_sound.set_volume(Decimal(Settings[0]["value"]/100))
         hover_sound.set_volume(Decimal(Settings[0]["value"]/100))
         click_sound.set_volume(Decimal(Settings[0]["value"]/100))
-    pygame.draw.rect(screen, (128, 192, 255, offlineBoxAlpha), (160*WindowXscale - 5*WindowScale2, 180*WindowYscale - 5*WindowScale2, 960*WindowXscale + 10*WindowScale2, 360*WindowYscale + 10*WindowScale2), 30)
-    pygame.draw.rect(screen, (0, 64, 128, offlineBoxAlpha), (160*WindowXscale, 180*WindowYscale, 960*WindowXscale, 360*WindowYscale))
+    pygame.draw.rect(screen, (128, 192, 255), (((640*WindowXscale) - (480*WindowScale2)) - (5*WindowXscale), (((360*WindowYscale) - (180*WindowScale2)) - 5*WindowYscale), (960*WindowScale2 + 10*WindowXscale), (360*WindowScale2 + 10*WindowYscale)), 30)
+    pygame.draw.rect(screen, (0, 64, 128), ((640*WindowXscale) - (480*WindowScale2), (360*WindowYscale) - (180*WindowScale2), 960*WindowScale2, 360*WindowScale2))
+    draw_text("niuijmkm", pygame.font.Font("./assets/fonts/Lato/Lato-Bold.ttf", int(72*WindowScale2)), (255, 64, 128), 21*WindowXscale, 360*WindowYscale, "center")
     
     # Update display
     particle1.emit()
-    pygame.display.flip()
     pygame.display.update()
     #clock.tick(24)
     keys = pygame.key.get_pressed()
