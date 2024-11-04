@@ -494,6 +494,7 @@ bulkbuy = 1
 CamPos = [0, 0]
 CamPos2 = [0, 0]
 gems = Decimal(0)
+differenceTimeOffline = 0
 def constrain(val, min_val, max_val):
 
     if val < min_val: return min_val
@@ -551,7 +552,7 @@ def save_game():
 
 def load_game():
     try:
-        global Settings, upgrades, gems, score, start_time, game_time, offlineCurrentTime, offlineOldTime, delta_time, offlineTime, offlineProgressCheck, framestofixload, auto_click_rate, auto_click_value, click_value, click_value_multi, cps_to_cpc
+        global Settings, upgrades, gems, score, start_time, game_time, offlineCurrentTime, offlineOldTime, delta_time, offlineTime, offlineProgressCheck, framestofixload, auto_click_rate, auto_click_value, click_value, click_value_multi, cps_to_cpc, offlineBoxAlpha, differenceTimeOffline, offlineCurrentTime, offlineOldTime
         score = Decimal(open('./save/gamesaveScore.txt', 'r').read())
         for _ in range(len(Settings)):
             file1 = open(f'./save/gamesaveSettings{_}.txt', 'r')
@@ -573,7 +574,7 @@ def load_game():
         click_value_multi = (Decimal(2)**Decimal(upgrades[3]["bought"]))
         start_time = float(open(f'./save/gamesaveGameTimeStuff1.txt', 'r').read())
         gems = Decimal(open('./save/gamesaveGems.txt', 'r').read())
-        delta_time = (time.time() - start_time) - game_time
+        #delta_time = (time.time() - start_time) - game_time
         game_time = time.time() - start_time
         tempOfflineTime = float(open(f'./save/gamesaveGameTimeStuff2.txt', 'r').read())
         offlineOldTime = tempOfflineTime
@@ -581,7 +582,7 @@ def load_game():
         differenceTimeOffline = (offlineCurrentTime - offlineOldTime) * .1
         framestofixload = 0
         offlineProgressCheck = False
-        offlineBoxAlpha = 1
+        offlineBoxAlpha = 255
         score += (Decimal(differenceTimeOffline) * Decimal(auto_click_value) * Decimal(auto_click_rate) * Decimal(gemboost))
     except FileNotFoundError:
         save_game()
@@ -718,7 +719,7 @@ while running:
                 UpgradeTargetButtonOutlineColorGreen[i] = 0
                 UpgradeTargetButtonOutlineColorBlue[i] = 0
         for i, button in enumerate(Settings_buttons):
-            if button.collidepoint((mos_x - CamPos[0]*WindowXscale, mos_y - CamPos[1]*WindowYscale)):
+            if button.collidepoint((mos_x - (CamPos[0]*WindowXscale), mos_y - (CamPos[1]*WindowYscale))):
                 SettingsTargetButtonColorRed[i] = 0
                 SettingsTargetButtonColorGreen[i] = 100
                 SettingsTargetButtonColorBlue[i] = 0
@@ -812,26 +813,27 @@ while running:
     screen.blit(smalclicrimg, (button_rect_x[0]-(scale_x[0]/2)*WindowScale2, button_rect_y[0]-(scale_y[0]/2)*WindowScale2))
     # Draw text
     font = pygame.font.Font("./assets/fonts/Lato/Lato-Bold.ttf", int(24*WindowScale2))
-    def draw_text(text, font, color, x, y, align):
+    def draw_text(text, font, color, x, y, align, alpha):
         text_surface = font.render(text, True, color)
+        text_surface.set_alpha(alpha)
         text_rect = text_surface.get_rect()
         if align == "left":
             screen.blit(text_surface, (x, y))
         elif align == "center":
             text_rect.center = (x, y)
             screen.blit(text_surface, text_rect)
-    draw_text(f"Clicks: {abbreviate(score, "s", 3, 100000, False)}", font, WHITE, 10*WindowScale2 + CamPos[0]*WindowXscale, 10*WindowScale2 + CamPos[1]*WindowYscale, "left")
-    draw_text(f"Clicks Per Click: {abbreviate(click_value + cps_to_cpc*auto_click_value*auto_click_rate, "s", 3, 100000, False)}", font, WHITE, 10*WindowScale2 + CamPos[0]*WindowXscale, 40*WindowScale2 + CamPos[1]*WindowYscale, "left")
-    draw_text(f"Click Value Multiplier: x{abbreviate(click_value_multi, "s", 3, 100000, False)}", font, WHITE, 10*WindowScale2 + CamPos[0]*WindowXscale, 70*WindowScale2 + CamPos[1]*WindowYscale, "left")
-    draw_text(f"Clicks Per Second: {abbreviate(auto_click_value, "s", 3, 100000, False)}/s", font, WHITE, 10*WindowScale2 + CamPos[0]*WindowXscale, 100*WindowScale2 + CamPos[1]*WindowYscale, "left")
+    draw_text(f"Clicks: {abbreviate(score, "s", 3, 100000, False)}", font, WHITE, 10*WindowScale2 + CamPos[0]*WindowXscale, 10*WindowScale2 + CamPos[1]*WindowYscale, "left", 255)
+    draw_text(f"Clicks Per Click: {abbreviate(click_value + cps_to_cpc*auto_click_value*auto_click_rate, "s", 3, 100000, False)}", font, WHITE, 10*WindowScale2 + CamPos[0]*WindowXscale, 40*WindowScale2 + CamPos[1]*WindowYscale, "left", 255)
+    draw_text(f"Click Value Multiplier: x{abbreviate(click_value_multi, "s", 3, 100000, False)}", font, WHITE, 10*WindowScale2 + CamPos[0]*WindowXscale, 70*WindowScale2 + CamPos[1]*WindowYscale, "left", 255)
+    draw_text(f"Clicks Per Second: {abbreviate(auto_click_value, "s", 3, 100000, False)}/s", font, WHITE, 10*WindowScale2 + CamPos[0]*WindowXscale, 100*WindowScale2 + CamPos[1]*WindowYscale, "left", 255)
     if delta_time > 0:
-        draw_text(f"FPS: {Decimal(1/delta_time):.2f}", font, WHITE, 10*WindowScale2 + CamPos[0]*WindowXscale, 130*WindowScale2 + CamPos[1]*WindowYscale, "left")
+        draw_text(f"FPS: {Decimal(1/delta_time):.2f}", font, WHITE, 10*WindowScale2 + CamPos[0]*WindowXscale, 130*WindowScale2 + CamPos[1]*WindowYscale, "left", 255)
     else:
-        draw_text(f"FPS: INFINITY", font, WHITE, 10*WindowScale2 + CamPos[0]*WindowXscale, 130*WindowScale2 + CamPos[1]*WindowYscale, "left")
-    draw_text(f"Seconds Per Second: {abbreviate(auto_click_rate, "s", 3, 1000, False)}/s", font, WHITE, 10*WindowScale2 + CamPos[0]*WindowXscale, 160*WindowScale2 + CamPos[1]*WindowYscale, "left")
-    draw_text(f"Gems: {abbreviate(gems, "s", 3, 100000, True)}, {abbreviate(Decimal(gemboost), "s", 3, 100000, False)}x boost", font, WHITE, 10*WindowScale2 + CamPos[0]*WindowXscale, 190*WindowScale2 + CamPos[1]*WindowYscale, "left")
-    draw_text(f"Total Clicks Per Second: {abbreviate(auto_click_value * auto_click_rate * gemboost, "s", 3, 1000, False)}/s", font, WHITE, 10*WindowScale2 + CamPos[0]*WindowXscale, 220*WindowScale2 + CamPos[1]*WindowYscale, "left")
-    draw_text(f"Total Clicks Per Click: {abbreviate((click_value*click_value_multi + cps_to_cpc*auto_click_value*auto_click_rate)*gemboost, "s", 3, 100000, False)}", font, WHITE, 10*WindowScale2 + CamPos[0]*WindowXscale, 250*WindowScale2 + CamPos[1]*WindowYscale, "left")
+        draw_text(f"FPS: INFINITY", font, WHITE, 10*WindowScale2 + CamPos[0]*WindowXscale, 130*WindowScale2 + CamPos[1]*WindowYscale, "left", 255)
+    draw_text(f"Seconds Per Second: {abbreviate(auto_click_rate, "s", 3, 1000, False)}/s", font, WHITE, 10*WindowScale2 + CamPos[0]*WindowXscale, 160*WindowScale2 + CamPos[1]*WindowYscale, "left", 255)
+    draw_text(f"Gems: {abbreviate(gems, "s", 3, 100000, True)}, {abbreviate(Decimal(gemboost), "s", 3, 100000, False)}x boost", font, WHITE, 10*WindowScale2 + CamPos[0]*WindowXscale, 190*WindowScale2 + CamPos[1]*WindowYscale, "left", 255)
+    draw_text(f"Total Clicks Per Second: {abbreviate(auto_click_value * auto_click_rate * gemboost, "s", 3, 1000, False)}/s", font, WHITE, 10*WindowScale2 + CamPos[0]*WindowXscale, 220*WindowScale2 + CamPos[1]*WindowYscale, "left", 255)
+    draw_text(f"Total Clicks Per Click: {abbreviate((click_value*click_value_multi + cps_to_cpc*auto_click_value*auto_click_rate)*gemboost, "s", 3, 100000, False)}", font, WHITE, 10*WindowScale2 + CamPos[0]*WindowXscale, 250*WindowScale2 + CamPos[1]*WindowYscale, "left", 255)
 
     # Draw upgrade buttons
     for i, button in enumerate(Settings_buttons):
@@ -850,23 +852,23 @@ while running:
             Settings[2]["value"] = "Max"
         Settings_buttons[i] = pygame.Rect(setx*WindowXscale, sety*WindowYscale, Settings_button_width[i]*WindowXscale, Settings_button_height[i]*WindowScale2)
         pygame.draw.rect(screen, (SettingsButtonOutlineColorRed[i], SettingsButtonOutlineColorGreen[i], SettingsButtonOutlineColorBlue[i]), (setx*WindowXscale - 5*WindowScale2, sety*WindowYscale - 5*WindowScale2, Settings_button_width[i]*WindowXscale + 10*WindowScale2, Settings_button_height[i]*WindowScale2 + 10*WindowScale2), 30)
-        pygame.draw.rect(screen, (SettingsButtonColorRed[i], SettingsButtonColorGreen[i], SettingsButtonColorBlue[i]), (setx*WindowXscale, sety*WindowYscale, Settings_button_width[i]*WindowXscale, Settings_button_height[i]*WindowScale2))
+        pygame.draw.rect(screen, (SettingsButtonColorRed[i], SettingsButtonColorGreen[i], SettingsButtonColorBlue[i]), (Settings_buttons[i]))
         if Settings[i]["round"] and not isinstance(Settings[i]["value"], str):
             if Settings[i]["percent"]:
-                draw_text(f"{Settings[i]['name']} - {Decimal.__round__((Settings[i]['value']))}%", font, WHITE, setx*WindowXscale + Settings_button_width[i]*WindowXscale/2, sety*WindowYscale + Settings_button_height[i]*WindowScale2/2, "center")
+                draw_text(f"{Settings[i]['name']} - {Decimal.__round__((Settings[i]['value']))}%", font, WHITE, setx*WindowXscale + Settings_button_width[i]*WindowXscale/2, sety*WindowYscale + Settings_button_height[i]*WindowScale2/2, "center", 255)
             else:
-                draw_text(f"{Settings[i]['name']} - {Decimal.__round__((Settings[i]['value']))}", font, WHITE, setx*WindowXscale + Settings_button_width[i]*WindowXscale/2, sety*WindowYscale + Settings_button_height[i]*WindowScale2/2, "center")
+                draw_text(f"{Settings[i]['name']} - {Decimal.__round__((Settings[i]['value']))}", font, WHITE, setx*WindowXscale + Settings_button_width[i]*WindowXscale/2, sety*WindowYscale + Settings_button_height[i]*WindowScale2/2, "center", 255)
         elif Settings[i]["percent"] and not isinstance(Settings[i]["value"], str):
-            draw_text(f"{Settings[i]['name']} - {Decimal(Settings[i]['value'])}%", font, WHITE, setx*WindowXscale + Settings_button_width[i]*WindowXscale/2, sety*WindowYscale + Settings_button_height[i]*WindowScale2/2, "center")
+            draw_text(f"{Settings[i]['name']} - {Decimal(Settings[i]['value'])}%", font, WHITE, setx*WindowXscale + Settings_button_width[i]*WindowXscale/2, sety*WindowYscale + Settings_button_height[i]*WindowScale2/2, "center", 255)
         elif Settings[i]['value'] != "":
-            draw_text(f"{Settings[i]['name']} - {Settings[i]['value']}", font, WHITE, setx*WindowXscale + Settings_button_width[i]*WindowXscale/2, sety*WindowYscale + Settings_button_height[i]*WindowScale2/2, "center")
+            draw_text(f"{Settings[i]['name']} - {Settings[i]['value']}", font, WHITE, setx*WindowXscale + Settings_button_width[i]*WindowXscale/2, sety*WindowYscale + Settings_button_height[i]*WindowScale2/2, "center", 255)
         else:
-            draw_text(f"{Settings[i]['name']}", font, WHITE, setx*WindowXscale + Settings_button_width[i]*WindowXscale/2, sety*WindowYscale + Settings_button_height[i]*WindowScale2/2, "center")
+            draw_text(f"{Settings[i]['name']}", font, WHITE, setx*WindowXscale + Settings_button_width[i]*WindowXscale/2, sety*WindowYscale + Settings_button_height[i]*WindowScale2/2, "center", 255)
     pygame.draw.rect(screen, (30, 30, 30), (900*WindowXscale + CamPos[0]*WindowXscale, WindowHeight*0.35 + CamPos[1]*WindowYscale, 380*WindowXscale, WindowHeight*1))
     pygame.draw.rect(screen, (30, 30, 30), (900*WindowXscale + CamPos[0]*WindowXscale, WindowHeight*0.0 + CamPos[1]*WindowYscale, 380*WindowXscale, WindowHeight*0.1))
-    draw_text(f"Options", pygame.font.Font("./assets/fonts/Lato/Lato-Bold.ttf", int(36*WindowScale2)), WHITE, 1110*WindowXscale + CamPos[0]*WindowXscale, 18 * WindowYscale + CamPos[1]*WindowYscale, "center")
-    draw_text(f"Log", pygame.font.Font("./assets/fonts/Lato/Lato-Bold.ttf", int(36*WindowScale2)), WHITE, 1110*WindowXscale + CamPos[0]*WindowXscale, 318 * WindowYscale + CamPos[1]*WindowYscale, "center") # IT'S CLONE RIGGY!
-    draw_text(f"Upgrades", pygame.font.Font("./assets/fonts/Lato/Lato-Bold.ttf", int(36*WindowScale2)), WHITE, 30*WindowXscale + CamPos[0]*WindowXscale, 540 * WindowYscale + CamPos[1]*WindowYscale, "left")
+    draw_text(f"Options", pygame.font.Font("./assets/fonts/Lato/Lato-Bold.ttf", int(36*WindowScale2)), WHITE, 1110*WindowXscale + CamPos[0]*WindowXscale, 18 * WindowYscale + CamPos[1]*WindowYscale, "center", 255)
+    draw_text(f"Log", pygame.font.Font("./assets/fonts/Lato/Lato-Bold.ttf", int(36*WindowScale2)), WHITE, 1110*WindowXscale + CamPos[0]*WindowXscale, 318 * WindowYscale + CamPos[1]*WindowYscale, "center", 255) # IT'S CLONE RIGGY!
+    draw_text(f"Upgrades", pygame.font.Font("./assets/fonts/Lato/Lato-Bold.ttf", int(36*WindowScale2)), WHITE, 30*WindowXscale + CamPos[0]*WindowXscale, 540 * WindowYscale + CamPos[1]*WindowYscale, "left", 255)
     for i, button in enumerate(upgrade_buttons):
         def calcmax():
             return constrain(Decimal.__floor__( Decimal.log10( (Decimal(score) * (Decimal(upgrades[i]["costcoefficient"]) - 1)) / Decimal(upgrades[i]["startcost"] * (Decimal(upgrades[i]["costcoefficient"]) ** Decimal(upgrades[i]["bought"]))) + 1) / Decimal.log10(Decimal(upgrades[i]["costcoefficient"]))), Decimal(1), math.inf)
@@ -882,13 +884,13 @@ while running:
         pygame.draw.rect(screen, (UpgradeButtonColorRed[i], UpgradeButtonColorGreen[i], UpgradeButtonColorBlue[i]), (upgx*WindowScale2 - 5*WindowScale2, upgy - 40*WindowScale2, 200*WindowScale2, upgrade_button_height[i]*WindowScale2 - 15*WindowScale2), 30)
         pygame.draw.rect(screen, (UpgradeButtonOutlineColorRed[i], UpgradeButtonOutlineColorGreen[i], UpgradeButtonOutlineColorBlue[i]), (upgx*WindowScale2 - 5*WindowScale2, upgy - 5*WindowScale2, upgrade_button_width[i]*WindowScale2 + 10*WindowScale2, upgrade_button_height[i]*WindowScale2 + 10*WindowScale2), 30)
         pygame.draw.rect(screen, (UpgradeButtonColorRed[i], UpgradeButtonColorGreen[i], UpgradeButtonColorBlue[i]), (upgx*WindowScale2, upgy, upgrade_button_width[i]*WindowScale2, upgrade_button_height[i]*WindowScale2))
-        draw_text(f"{upgrades[i]['name']} - {abbreviate(upgrades[i]['cost'], "s", 3, 10000, False)}", font, WHITE, upgx*WindowScale2 + upgrade_button_width[i]*WindowScale2/2, upgy + upgrade_button_height[i]*WindowScale2/2, "center")
+        draw_text(f"{upgrades[i]['name']} - {abbreviate(upgrades[i]['cost'], "s", 3, 10000, False)}", font, WHITE, upgx*WindowScale2 + upgrade_button_width[i]*WindowScale2/2, upgy + upgrade_button_height[i]*WindowScale2/2, "center", 255)
         if bulkbuy == "Max":
-            draw_text(f"{abbreviate(upgrades[i]["bought"], "s", 3, 100000, True)} + Max ({Decimal(calcmax())})", font, WHITE, upgx*WindowScale2, upgy - 38*WindowScale2, "left")
+            draw_text(f"{abbreviate(upgrades[i]["bought"], "s", 3, 100000, True)} + Max ({Decimal(calcmax())})", font, WHITE, upgx*WindowScale2, upgy - 38*WindowScale2, "left", 255)
         elif Settings[3]["value"] == "ON":
-            draw_text(f"{abbreviate(upgrades[i]["bought"], "s", 3, 100000, True)} + {Decimal(upgrades[i]["bought"]) - Decimal(upgrades[i]["bought"]) % Decimal(bulkbuy) + Decimal(bulkbuy) - Decimal(upgrades[i]["bought"])}", font, WHITE, upgx*WindowScale2, upgy - 38*WindowScale2, "left")
+            draw_text(f"{abbreviate(upgrades[i]["bought"], "s", 3, 100000, True)} + {Decimal(upgrades[i]["bought"]) - Decimal(upgrades[i]["bought"]) % Decimal(bulkbuy) + Decimal(bulkbuy) - Decimal(upgrades[i]["bought"])}", font, WHITE, upgx*WindowScale2, upgy - 38*WindowScale2, "left", 255)
         else:
-            draw_text(f"{abbreviate(upgrades[i]["bought"], "s", 3, 100000, True)} + {bulkbuy}", font, WHITE, upgx*WindowScale2, upgy - 38*WindowScale2, "left")
+            draw_text(f"{abbreviate(upgrades[i]["bought"], "s", 3, 100000, True)} + {bulkbuy}", font, WHITE, upgx*WindowScale2, upgy - 38*WindowScale2, "left", 255)
     def distance_to(ax, ay, bx, by):
         return math.sqrt((ax - bx)**2 + (ay - by)**2)
     realarrowdownimg1.set_alpha(200 - distance_to(mos_x, mos_y, 1100*WindowXscale + CamPos[0]*WindowXscale, 252*WindowYscale + CamPos[1]*WindowYscale))
@@ -902,13 +904,18 @@ while running:
         upgrade_sound.set_volume(Decimal(Settings[0]["value"]/100))
         hover_sound.set_volume(Decimal(Settings[0]["value"]/100))
         click_sound.set_volume(Decimal(Settings[0]["value"]/100))
-    pygame.draw.rect(screen, (128, 192, 255), (((640*WindowXscale) - (480*WindowScale2)) - (5*WindowXscale), (((360*WindowYscale) - (180*WindowScale2)) - 5*WindowYscale), (960*WindowScale2 + 10*WindowXscale), (360*WindowScale2 + 10*WindowYscale)), 30)
-    pygame.draw.rect(screen, (0, 64, 128), ((640*WindowXscale) - (480*WindowScale2), (360*WindowYscale) - (180*WindowScale2), 960*WindowScale2, 360*WindowScale2))
-    draw_text("niuijmkm", pygame.font.Font("./assets/fonts/Lato/Lato-Bold.ttf", int(72*WindowScale2)), (255, 64, 128), 21*WindowXscale, 360*WindowYscale, "center")
-    
+    offlineBoxOutline_rect_surface = pygame.Surface((960*WindowScale2 + 10*WindowXscale, 360*WindowScale2 + 10*WindowYscale), pygame.SRCALPHA)
+    offlineBoxOutline_rect_surface.fill((128, 192, 255, offlineBoxAlpha))  # Fill with red and set alpha to 128 (50% transparent)
+    screen.blit(offlineBoxOutline_rect_surface, ((635*WindowXscale) - (480*WindowScale2), (355*WindowYscale) - (180*WindowScale2)))
+    offlineBox_rect_surface = pygame.Surface((960*WindowScale2, 360*WindowScale2), pygame.SRCALPHA)
+    offlineBox_rect_surface.fill((0, 64, 128, offlineBoxAlpha))  # Fill with red and set alpha to 128 (50% transparent)
+    screen.blit(offlineBox_rect_surface, ((640*WindowXscale) - (480*WindowScale2), (360*WindowYscale) - (180*WindowScale2)))
+    draw_text(f"While you were away for {abbreviate((Decimal(offlineCurrentTime) - Decimal(offlineOldTime)), "s", 3, 10000, True)} seconds,", pygame.font.Font("./assets/fonts/Lato/Lato-Bold.ttf", int(30*WindowScale2)), (255, 64, 128, offlineBoxAlpha), 640*WindowXscale, 330*WindowYscale, "center", offlineBoxAlpha)
+    draw_text(f"You earned {abbreviate(Decimal(differenceTimeOffline) * Decimal(auto_click_value) * Decimal(auto_click_rate) * Decimal(gemboost), "s", 3, 100000, True)} clicks.", pygame.font.Font("./assets/fonts/Lato/Lato-Bold.ttf", int(30*WindowScale2)), (255, 64, 128, offlineBoxAlpha), 640*WindowXscale, 390*WindowYscale, "center", offlineBoxAlpha)
+    offlineBoxAlpha = constrain(offlineBoxAlpha - 51*delta_time, 0, 255)
     # Update display
     particle1.emit()
-    pygame.display.update()
+    pygame.display.flip()
     #clock.tick(24)
     keys = pygame.key.get_pressed()
     if keys[pygame.K_a]:
