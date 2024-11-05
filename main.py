@@ -436,6 +436,7 @@ Settings = [
     "max": ""},
 ]
 Settings_buttons = []
+NoSettings_buttons = []
 Settings_button_width = [300, 300, 300, 300, 300, 300]
 Settings_button_height = [50, 50, 50, 50, 50, 50]
 Settings_button_x = [960, 960, 960, 960, 960, 960]
@@ -476,6 +477,7 @@ for i, upgrade in enumerate(upgrades):
     upgrade_buttons[i] = pygame.Rect(x, y, upgrade_button_width[i], upgrade_button_height[i])
 for i, setting in enumerate(Settings):
     Settings_buttons.append(pygame.Rect(Settings_button_x[i], Settings_button_y[i], Settings_button_width[i], Settings_button_height[i]))
+    NoSettings_buttons.append(pygame.Rect(Settings_button_x[i], Settings_button_y[i], Settings_button_width[i], Settings_button_height[i]))
     Settings_buttons[i] = pygame.Rect(Settings_button_x[i], Settings_button_y[i], Settings_button_width[i], Settings_button_height[i])
 
 # Game loop
@@ -655,6 +657,7 @@ while running:
         x = Settings_button_x[i]
         y = Settings_button_y[i] + Settings_Button_Y_scroll + Settings_Button_Y_scroll_vel
         Settings_buttons[i] = pygame.Rect(x*WindowScale2, y*WindowYscale, Settings_button_width[i]*WindowScale2, Settings_button_height[i]*WindowScale2)
+        NoSettings_buttons[i] = pygame.Rect((Settings_button_x[i] + CamPos[0]*WindowXscale)*WindowXscale, (constrain(Settings_button_y[i] + Settings_Button_Y_scroll + Settings_Button_Y_scroll_vel, screen_height*0.05, screen_height*0.5) + CamPos[1]*WindowYscale/WindowYscale)*WindowYscale, Settings_button_width[i]*WindowXscale, Settings_button_height[i]*WindowYscale)
         SettingsButtonColorRed[i] += (SettingsTargetButtonColorRed[i] - SettingsButtonColorRed[i])/(0.15/delta_time)
         SettingsButtonColorGreen[i] += (SettingsTargetButtonColorGreen[i] - SettingsButtonColorGreen[i])/(0.15/delta_time)
         SettingsButtonColorBlue[i] += (SettingsTargetButtonColorBlue[i] - SettingsButtonColorBlue[i])/(0.15/delta_time)
@@ -718,7 +721,7 @@ while running:
                 UpgradeTargetButtonOutlineColorRed[i] = 0
                 UpgradeTargetButtonOutlineColorGreen[i] = 0
                 UpgradeTargetButtonOutlineColorBlue[i] = 0
-        for i, button in enumerate(Settings_buttons):
+        for i, button in enumerate(NoSettings_buttons):
             if button.collidepoint((mos_x - (CamPos[0]*WindowXscale), mos_y - (CamPos[1]*WindowYscale))):
                 SettingsTargetButtonColorRed[i] = 0
                 SettingsTargetButtonColorGreen[i] = 100
@@ -734,7 +737,7 @@ while running:
                 SettingsTargetButtonOutlineColorGreen[i] = 0
                 SettingsTargetButtonOutlineColorBlue[i] = 0
         if event.type == pygame.MOUSEBUTTONUP:
-            for i, button in enumerate(Settings_buttons):
+            for i, button in enumerate(NoSettings_buttons):
                 Settings[i]["held"] = False
         if event.type == pygame.MOUSEBUTTONDOWN:
             for i, button in enumerate(upgrade_buttons):
@@ -756,7 +759,7 @@ while running:
                         upgrade_sound.stop()
                         upgrade_sound.play()
                         click_sound.play()
-            for i, button in enumerate(Settings_buttons):
+            for i, button in enumerate(NoSettings_buttons):
                 if button.collidepoint(event.pos):
                     click_sound.play()
                     SettingsTargetButtonColorRed[i] = 150
@@ -823,7 +826,7 @@ while running:
             text_rect.center = (x, y)
             screen.blit(text_surface, text_rect)
     draw_text(f"Clicks: {abbreviate(score, "s", 3, 100000, False)}", font, WHITE, 10*WindowScale2 + CamPos[0]*WindowXscale, 10*WindowScale2 + CamPos[1]*WindowYscale, "left", 255)
-    draw_text(f"Clicks Per Click: {abbreviate(click_value + cps_to_cpc*auto_click_value*auto_click_rate, "s", 3, 100000, False)}", font, WHITE, 10*WindowScale2 + CamPos[0]*WindowXscale, 40*WindowScale2 + CamPos[1]*WindowYscale, "left", 255)
+    draw_text(f"Clicks Per Click: {abbreviate(click_value + (cps_to_cpc*auto_click_value*auto_click_rate), "s", 3, 100000, False)}", font, WHITE, 10*WindowScale2 + CamPos[0]*WindowXscale, 40*WindowScale2 + CamPos[1]*WindowYscale, "left", 255)
     draw_text(f"Click Value Multiplier: x{abbreviate(click_value_multi, "s", 3, 100000, False)}", font, WHITE, 10*WindowScale2 + CamPos[0]*WindowXscale, 70*WindowScale2 + CamPos[1]*WindowYscale, "left", 255)
     draw_text(f"Clicks Per Second: {abbreviate(auto_click_value, "s", 3, 100000, False)}/s", font, WHITE, 10*WindowScale2 + CamPos[0]*WindowXscale, 100*WindowScale2 + CamPos[1]*WindowYscale, "left", 255)
     if delta_time > 0:
@@ -910,8 +913,8 @@ while running:
     offlineBox_rect_surface = pygame.Surface((960*WindowScale2, 360*WindowScale2), pygame.SRCALPHA)
     offlineBox_rect_surface.fill((0, 64, 128, offlineBoxAlpha))  # Fill with red and set alpha to 128 (50% transparent)
     screen.blit(offlineBox_rect_surface, ((640*WindowXscale) - (480*WindowScale2), (360*WindowYscale) - (180*WindowScale2)))
-    draw_text(f"While you were away for {abbreviate((Decimal(offlineCurrentTime) - Decimal(offlineOldTime)), "s", 3, 10000, True)} seconds,", pygame.font.Font("./assets/fonts/Lato/Lato-Bold.ttf", int(30*WindowScale2)), (255, 64, 128, offlineBoxAlpha), 640*WindowXscale, 330*WindowYscale, "center", offlineBoxAlpha)
-    draw_text(f"You earned {abbreviate(Decimal(differenceTimeOffline) * Decimal(auto_click_value) * Decimal(auto_click_rate) * Decimal(gemboost), "s", 3, 100000, True)} clicks.", pygame.font.Font("./assets/fonts/Lato/Lato-Bold.ttf", int(30*WindowScale2)), (255, 64, 128, offlineBoxAlpha), 640*WindowXscale, 390*WindowYscale, "center", offlineBoxAlpha)
+    draw_text(f"While you were away for {abbreviate((Decimal(offlineCurrentTime) - Decimal(offlineOldTime)), "s", 3, 10000, False)} seconds,", pygame.font.Font("./assets/fonts/Lato/Lato-Bold.ttf", int(30*WindowScale2)), (255, 64, 128, offlineBoxAlpha), 640*WindowXscale, 330*WindowYscale, "center", offlineBoxAlpha)
+    draw_text(f"You earned {abbreviate(Decimal(differenceTimeOffline) * Decimal(auto_click_value) * Decimal(auto_click_rate) * Decimal(gemboost), "s", 3, 100000, False)} clicks.", pygame.font.Font("./assets/fonts/Lato/Lato-Bold.ttf", int(30*WindowScale2)), (255, 64, 128, offlineBoxAlpha), 640*WindowXscale, 390*WindowYscale, "center", offlineBoxAlpha)
     offlineBoxAlpha = constrain(offlineBoxAlpha - 51*delta_time, 0, 255)
     # Update display
     particle1.emit()
