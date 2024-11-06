@@ -597,6 +597,13 @@ except FileNotFoundError:
     if not offlineProgressCheck:
         offlineProgressCheck = True
     open('./save/gamesaveGameTimeStuff2.txt', 'w').write(f"{offlineTime}")
+
+"""
+    if event.button == 1:
+        print("You pressed the left mouse button")
+    elif event.button == 3:
+        print("You pressed the right mouse button")
+"""
 while running:
     framestofixload += 1
     gemboost = Decimal((50+gems)/50)
@@ -691,7 +698,7 @@ while running:
             if button_i == 0:
                 target_scale_x[0] = 550
                 for event in pygame.event.get():
-                    if event.type == pygame.MOUSEBUTTONDOWN:
+                    if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                         target_scale_x[0] = 450
                         scale_x[0] = constrain(scale_x[0]-40, 200, math.inf)
                         score += Decimal(click_value)*Decimal(random.uniform(0.95, 1.05))*Decimal(click_value_multi)*Decimal(gemboost) + Decimal(cps_to_cpc)*Decimal(auto_click_value)*Decimal(auto_click_rate)*Decimal(gemboost)
@@ -739,7 +746,7 @@ while running:
         if event.type == pygame.MOUSEBUTTONUP:
             for i, button in enumerate(NoSettings_buttons):
                 Settings[i]["held"] = False
-        if event.type == pygame.MOUSEBUTTONDOWN:
+        if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
             for i, button in enumerate(upgrade_buttons):
                 if button.collidepoint((mos_x - CamPos[0]*WindowXscale, mos_y - CamPos[1]*WindowYscale)):
                     UpgradeTargetButtonColorRed[i] = 150
