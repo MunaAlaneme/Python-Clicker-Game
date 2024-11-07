@@ -266,86 +266,90 @@ auto_click_rate = Decimal(1)
 click_value_multi = Decimal(1)
 cps_to_cpc = Decimal(0)
 upgrades = []
-upgrades.append(
-    {"num": 1,
-    "name": "+1 Per Click",
-    "cost": Decimal(0),
-    "startcost": Decimal(40/1.1),
-    "costcoefficient": Decimal(1.1),
-    "bought": Decimal(1)}
-)
-upgrades.append(
-    {"num": 2,
-    "name": "Auto Clicker +0.1",
-    "cost": Decimal(0),
-    "startcost": Decimal(80),
-    "costcoefficient": Decimal(1.1),
-    "bought": Decimal(0)}
-)
-upgrades.append(
-    {"num": 3,
-    "name": "Auto Click Rate +0.1",
-    "cost": Decimal(0),
-    "startcost": Decimal(500),
-    "costcoefficient": Decimal(1.1),
-    "bought": Decimal(0)}
-)
-upgrades.append(
-    {"num": 4,
-    "name": "Double Clicks (X2)",
-    "cost": Decimal(0),
-    "startcost": Decimal(10000),
-    "costcoefficient": Decimal(7),
-    "bought": Decimal(0)}
-)
-upgrades.append(
-    {"num": 5,
-    "name": "Auto Clicker +1",
-    "cost": Decimal(0),
-    "startcost": Decimal(1200),
-    "costcoefficient": Decimal(1.07),
-    "bought": Decimal(0)}
-)
-upgrades.append(
-    {"num": 6,
-    "name": "Double Click Rate (X2)",
-    "cost": Decimal(0),
-    "startcost": Decimal(35000),
-    "costcoefficient": Decimal(9),
-    "bought": Decimal(0)}
-)
-upgrades.append(
-    {"num": 7,
-    "name": "Auto Clicker +10",
-    "cost": Decimal(0),
-    "startcost": Decimal(18000),
-    "costcoefficient": Decimal(1.07),
-    "bought": Decimal(0)}
-)
-upgrades.append(
-    {"num": 8,
-    "name": "+10 Per Click",
-    "cost": Decimal(0),
-    "startcost": Decimal(1000),
-    "costcoefficient": Decimal(1.06),
-    "bought": Decimal(0)}
-)
-upgrades.append(
-    {"num": 9,
-    "name": "Triple Click Rate (X3)",
-    "cost": Decimal(0),
-    "startcost": Decimal(500000),
-    "costcoefficient": Decimal(15),
-    "bought": Decimal(0)}
-)
-upgrades.append(
-    {"num": 10,
-    "name": "+1% CPS per click",
-    "cost": Decimal(0),
-    "startcost": Decimal(1000000),
-    "costcoefficient": Decimal(5),
-    "bought": Decimal(0)}
-)
+def resetupgrades():
+    global upgrades
+    upgrades = []
+    upgrades.append(
+        {"num": 1,
+        "name": "+1 Per Click",
+        "cost": Decimal(0),
+        "startcost": Decimal(40/1.1),
+        "costcoefficient": Decimal(1.1),
+        "bought": Decimal(1)}
+    )
+    upgrades.append(
+        {"num": 2,
+        "name": "Auto Clicker +0.1",
+        "cost": Decimal(0),
+        "startcost": Decimal(80),
+        "costcoefficient": Decimal(1.1),
+        "bought": Decimal(0)}
+    )
+    upgrades.append(
+        {"num": 3,
+        "name": "Auto Click Rate +0.1",
+        "cost": Decimal(0),
+        "startcost": Decimal(500),
+        "costcoefficient": Decimal(1.1),
+        "bought": Decimal(0)}
+    )
+    upgrades.append(
+        {"num": 4,
+        "name": "Double Clicks (X2)",
+        "cost": Decimal(0),
+        "startcost": Decimal(10000),
+        "costcoefficient": Decimal(7),
+        "bought": Decimal(0)}
+    )
+    upgrades.append(
+        {"num": 5,
+        "name": "Auto Clicker +1",
+        "cost": Decimal(0),
+        "startcost": Decimal(1200),
+        "costcoefficient": Decimal(1.07),
+        "bought": Decimal(0)}
+    )
+    upgrades.append(
+        {"num": 6,
+        "name": "Double Click Rate (X2)",
+        "cost": Decimal(0),
+        "startcost": Decimal(35000),
+        "costcoefficient": Decimal(9),
+        "bought": Decimal(0)}
+    )
+    upgrades.append(
+        {"num": 7,
+        "name": "Auto Clicker +10",
+        "cost": Decimal(0),
+        "startcost": Decimal(18000),
+        "costcoefficient": Decimal(1.07),
+        "bought": Decimal(0)}
+    )
+    upgrades.append(
+        {"num": 8,
+        "name": "+10 Per Click",
+        "cost": Decimal(0),
+        "startcost": Decimal(1000),
+        "costcoefficient": Decimal(1.06),
+        "bought": Decimal(0)}
+    )
+    upgrades.append(
+        {"num": 9,
+        "name": "Triple Click Rate (X3)",
+        "cost": Decimal(0),
+        "startcost": Decimal(500000),
+        "costcoefficient": Decimal(15),
+        "bought": Decimal(0)}
+    )
+    upgrades.append(
+        {"num": 10,
+        "name": "+1% CPS per click",
+        "cost": Decimal(0),
+        "startcost": Decimal(1000000),
+        "costcoefficient": Decimal(5),
+        "bought": Decimal(0)}
+    )
+resetupgrades()
 upgrade_buttons = []
 upgrade_button_width = [300, 360, 400, 380, 360, 440, 360, 320, 460, 440]
 upgrade_button_height = [50, 50, 50, 50, 50, 50, 50, 50, 50, 50]
@@ -434,13 +438,22 @@ Settings = [
     "held": False,
     "min": "",
     "max": ""},
+    {"num": 7,
+    "name": "Prestige",
+    "value": "",
+    "percent": False,
+    "round": False,
+    "holdable": False,
+    "held": False,
+    "min": "",
+    "max": ""},
 ]
 Settings_buttons = []
 NoSettings_buttons = []
-Settings_button_width = [300, 300, 300, 300, 300, 300]
-Settings_button_height = [50, 50, 50, 50, 50, 50]
-Settings_button_x = [960, 960, 960, 960, 960, 960]
-Settings_button_y = [70, 140, 210, 280, 350, 420, 490]
+Settings_button_width = [300, 300, 300, 300, 300, 300, 300]
+Settings_button_height = [50, 50, 50, 50, 50, 50, 50]
+Settings_button_x = [960, 960, 960, 960, 960, 960, 960]
+Settings_button_y = [70, 140, 210, 280, 350, 420, 490, 560]
 (SettingsButtonColorRed, SettingsButtonColorGreen, SettingsButtonColorBlue) = (
     [200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200],
     [200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200],
@@ -496,6 +509,7 @@ bulkbuy = 1
 CamPos = [0, 0]
 CamPos2 = [0, 0]
 gems = Decimal(0)
+gemstoget = Decimal(0)
 differenceTimeOffline = 0
 def constrain(val, min_val, max_val):
 
@@ -506,6 +520,7 @@ def constrain(val, min_val, max_val):
 pygame.mixer.init()
 pygamemixermusic = 1
 def PlayMusic(musNum):
+    pygame.mixer.music.stop()
     global pygamemixermusic
     pygamemixermusic = 1
     if musNum == 1:
@@ -804,6 +819,8 @@ while running:
                         save_game()
                     if i == 5:
                         load_game()
+                    if i == 6:
+                        prestige()
     scale_x[0] += (target_scale_x[0]-scale_x[0])/(0.15/delta_time)
     scale_y[0] = scale_x[0]
     smalclicrimg = pygame.transform.scale(clicker_button_image, (constrain(scale_x[0]*WindowScale2, 1, math.inf), constrain(scale_y[0]*WindowScale2, 1, math.inf)))
@@ -817,6 +834,7 @@ while running:
     click_value_multi = (Decimal(2)**Decimal(upgrades[3]["bought"]))
     if framestofixload >= 1:
         score += Decimal(auto_click_value) * Decimal(auto_click_rate) * Decimal(delta_time) * Decimal(gemboost)
+    gemstoget = (Decimal(100) * Decimal.sqrt(Decimal(score) / Decimal(1000000000000))) + Decimal(0)
 
     # Draw screen
     screen.fill((30, 30, 30))
@@ -841,9 +859,17 @@ while running:
     else:
         draw_text(f"FPS: INFINITY", font, WHITE, 10*WindowScale2 + CamPos[0]*WindowXscale, 130*WindowScale2 + CamPos[1]*WindowYscale, "left", 255)
     draw_text(f"Seconds Per Second: {abbreviate(auto_click_rate, "s", 3, 1000, False)}/s", font, WHITE, 10*WindowScale2 + CamPos[0]*WindowXscale, 160*WindowScale2 + CamPos[1]*WindowYscale, "left", 255)
-    draw_text(f"Gems: {abbreviate(gems, "s", 3, 100000, True)}, {abbreviate(Decimal(gemboost), "s", 3, 100000, False)}x boost", font, WHITE, 10*WindowScale2 + CamPos[0]*WindowXscale, 190*WindowScale2 + CamPos[1]*WindowYscale, "left", 255)
+    draw_text(f"Gems: {abbreviate(gems, "s", 3, 100000, True)} (+ {abbreviate(gemstoget, "s", 3, 100000, True)}), {abbreviate(Decimal(gemboost), "s", 3, 100000, False)}x boost", font, WHITE, 10*WindowScale2 + CamPos[0]*WindowXscale, 190*WindowScale2 + CamPos[1]*WindowYscale, "left", 255)
     draw_text(f"Total Clicks Per Second: {abbreviate(auto_click_value * auto_click_rate * gemboost, "s", 3, 1000, False)}/s", font, WHITE, 10*WindowScale2 + CamPos[0]*WindowXscale, 220*WindowScale2 + CamPos[1]*WindowYscale, "left", 255)
     draw_text(f"Total Clicks Per Click: {abbreviate((click_value*click_value_multi + cps_to_cpc*auto_click_value*auto_click_rate)*gemboost, "s", 3, 100000, False)}", font, WHITE, 10*WindowScale2 + CamPos[0]*WindowXscale, 250*WindowScale2 + CamPos[1]*WindowYscale, "left", 255)
+
+    def prestige():
+        global score, gems
+        score = 0
+        resetupgrades()
+        PlayMusic(random.randint(1,4))
+        pygame.mixer.music.set_volume(Decimal(pygamemixermusic) * (Settings[1]["value"] / 100))
+        gems += gemstoget
 
     # Draw upgrade buttons
     for i, button in enumerate(Settings_buttons):
