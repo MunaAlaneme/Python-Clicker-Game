@@ -3,6 +3,8 @@ setuptools
 PySDL2
 PySDL3
 cython
+SDL2
+pygame
 pygame-ce
 random
 decimal
