@@ -1,0 +1,16 @@
+pyglet
+sys
+setuptools
+pygame
+random
+decimal
+math
+time
+os
+numpy
+svg
+datetime
+pickle
+json
+csv
+asyncio
