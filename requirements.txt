@@ -1,6 +1,8 @@
 pyglet
 setuptools
 PySDL2
+PySDL3
+cython
 pygame
 random
 decimal
