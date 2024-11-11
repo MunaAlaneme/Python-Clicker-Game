@@ -512,7 +512,6 @@ gems = Decimal(0)
 gemstoget = Decimal(0)
 differenceTimeOffline = 0
 def constrain(val, min_val, max_val):
-
     if val < min_val: return min_val
     if val > max_val: return max_val
     return val
@@ -770,12 +769,12 @@ while running:
                     UpgradeTargetButtonOutlineColorRed[i] = 0
                     UpgradeTargetButtonOutlineColorGreen[i] = 128
                     UpgradeTargetButtonOutlineColorBlue[i] = 255
+                    if bulkbuy == "Max":
+                        buy00001 = Decimal(calcmax())
+                    elif Settings[3]["value"] == "ON":
+                        buy00001 = Decimal(upgrades[i]["bought"]) - Decimal(upgrades[i]["bought"]) % Decimal(bulkbuy) + Decimal(bulkbuy) - Decimal(upgrades[i]["bought"])
+                    else: buy00001 = Decimal(bulkbuy)
                     if Decimal(score) >= Decimal(upgrades[i]["cost"]):
-                        if bulkbuy == "Max":
-                            buy00001 = Decimal(calcmax())
-                        elif Settings[3]["value"] == "ON":
-                            buy00001 = Decimal(upgrades[i]["bought"]) - Decimal(upgrades[i]["bought"]) % Decimal(bulkbuy) + Decimal(bulkbuy) - Decimal(upgrades[i]["bought"])
-                        else: buy00001 = Decimal(bulkbuy)
                         score -= Decimal(upgrades[i]["cost"])
                         upgrades[i]["bought"] += Decimal(buy00001)
                         upgrade_sound.stop()
