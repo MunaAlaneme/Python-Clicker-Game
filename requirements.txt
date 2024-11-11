@@ -5,7 +5,6 @@ cython
 pygame
 wheel
 toml
-decimal
 numpy
 svg
 datetime
