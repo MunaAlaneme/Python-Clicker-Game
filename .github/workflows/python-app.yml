@@ -1,5 +1,11 @@
 # This workflow will install Python dependencies, run tests and lint with a single version of Python
 # For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-python
+# git clone https://github.com/pygame/pygame.git
+# cd pygame
+# python3 setup.py -config -auto
+# python3 setup.py build
+# python3 setup.py install --user
+# cd
 
 name: Python application
 
@@ -29,12 +35,6 @@ jobs:
         pip install flake8 pytest
         sudo apt-get update
         sudo apt-get install libsdl2-dev libsdl2-image-dev libsdl2-mixer-dev libsdl2-ttf-dev libfreetype6-dev libportmidi-dev libjpeg-dev build-essential python3-dev python3-numpy python3-pip python3-virtualenv cython3 python3-full
-        git clone https://github.com/pygame/pygame.git
-        cd pygame
-        python3 setup.py -config -auto
-        python3 setup.py build
-        python3 setup.py install --user
-        cd
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
     - name: Lint with flake8
       run: |
