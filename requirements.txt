@@ -1,5 +1,4 @@
 pyglet
-setuptools
 PySDL2
 PySDL3
 cython
