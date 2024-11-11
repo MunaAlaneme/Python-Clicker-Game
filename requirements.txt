@@ -6,7 +6,6 @@ pygame
 wheel
 toml
 pygame-ce
-numpy
 pynanosvg
 datetime
 pickle
