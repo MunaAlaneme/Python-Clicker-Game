@@ -7,7 +7,7 @@ wheel
 toml
 pygame-ce
 numpy
-svg
+pynanosvg
 datetime
 pickle
 csv
