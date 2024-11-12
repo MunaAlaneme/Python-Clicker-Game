@@ -20,10 +20,10 @@ jobs:
           pip install -r requirements.txt
       - name: Run PyInstaller
         run: |
-          python -m PyInstaller qwiklab_badge_checker.spec
+          python -m PyInstaller main.spec
       - uses: actions/upload-artifact@v4.4.3
         with:
-          name: Windows_qwiklabs
+          name: Windows_CopilotClicker
           path: dist/MicrosoftCopilotClickerPygame.exe
 
       - name: create release
