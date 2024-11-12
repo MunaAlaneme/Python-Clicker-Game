@@ -20,6 +20,7 @@ import pickle
 import json
 import csv
 import asyncio
+#pynanosvg
 
 GameFPS = 60
 
