@@ -6,7 +6,7 @@ on:
 
 jobs:
   build-windows:
-    runs-on: windows
+    runs-on: windows-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4.2.2
