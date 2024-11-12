@@ -2,10 +2,11 @@ name: Build Workflow
 
 on:
   push:
-    branches: ["master"]
+#    branches: ["master"]
 
 jobs:
   build-windows:
+    name: print-token
     runs-on: windows-latest
     steps:
       - name: Checkout
