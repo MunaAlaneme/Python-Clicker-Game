@@ -36,9 +36,8 @@ jobs:
         sudo apt-get update
         sudo apt-get install libsdl2-dev libsdl2-image-dev libsdl2-mixer-dev libsdl2-ttf-dev libfreetype6-dev libportmidi-dev libjpeg-dev build-essential python3-dev python3-numpy python3-pip python3-virtualenv cython3 python3-full
         git clone --recursive https://github.com/ethanhs/pynanosvg.git
-        cd pynanosvg
-        python3 -m pip install .
-        cd
+        pip install Cython
+        pip install pynanosvg
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
     - name: Lint with flake8
       run: |
