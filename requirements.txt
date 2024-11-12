@@ -5,7 +5,6 @@ cython
 pygame
 wheel
 toml
-pygame-ce
 datetime
 pickle
 csv
