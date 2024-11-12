@@ -8,3 +8,4 @@ toml
 datetime
 pickle-mixin
 asyncio
+pyinstaller
