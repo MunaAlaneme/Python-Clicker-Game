@@ -6,6 +6,6 @@ pygame
 wheel
 toml
 datetime
-pickle
+pickle-mixin
 csv
 asyncio
