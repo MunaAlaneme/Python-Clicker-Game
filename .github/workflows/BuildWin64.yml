@@ -6,7 +6,10 @@ on:
 
 jobs:
   build-windows:
-    permissions: write-all
+    permissions:
+      contents: write
+      pull-requests: write
+      repository-projects: write
     runs-on: windows-latest
     steps:
       - name: Checkout
