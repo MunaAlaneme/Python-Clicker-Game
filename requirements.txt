@@ -7,5 +7,4 @@ wheel
 toml
 datetime
 pickle-mixin
-csv
 asyncio
