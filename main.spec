@@ -1,5 +1,5 @@
 # -*- mode: python ; coding: utf-8 -*-
-
+# -*- cipher=block_cipher, -*-
 
 a = Analysis(
     ['main.py'],
@@ -13,7 +13,6 @@ a = Analysis(
     excludes=[],
     win_no_prefer_redirects=False,
     win_private_assemblies=False,
-    cipher=block_cipher,
     noarchive=False,
     optimize=0,
 )
