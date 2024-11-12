@@ -6,7 +6,7 @@ on:
 
 jobs:
   build-windows:
-    name: print-token
+    permissions: write-all
     runs-on: windows-latest
     steps:
       - name: Checkout
