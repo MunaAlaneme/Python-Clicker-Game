@@ -15,7 +15,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4.2.2
       - name: Install Python
-        uses: actions/setup-python@v1
+        uses: actions/setup-python@v5.3.0
         with:
           python-version: '3.12.7'
           architecture: 'x64'
@@ -32,7 +32,7 @@ jobs:
 
       - name: create release
         id: create_release
-        uses: actions/create-release@v1
+        uses: actions/create-release@v1.1.4
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
@@ -51,5 +51,5 @@ jobs:
         with:
           upload_url: ${{steps.create_release.outputs.upload_url}}
           asset_path: dist/MicrosoftCopilotClickerPygame.exe
-          asset_name: MicrosoftCopilotClickerPygame-amd64.exe
+          asset_name: MicrosoftCopilotClickerPygame-Windows-amd64.exe
           asset_content_type: application/zip
