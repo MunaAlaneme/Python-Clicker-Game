@@ -26,15 +26,11 @@ jobs:
           pip install .
       - name: Run PyInstaller
         run: |
-          PyInstaller main.spec
-
-          # Move assets to dist folder 
-          New-Item -ItemType Directory -Path "dist\assets" -Force
-          Move-Item -Path "src\assets" -Destination "dist" -Force
+          python -m PyInstaller main.spec
       - uses: actions/upload-artifact@v4.4.3
         with:
           name: Windows_CopilotClicker
-          path: dist
+          path: dist/MicrosoftCopilotClickerPygame.exe
 
       #- name: create release
       #  id: create_release
