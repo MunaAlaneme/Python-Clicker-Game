@@ -1,3 +1,26 @@
+#    permissions:
+#      contents: write
+#      pull-requests: write
+#      repository-projects: write
+#    steps:
+#      - name: Checkout
+#        uses: actions/checkout@v4.2.2
+#      - name: Install Python
+#        uses: actions/setup-python@v5.3.0
+#        with:
+#          python-version: '3.12.7'
+#          architecture: 'x64'
+#      - uses: actions/upload-artifact@v4.4.3
+#        with:
+#          name: Windows_CopilotClicker
+#          path: build
+#          if-no-files-found: error
+#        
+#
+      #- name: Upload Release Asset
+      #  id: upload-release-asset
+      #  uses: actions/upload-release-asset@v1.0.2
+
 name: Build Workflow
 
 on:
@@ -6,18 +29,14 @@ on:
 
 jobs:
   build-windows:
-    permissions:
-      contents: write
-      pull-requests: write
-      repository-projects: write
     runs-on: windows-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4.2.2
+        uses: actions/checkout@v1
       - name: Install Python
-        uses: actions/setup-python@v5.3.0
+        uses: actions/setup-python@v1
         with:
-          python-version: '3.12.7'
+          python-version: '3.7'
           architecture: 'x64'
       - name: Install requirements
         run: |
@@ -25,16 +44,14 @@ jobs:
       - name: Run PyInstaller
         run: |
           python -m PyInstaller main.spec
-      - uses: actions/upload-artifact@v4.4.3
+      - uses: actions/upload-artifact@v2
         with:
           name: Windows_CopilotClicker
-          path: build
-          if-no-files-found: error
-        
+          path: dist/CopilotClickerPygame_Windows64.exe
 
       - name: create release
         id: create_release
-        uses: actions/create-release@v1.1.4
+        uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
@@ -47,7 +64,7 @@ jobs:
           prerelease: true
       - name: Upload Release Asset
         id: upload-release-asset
-        uses: actions/upload-release-asset@v1.0.2
+        uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
