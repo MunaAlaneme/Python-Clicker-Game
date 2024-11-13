@@ -11,6 +11,9 @@ jobs:
       pull-requests: write
       repository-projects: write
     runs-on: windows-latest
+    defaults:
+      run:
+        working-directory: ./thing
     steps:
       - name: Checkout
         uses: actions/checkout@v4.2.2
@@ -28,12 +31,12 @@ jobs:
       - uses: actions/upload-artifact@v4.4.3
         with:
           name: Windows_CopilotClicker
-          path: build/*
+          path: build
           if-no-files-found: error
       - uses: actions/upload-artifact@v4.4.3
         with:
           name: Windows_CopilotClicker
-          path: dist/*
+          path: dist
           if-no-files-found: error
         
 
