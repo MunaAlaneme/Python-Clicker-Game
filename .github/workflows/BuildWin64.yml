@@ -21,35 +21,41 @@ jobs:
           architecture: 'x64'
       - name: Install requirements
         run: |
-          pip install -r requirements.txt
+          python -m pip install --upgrade pip
+          pip install --requirement requirements.txt
+          pip install .
       - name: Run PyInstaller
         run: |
-          python -m PyInstaller main.spec
+          PyInstaller main.spec
+
+          # Move assets to dist folder 
+          New-Item -ItemType Directory -Path "dist\assets" -Force
+          Move-Item -Path "src\assets" -Destination "dist" -Force
       - uses: actions/upload-artifact@v4.4.3
         with:
           name: Windows_CopilotClicker
-          path: dist/MicrosoftCopilotClickerPygame.exe
+          path: dist
 
-      - name: create release
-        id: create_release
-        uses: actions/create-release@v1.1.4
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: ${{ github.event.head_commit.message }}
-          release_name: ${{ github.event.head_commit.message }}
-          overwrite: true
-          body: |
-            Prerelease v0.1.0
-          draft: false
-          prerelease: true
-      - name: Upload Release Asset
-        id: upload-release-asset
-        uses: actions/upload-release-asset@v1.0.2
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{steps.create_release.outputs.upload_url}}
-          asset_path: dist/MicrosoftCopilotClickerPygame.exe
-          asset_name: MicrosoftCopilotClickerPygame-Windows-amd64.exe
-          asset_content_type: application/zip
+      #- name: create release
+      #  id: create_release
+      #  uses: actions/create-release@v1.1.4
+      #  env:
+      #    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      #  with:
+      #    tag_name: ${{ github.event.head_commit.message }}
+      #    release_name: ${{ github.event.head_commit.message }}
+      #    overwrite: true
+      #    body: |
+      #      Prerelease v0.1.0
+      #    draft: false
+      #    prerelease: true
+      #- name: Upload Release Asset
+      #  id: upload-release-asset
+      #  uses: actions/upload-release-asset@v1.0.2
+      #  env:
+      #    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      #  with:
+      #    upload_url: ${{steps.create_release.outputs.upload_url}}
+      #    asset_path: dist/MicrosoftCopilotClickerPygame.exe
+      #    asset_name: MicrosoftCopilotClickerPygame-Windows-amd64.exe
+      #    asset_content_type: application/zip
