@@ -70,8 +70,12 @@ jobs:
       #- name: Find Release Asset
       #  id: find_asset
       #  run: echo "asset=$(find dist -type f -name '*.exe')" >> $GITHUB_ENV
-      - name: Compress Directory
-        run: zip -r dist.zip dist
+      - name: Install zip and Compress Directory
+        #run: zip -r dist.zip dist
+        run: |
+          choco install zip -y
+          Compress-Archive -Path dist\* -DestinationPath dist.zip
+        shell: pwsh
       - name: Upload Release Asset
         id: upload-release-asset
         uses: actions/upload-release-asset@v1.0.2
@@ -83,5 +87,5 @@ jobs:
           #asset_path: dist/MicrosoftCopilotClickerPygame-Windows-amd64.exe
           #asset_path: ${{ env.asset }}
           asset_path: dist.zip
-          asset_name: MicrosoftCopilotClickerPygame-Windows-amd64.exe
+          asset_name: MicrosoftCopilotClickerPygame-Windows-amd64.zip
           asset_content_type: application/zip
