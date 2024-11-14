@@ -89,3 +89,4 @@ jobs:
           asset_path: dist.zip
           asset_name: MicrosoftCopilotClickerPygame-Windows-amd64.zip
           asset_content_type: application/zip
+          token: ${{ secrets.GITHUB_TOKEN }}
