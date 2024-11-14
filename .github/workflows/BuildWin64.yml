@@ -7,11 +7,13 @@ name: Build Workflow
 on:
   push:
     branches: [ "main" ]
+    tags:
+      - 'v*.*.*'
   pull_request:
     branches: [ "main" ]
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   build-windows:
@@ -64,6 +66,7 @@ jobs:
             Prerelease v0.0.1
           draft: true
           prerelease: true
+          generateReleaseNotes: true
       - name: Upload Release Asset
         id: upload-release-asset
         uses: actions/upload-release-asset@v1.0.2
