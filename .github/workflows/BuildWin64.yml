@@ -47,7 +47,9 @@ jobs:
       - uses: actions/upload-artifact@v3
         with:
           name: Windows_CopilotClicker
-          path: dist/CopilotClickerPygame_Windows64.exe
+          #path: dist/CopilotClickerPygame_Windows64.exe
+          path: build
+          if-no-files-found: error
 
       - name: create release
         id: create_release
