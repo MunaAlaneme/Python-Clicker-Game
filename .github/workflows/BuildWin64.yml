@@ -76,6 +76,6 @@ jobs:
           #upload_url: ${{steps.create_release.outputs.upload_url}}
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           #asset_path: dist/MicrosoftCopilotClickerPygame.exe
-          asset_path: build
+          asset_path: dist
           asset_name: MicrosoftCopilotClickerPygame-Windows-amd64.exe
           asset_content_type: application/zip
