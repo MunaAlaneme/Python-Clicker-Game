@@ -40,7 +40,7 @@ jobs:
           pip install -r requirements.txt
       - name: Run PyInstaller
         run: |
-          python -m PyInstaller main.spec
+          python -m pyinstaller main.spec
       - uses: actions/upload-artifact@v4.4.3
         with:
           name: Windows_CopilotClicker
