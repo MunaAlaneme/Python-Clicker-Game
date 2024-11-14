@@ -39,7 +39,7 @@ jobs:
           python.exe -m pip install pip==18.1
           pip3 install -r PyInstaller
           pip3 install -r requirements.txt
-          python.exe -m pip install --upgrade pip
+          #python.exe -m pip install --upgrade pip
       - name: Run PyInstaller
         run: |
           python -m PyInstaller main.spec
