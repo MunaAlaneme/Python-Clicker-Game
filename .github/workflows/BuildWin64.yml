@@ -80,7 +80,8 @@ jobs:
         uses: softprops/action-gh-release@v2.1.0
         env:
           #GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          GITHUB_TOKEN:  ${{ secrets.variables.MY_PERSONAL_ACCESS_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          #GITHUB_TOKEN:  ${{ secrets.variables.MY_PERSONAL_ACCESS_TOKEN }}
         with:
           files: dist.zip
           #upload_url: ${{ steps.create_release.outputs.upload_url }}
