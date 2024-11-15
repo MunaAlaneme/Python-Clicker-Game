@@ -12,6 +12,7 @@ permissions:
   contents: write
   pull-requests: write
   repository-projects: write
+  packages: write
 
 jobs:
   build-windows:
@@ -54,14 +55,12 @@ jobs:
         #env:
           #GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          #tag_name: ${{ github.event.head_commit.message }}
-          token: ${{ secrets.GITHUB_TOKEN }}
           tag: ${{ github.ref_name }}
           #release_name: ${{ github.event.head_commit.message }}
           name: Prerelease ${{ github.ref_name }}
           #overwrite: true
           body: |
-            Prerelease v0.0.1
+            Prerelease ${{ github.ref_name }}
           draft: true
           prerelease: true
           generateReleaseNotes: true
@@ -69,25 +68,19 @@ jobs:
       #  id: find_asset
       #  run: echo "asset=$(find dist -type f -name '*.exe')" >> $GITHUB_ENV
       - name: Install zip and Compress Directory
-        #Compress-Archive -Path dist\* -DestinationPath dist.zip
         run: |
           choco install zip -y
-          zip -r dist.zip dist
-        #shell: pwsh
+          Compress-Archive -Path dist\* -DestinationPath dist.zip
+        shell: pwsh
       - name: Upload Release Asset
         #id: upload-release-asset
-        #uses: actions/upload-release-asset@v1.0.2
-        uses: softprops/action-gh-release@v2.1.0
-        env:
-          #GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          GITHUB_TOKEN: ${{ secrets.TOKEN }}
-          #GITHUB_TOKEN:  ${{ secrets.variables.MY_PERSONAL_ACCESS_TOKEN }}
+        #uses: softprops/action-gh-release@v2.1.0
+        uses: actions/upload-release-asset@v1.0.2
         with:
-          files: dist.zip
-          #upload_url: ${{ steps.create_release.outputs.upload_url }}
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
           ##asset_path: dist/MicrosoftCopilotClickerPygame-Windows-amd64.exe
           ##asset_path: ${{ env.asset }}
-          #asset_path: dist.zip
-          #asset_name: MicrosoftCopilotClickerPygame-Windows-amd64.zip
-          #asset_content_type: application/zip
+          asset_path: dist.zip
+          asset_name: MicrosoftCopilotClickerPygame-Windows-amd64.zip
+          asset_content_type: application/zip
           ##token: ${{ secrets.variables.MY_PERSONAL_ACCESS_TOKEN }}
