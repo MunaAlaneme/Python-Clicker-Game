@@ -11,15 +11,20 @@ import random
 from decimal import *
 import math
 import sys
+sys.path.append('./ffmpeg')
+sys.path.append('./ffprobe')
 import time
 import os
-# import numpy as np UGLY!
+# import numpy as np
 import svg
 import datetime
 import pickle
 import json
 import csv
 import asyncio
+import wave
+import audioop
+import pyaudio
 #pynanosvg
 
 GameFPS = 60
@@ -519,27 +524,60 @@ def constrain(val, min_val, max_val):
 
 pygame.mixer.init()
 pygamemixermusic = 1
+musicfilepath = ""
 def PlayMusic(musNum):
     pygame.mixer.music.stop()
-    global pygamemixermusic
+    global pygamemixermusic, musicfilepath
     pygamemixermusic = 1
     if musNum == 1:
         pygamemixermusic = 0.25
-        pygame.mixer.music.load("./assets/audio/Debug Menu Unused   Paper Mario  The Thousand Year Door.wav")
+        pymusictype = "wav"
+        musicfilepath = "./assets/audio/Debug Menu Unused   Paper Mario  The Thousand Year Door.wav"
     elif musNum == 2:
         pygamemixermusic = 1
-        pygame.mixer.music.load("./assets/audio/SpongeBob SquarePants OST - Dombummel (LQ).wav")
+        pymusictype = "wav"
+        musicfilepath = "./assets/audio/SpongeBob SquarePants OST - Dombummel (LQ).wav"
     elif musNum == 3:
         pygamemixermusic = 0.7
-        pygame.mixer.music.load("./assets/audio/Kevin MacLeod - Hep Cats.mp3")
+        pymusictype = "mp3"
+        musicfilepath = "./assets/audio/Kevin MacLeod - Hep Cats.mp3"
     elif musNum == 4:
         pygamemixermusic = 1
-        pygame.mixer.music.load("./assets/audio/(Object Break) Kevin MacLeod - Padanaya Blokov - loop.wav")
+        pymusictype = "wav"
+        musicfilepath = "./assets/audio/(Object Break) Kevin MacLeod - Padanaya Blokov - loop.wav"
+    elif musNum == 5:
+        pygamemixermusic = .9
+        pymusictype = "mp3"
+        musicfilepath = "./assets/audio/(radzlan - Miami Hotline Vol.3 (feat. Demonicity)) 673473_-Miami-Hotline--Vol3.mp3"
+    elif musNum == 6:
+        pygamemixermusic = .9
+        pymusictype = "wav"
+        musicfilepath = "./assets/audio/INOSSI - Got you-loop.wav"
     pygame.mixer.music.set_volume(Decimal(pygamemixermusic))
-    pygame.mixer.music.play(loops=-1)
-PlayMusic(random.randint(1,4))
+    #pygame.mixer.music.play(loops=-1)
+
+PlayMusic(random.randint(1,6))
 pygame.mixer.music.set_volume(Decimal(pygamemixermusic) * (Settings[1]["value"] / 100))
 
+def play_sound_with_pitch(file_path, pitch_factor):
+    # Load the sound
+    sound = pygame.mixer.Sound(file_path)
+
+    # Get the original sound frequency (default 44100 Hz)
+    original_frequency = pygame.mixer.get_init()[0]
+
+    # Adjust the frequency to change pitch
+    new_frequency = int(original_frequency * pitch_factor)
+    pygame.mixer.quit()  # Quit the mixer to reinitialize it
+    pygame.mixer.init(frequency=new_frequency)
+
+    # Play the sound
+    sound.play()
+    '''
+
+    # Wait until the sound finishes playing
+    time.sleep(sound.get_length())'''
+play_sound_with_pitch(musicfilepath, 1.2)
 click_sound = pygame.mixer.Sound("./assets/audio/Click mouse - Fugitive Simulator - The-Nick-of-Time.wav")
 hover_sound = pygame.mixer.Sound("./assets/audio/251389__deadsillyrabbit__button_hover-wav.wav")
 upgrade_sound = pygame.mixer.Sound("./assets/audio/Upgrade SOund 0001.wav")
@@ -619,6 +657,7 @@ except FileNotFoundError:
     elif event.button == 3:
         print("You pressed the right mouse button")
 """
+YouWillNotUpgradeUnlessToldTo_Time = 0.3
 while running:
     framestofixload += 1
     gemboost = Decimal((50+gems)/50)
@@ -772,17 +811,22 @@ while running:
                     UpgradeTargetButtonOutlineColorBlue[i] = 255
                     if bulkbuy == "Max":
                         buy00001 = Decimal(calcmax())
+                        upgrades[i]["cost"] = Decimal(upgrades[i]["startcost"]) * (((Decimal(upgrades[i]["costcoefficient"])**Decimal(upgrades[i]["bought"])) * (Decimal(upgrades[i]["costcoefficient"])**Decimal(calcmax()) - Decimal(1))) / (Decimal(upgrades[i]["costcoefficient"])-Decimal(1)))
                     elif Settings[3]["value"] == "ON":
                         buy00001 = Decimal(upgrades[i]["bought"]) - Decimal(upgrades[i]["bought"]) % Decimal(bulkbuy) + Decimal(bulkbuy) - Decimal(upgrades[i]["bought"])
-                    else: buy00001 = Decimal(bulkbuy)
-                    if Decimal(score) >= Decimal(upgrades[i]["cost"]):
+                        upgrades[i]["cost"] = Decimal(upgrades[i]["startcost"]) * (((Decimal(upgrades[i]["costcoefficient"])**Decimal(upgrades[i]["bought"])) * (Decimal(upgrades[i]["costcoefficient"])**Decimal(Decimal(upgrades[i]["bought"]) - Decimal(upgrades[i]["bought"]) % Decimal(bulkbuy) + Decimal(bulkbuy) - Decimal(upgrades[i]["bought"])) - Decimal(1))) / (Decimal(upgrades[i]["costcoefficient"])-Decimal(1)))
+                    else:
+                        buy00001 = Decimal(bulkbuy)
+                        upgrades[i]["cost"] = Decimal(upgrades[i]["startcost"]) * (((Decimal(upgrades[i]["costcoefficient"])**Decimal(upgrades[i]["bought"])) * (Decimal(upgrades[i]["costcoefficient"])**Decimal(bulkbuy) - Decimal(1))) / (Decimal(upgrades[i]["costcoefficient"])-Decimal(1)))
+                    if Decimal(score) >= Decimal(upgrades[i]["cost"]) and YouWillNotUpgradeUnlessToldTo_Time <=0:
                         score -= Decimal(upgrades[i]["cost"])
                         upgrades[i]["bought"] += Decimal(buy00001)
                         upgrade_sound.stop()
                         upgrade_sound.play()
                         click_sound.play()
+                        YouWillNotUpgradeUnlessToldTo_Time = 0.1
             for i, button in enumerate(NoSettings_buttons):
-                if button.collidepoint(event.pos):
+                if button.collidepoint(event.pos) and event.pos[1] == constrain(event.pos[1], screen_height*0.05, screen_height*0.5):
                     click_sound.play()
                     SettingsTargetButtonColorRed[i] = 150
                     SettingsTargetButtonColorGreen[i] = 75
@@ -867,14 +911,14 @@ while running:
         global score, gems
         score = 0
         resetupgrades()
-        PlayMusic(random.randint(1,4))
+        PlayMusic(random.randint(1,6))
         pygame.mixer.music.set_volume(Decimal(pygamemixermusic) * (Settings[1]["value"] / 100))
         gems += gemstoget
 
     # Draw upgrade buttons
     for i, button in enumerate(Settings_buttons):
         setx = Settings_button_x[i] + CamPos[0]*WindowXscale
-        sety = constrain(Settings_button_y[i] + Settings_Button_Y_scroll + Settings_Button_Y_scroll_vel, screen_height*0.05, screen_height*0.5) + CamPos[1]*WindowYscale/WindowYscale
+        sety = constrain(Settings_button_y[i] + Settings_Button_Y_scroll + Settings_Button_Y_scroll_vel, screen_height*-3, screen_height*0.5) + CamPos[1]*WindowYscale/WindowYscale
         if isinstance(Settings[i]["value"], Decimal):
             if Settings[i]["held"] and Settings[i]["holdable"]:
                 if mos_x/WindowXscale <= setx + Settings_button_width[i]/2:
@@ -949,6 +993,7 @@ while running:
     draw_text(f"While you were away for {abbreviate((Decimal(offlineCurrentTime) - Decimal(offlineOldTime)), "s", 3, 10000, False)} seconds,", pygame.font.Font("./assets/fonts/Lato/Lato-Bold.ttf", int(30*WindowScale2)), (255, 64, 128, offlineBoxAlpha), 640*WindowXscale, 330*WindowYscale, "center", offlineBoxAlpha)
     draw_text(f"You earned {abbreviate(Decimal(differenceTimeOffline) * Decimal(auto_click_value) * Decimal(auto_click_rate) * Decimal(gemboost), "s", 3, 100000, False)} clicks.", pygame.font.Font("./assets/fonts/Lato/Lato-Bold.ttf", int(30*WindowScale2)), (255, 64, 128, offlineBoxAlpha), 640*WindowXscale, 390*WindowYscale, "center", offlineBoxAlpha)
     offlineBoxAlpha = constrain(offlineBoxAlpha - 51*delta_time, 0, 255)
+    YouWillNotUpgradeUnlessToldTo_Time -= delta_time
     # Update display
     particle1.emit()
     pygame.display.flip()
