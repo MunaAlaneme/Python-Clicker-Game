@@ -516,6 +516,7 @@ CamPos = [0, 0]
 CamPos2 = [0, 0]
 gems = Decimal(0)
 gemstoget = Decimal(0)
+gemboosttoget = Decimal(0)
 differenceTimeOffline = 0
 def constrain(val, min_val, max_val):
     if val < min_val: return min_val
@@ -525,59 +526,47 @@ def constrain(val, min_val, max_val):
 pygame.mixer.init()
 pygamemixermusic = 1
 musicfilepath = ""
+musicintrofilepath = ""
 def PlayMusic(musNum):
     pygame.mixer.music.stop()
-    global pygamemixermusic, musicfilepath
+    global pygamemixermusic, musicfilepath, musicintrofilepath
     pygamemixermusic = 1
     if musNum == 1:
         pygamemixermusic = 0.25
         pymusictype = "wav"
         musicfilepath = "./assets/audio/Debug Menu Unused   Paper Mario  The Thousand Year Door.wav"
+        musicintrofilepath = "./assets/audio/nosound.wav"
     elif musNum == 2:
         pygamemixermusic = 1
         pymusictype = "wav"
         musicfilepath = "./assets/audio/SpongeBob SquarePants OST - Dombummel (LQ).wav"
+        musicintrofilepath = "./assets/audio/nosound.wav"
     elif musNum == 3:
         pygamemixermusic = 0.7
         pymusictype = "mp3"
         musicfilepath = "./assets/audio/Kevin MacLeod - Hep Cats.mp3"
+        musicintrofilepath = "./assets/audio/nosound.wav"
     elif musNum == 4:
         pygamemixermusic = 1
         pymusictype = "wav"
         musicfilepath = "./assets/audio/(Object Break) Kevin MacLeod - Padanaya Blokov - loop.wav"
+        musicintrofilepath = "./assets/audio/(Object Break) Kevin MacLeod - Padanaya Blokov - intro.wav"
     elif musNum == 5:
         pygamemixermusic = .9
         pymusictype = "mp3"
         musicfilepath = "./assets/audio/(radzlan - Miami Hotline Vol.3 (feat. Demonicity)) 673473_-Miami-Hotline--Vol3.mp3"
+        musicintrofilepath = "./assets/audio/nosound.wav"
     elif musNum == 6:
         pygamemixermusic = .9
         pymusictype = "wav"
         musicfilepath = "./assets/audio/INOSSI - Got you-loop.wav"
+        musicintrofilepath = "./assets/audio/INOSSI - Got you-start.wav"
+    pygame.mixer.music.load(musicintrofilepath)
     pygame.mixer.music.set_volume(Decimal(pygamemixermusic))
-    #pygame.mixer.music.play(loops=-1)
+    pygame.mixer.music.play()
 
 PlayMusic(random.randint(1,6))
 pygame.mixer.music.set_volume(Decimal(pygamemixermusic) * (Settings[1]["value"] / 100))
-
-def play_sound_with_pitch(file_path, pitch_factor):
-    # Load the sound
-    sound = pygame.mixer.Sound(file_path)
-
-    # Get the original sound frequency (default 44100 Hz)
-    original_frequency = pygame.mixer.get_init()[0]
-
-    # Adjust the frequency to change pitch
-    new_frequency = int(original_frequency * pitch_factor)
-    pygame.mixer.quit()  # Quit the mixer to reinitialize it
-    pygame.mixer.init(frequency=new_frequency)
-
-    # Play the sound
-    sound.play()
-    '''
-
-    # Wait until the sound finishes playing
-    time.sleep(sound.get_length())'''
-play_sound_with_pitch(musicfilepath, 1.2)
 click_sound = pygame.mixer.Sound("./assets/audio/Click mouse - Fugitive Simulator - The-Nick-of-Time.wav")
 hover_sound = pygame.mixer.Sound("./assets/audio/251389__deadsillyrabbit__button_hover-wav.wav")
 upgrade_sound = pygame.mixer.Sound("./assets/audio/Upgrade SOund 0001.wav")
@@ -879,6 +868,7 @@ while running:
     if framestofixload >= 1:
         score += Decimal(auto_click_value) * Decimal(auto_click_rate) * Decimal(delta_time) * Decimal(gemboost)
     gemstoget = (Decimal(100) * Decimal.sqrt(Decimal(score) / Decimal(1000000000000))) + Decimal(0)
+    gemboosttoget = Decimal(gemstoget/50)
 
     # Draw screen
     screen.fill((30, 30, 30))
@@ -903,9 +893,10 @@ while running:
     else:
         draw_text(f"FPS: INFINITY", font, WHITE, 10*WindowScale2 + CamPos[0]*WindowXscale, 130*WindowScale2 + CamPos[1]*WindowYscale, "left", 255)
     draw_text(f"Seconds Per Second: {abbreviate(auto_click_rate, "s", 3, 1000, False)}/s", font, WHITE, 10*WindowScale2 + CamPos[0]*WindowXscale, 160*WindowScale2 + CamPos[1]*WindowYscale, "left", 255)
-    draw_text(f"Gems: {abbreviate(gems, "s", 3, 100000, True)} (+ {abbreviate(gemstoget, "s", 3, 100000, True)}), {abbreviate(Decimal(gemboost), "s", 3, 100000, False)}x boost", font, WHITE, 10*WindowScale2 + CamPos[0]*WindowXscale, 190*WindowScale2 + CamPos[1]*WindowYscale, "left", 255)
-    draw_text(f"Total Clicks Per Second: {abbreviate(auto_click_value * auto_click_rate * gemboost, "s", 3, 1000, False)}/s", font, WHITE, 10*WindowScale2 + CamPos[0]*WindowXscale, 220*WindowScale2 + CamPos[1]*WindowYscale, "left", 255)
-    draw_text(f"Total Clicks Per Click: {abbreviate((click_value*click_value_multi + cps_to_cpc*auto_click_value*auto_click_rate)*gemboost, "s", 3, 100000, False)}", font, WHITE, 10*WindowScale2 + CamPos[0]*WindowXscale, 250*WindowScale2 + CamPos[1]*WindowYscale, "left", 255)
+    draw_text(f"Gems: {abbreviate(gems, "s", 3, 100000, True)} (+ {abbreviate(gemstoget, "s", 3, 100000, True)})", font, WHITE, 10*WindowScale2 + CamPos[0]*WindowXscale, 190*WindowScale2 + CamPos[1]*WindowYscale, "left", 255)
+    draw_text(f"{abbreviate(Decimal(gemboost), "s", 3, 100000, False)}x boost (+{abbreviate(Decimal(gemboosttoget), "s", 3, 100000, False)})", font, WHITE, 10*WindowScale2 + CamPos[0]*WindowXscale, 220*WindowScale2 + CamPos[1]*WindowYscale, "left", 255)
+    draw_text(f"Total Clicks Per Second: {abbreviate(auto_click_value * auto_click_rate * gemboost, "s", 3, 1000, False)}/s", font, WHITE, 10*WindowScale2 + CamPos[0]*WindowXscale, 250*WindowScale2 + CamPos[1]*WindowYscale, "left", 255)
+    draw_text(f"Total Clicks Per Click: {abbreviate((click_value*click_value_multi + cps_to_cpc*auto_click_value*auto_click_rate)*gemboost, "s", 3, 100000, False)}", font, WHITE, 10*WindowScale2 + CamPos[0]*WindowXscale, 280*WindowScale2 + CamPos[1]*WindowYscale, "left", 255)
 
     def prestige():
         global score, gems
@@ -999,6 +990,9 @@ while running:
     pygame.display.flip()
     #clock.tick(24)
     keys = pygame.key.get_pressed()
+    if not pygame.mixer.music.get_busy():
+        pygame.mixer.music.load(musicfilepath)
+        pygame.mixer.music.play(-1)
     if keys[pygame.K_a]:
         CamPos = [1280, 0]
     if keys[pygame.K_s]:
