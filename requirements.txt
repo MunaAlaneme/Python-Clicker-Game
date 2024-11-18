@@ -12,6 +12,6 @@ PyInstaller
 soundfile
 pyaudio
 ffmpeg
-audioop-lts
+audioop
 ffprobe
 wave
