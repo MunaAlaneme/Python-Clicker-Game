@@ -9,9 +9,4 @@ datetime
 pickle-mixin
 asyncio
 PyInstaller
-soundfile
-pyaudio
 ffmpeg
-audioop
-ffprobe
-wave

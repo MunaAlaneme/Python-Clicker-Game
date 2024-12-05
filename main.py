@@ -22,9 +22,6 @@ import pickle
 import json
 import csv
 import asyncio
-import wave
-import audioop
-import pyaudio
 #pynanosvg
 
 GameFPS = 60
