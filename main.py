@@ -11,8 +11,6 @@ import random
 from decimal import *
 import math
 import sys
-sys.path.append('./ffmpeg')
-sys.path.append('./ffprobe')
 import time
 import os
 # import numpy as np

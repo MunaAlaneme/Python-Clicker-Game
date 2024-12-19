@@ -9,4 +9,3 @@ datetime
 pickle-mixin
 asyncio
 PyInstaller
-ffmpeg
