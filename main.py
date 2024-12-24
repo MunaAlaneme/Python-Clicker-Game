@@ -591,7 +591,7 @@ def save_game():
 
 def load_game():
     try:
-        global Settings, upgrades, gems, score, start_time, game_time, offlineCurrentTime, offlineOldTime, delta_time, offlineTime, offlineProgressCheck, framestofixload, auto_click_rate, auto_click_value, click_value, click_value_multi, cps_to_cpc, offlineBoxAlpha, differenceTimeOffline, offlineCurrentTime, offlineOldTime
+        global Settings, upgrades, gems, score, start_time, game_time, offlineCurrentTime, offlineOldTime, delta_time, offlineTime, offlineProgressCheck, framestofixload, auto_click_rate, auto_click_value, click_value, click_value_multi, cps_to_cpc, offlineBoxAlpha, differenceTimeOffline, offlineCurrentTime, offlineOldTime, gemboost
         score = Decimal(open('./save/gamesaveScore.txt', 'r').read())
         for _ in range(len(Settings)):
             file1 = open(f'./save/gamesaveSettings{_}.txt', 'r')
@@ -613,6 +613,7 @@ def load_game():
         click_value_multi = (Decimal(2)**Decimal(upgrades[3]["bought"]))
         start_time = float(open(f'./save/gamesaveGameTimeStuff1.txt', 'r').read())
         gems = Decimal(open('./save/gamesaveGems.txt', 'r').read())
+        gemboost = Decimal((50+gems)/50)
         #delta_time = (time.time() - start_time) - game_time
         game_time = time.time() - start_time
         tempOfflineTime = float(open(f'./save/gamesaveGameTimeStuff2.txt', 'r').read())
