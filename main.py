@@ -1,7 +1,5 @@
+#!/usr/bin/env python
 # Credits!!!
-# Google Bard - Help
-# OpenAI ChatGPT - Help
-# Microsoft Bing AI Chat Copilot - Help
 # (YT) Clear Code - Particle System
 # jay3332 - Number Abbreviation
 # Cryptogrounds / Considera Core
@@ -20,7 +18,13 @@ import pickle
 import json
 import csv
 import asyncio
+import pydub
+from pydub import AudioSegment
 #pynanosvg
+import ffmpeg
+#from ffprobe import FFProbe
+sys.path.append('./frameworks/ffmpeg')
+sys.path.append('./frameworks/ffprobe')
 
 GameFPS = 60
 
@@ -522,6 +526,7 @@ pygame.mixer.init()
 pygamemixermusic = 1
 musicfilepath = ""
 musicintrofilepath = ""
+pymusictype = ""
 def PlayMusic(musNum):
     pygame.mixer.music.stop()
     global pygamemixermusic, musicfilepath, musicintrofilepath
@@ -550,15 +555,17 @@ def PlayMusic(musNum):
         pygamemixermusic = .9
         pymusictype = "mp3"
         musicfilepath = "./assets/audio/(radzlan - Miami Hotline Vol.3 (feat. Demonicity)) 673473_-Miami-Hotline--Vol3.mp3"
-        musicintrofilepath = "./assets/audio/nosound.wav"
+        musicintrofilepath = "./assets/audio/nosound.mp3"
     elif musNum == 6:
         pygamemixermusic = .9
         pymusictype = "wav"
         musicfilepath = "./assets/audio/INOSSI - Got you-loop.wav"
         musicintrofilepath = "./assets/audio/INOSSI - Got you-start.wav"
-    pygame.mixer.music.load(musicintrofilepath)
-    pygame.mixer.music.set_volume(Decimal(pygamemixermusic))
-    pygame.mixer.music.play()
+    musicintro = AudioSegment.from_file(musicintrofilepath, format=pymusictype)
+    musicintro = AudioSegment.from_file(musicintrofilepath, format=musicintrofilepath[-3:])
+    #pygame.mixer.music.load(musicintrofilepath)
+    #pygame.mixer.music.set_volume(Decimal(pygamemixermusic))
+    #pygame.mixer.music.play()
 
 PlayMusic(random.randint(1,6))
 pygame.mixer.music.set_volume(Decimal(pygamemixermusic) * (Settings[1]["value"] / 100))
