@@ -7,8 +7,5 @@ wheel
 toml
 datetime
 pickle-mixin
-pydub
-ffmpeg
-ffprobe
 asyncio
 PyInstaller

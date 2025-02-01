@@ -19,12 +19,7 @@ import json
 import csv
 import asyncio
 import pydub
-from pydub import AudioSegment
 #pynanosvg
-import ffmpeg
-#from ffprobe import FFProbe
-sys.path.append('./frameworks/ffmpeg')
-sys.path.append('./frameworks/ffprobe')
 
 GameFPS = 60
 
@@ -561,11 +556,9 @@ def PlayMusic(musNum):
         pymusictype = "wav"
         musicfilepath = "./assets/audio/INOSSI - Got you-loop.wav"
         musicintrofilepath = "./assets/audio/INOSSI - Got you-start.wav"
-    musicintro = AudioSegment.from_file(musicintrofilepath, format=pymusictype)
-    musicintro = AudioSegment.from_file(musicintrofilepath, format=musicintrofilepath[-3:])
-    #pygame.mixer.music.load(musicintrofilepath)
-    #pygame.mixer.music.set_volume(Decimal(pygamemixermusic))
-    #pygame.mixer.music.play()
+    pygame.mixer.music.load(musicintrofilepath)
+    pygame.mixer.music.set_volume(Decimal(pygamemixermusic))
+    pygame.mixer.music.play()
 
 PlayMusic(random.randint(1,6))
 pygame.mixer.music.set_volume(Decimal(pygamemixermusic) * (Settings[1]["value"] / 100))
