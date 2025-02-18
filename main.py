@@ -11,14 +11,17 @@ import math
 import sys
 import time
 import os
-# import numpy as np
-import svg
+import numpy as np
+#import svg
 import datetime
 import pickle
 import json
 import csv
 import asyncio
 import pydub
+import audioop
+from pydub import AudioSegment
+from io import BytesIO
 #pynanosvg
 
 GameFPS = 60
@@ -522,6 +525,16 @@ pygamemixermusic = 1
 musicfilepath = ""
 musicintrofilepath = ""
 pymusictype = ""
+original_musicintro = ""
+pitched_musicintro = ""
+audio_buffer = ""
+def change_pitch_in_memory(sound, semitones):
+    """ Change the pitch of a Pydub AudioSegment by modifying the frame rate. """
+    new_sample_rate = int(sound.frame_rate * (2 ** (semitones / 12.0)))
+    pitched_sound = sound._spawn(sound.raw_data, overrides={"frame_rate": new_sample_rate})
+    pitched_sound = pitched_sound.set_frame_rate(44100)  # Resample to standard 44100 Hz
+    return pitched_sound
+
 def PlayMusic(musNum):
     pygame.mixer.music.stop()
     global pygamemixermusic, musicfilepath, musicintrofilepath
@@ -538,8 +551,8 @@ def PlayMusic(musNum):
         musicintrofilepath = "./assets/audio/nosound.wav"
     elif musNum == 3:
         pygamemixermusic = 0.7
-        pymusictype = "mp3"
-        musicfilepath = "./assets/audio/Kevin MacLeod - Hep Cats.mp3"
+        pymusictype = "wav"
+        musicfilepath = "./assets/audio/Kevin MacLeod - Hep Cats.wav"
         musicintrofilepath = "./assets/audio/nosound.wav"
     elif musNum == 4:
         pygamemixermusic = 1
@@ -548,15 +561,22 @@ def PlayMusic(musNum):
         musicintrofilepath = "./assets/audio/(Object Break) Kevin MacLeod - Padanaya Blokov - intro.wav"
     elif musNum == 5:
         pygamemixermusic = .9
-        pymusictype = "mp3"
-        musicfilepath = "./assets/audio/(radzlan - Miami Hotline Vol.3 (feat. Demonicity)) 673473_-Miami-Hotline--Vol3.mp3"
-        musicintrofilepath = "./assets/audio/nosound.mp3"
+        pymusictype = "wav"
+        musicfilepath = "./assets/audio/(radzlan - Miami Hotline Vol.3 (feat. Demonicity)) 673473_-Miami-Hotline--Vol3.wav"
+        musicintrofilepath = "./assets/audio/nosound.wav"
     elif musNum == 6:
         pygamemixermusic = .9
         pymusictype = "wav"
-        musicfilepath = "./assets/audio/INOSSI - Got you-loop.wav"
-        musicintrofilepath = "./assets/audio/INOSSI - Got you-start.wav"
-    pygame.mixer.music.load(musicintrofilepath)
+        musicfilepath = "./assets/audio/INOSSI - Got you-loop 44100.wav"
+        musicintrofilepath = "./assets/audio/INOSSI - Got you-start 44100.wav"
+    print(musicintrofilepath)
+    original_musicintro = AudioSegment.from_file(musicintrofilepath)
+    pitched_musicintro = change_pitch_in_memory(original_musicintro, 3)
+    audio_buffer1 = BytesIO()
+    pitched_musicintro.export(audio_buffer1, format="wav")
+    audio_buffer1.seek(0)
+    #pygame.mixer.music.load(musicintrofilepath)
+    pygame.mixer.music.load(audio_buffer1)
     pygame.mixer.music.set_volume(Decimal(pygamemixermusic))
     pygame.mixer.music.play()
 
@@ -574,12 +594,20 @@ offlineProgressCheck = False
 gemboost = 1
 def save_game():
     global offlineTime, offlineProgressCheck
+    tempsavelist1, tempsavelist2 = [], []
     for _ in range(len(Settings)):
-        with open(f'./save/gamesaveSettings{_}.txt', 'w') as file1:
-            file1.write(f"{Settings[_]["value"]}")
+        tempsavelist1.append(Settings[_]["value"])
+    with open(f'./save/gamesaveSettings.txt', 'w') as file1:
+        file1.write(f"{tempsavelist1}")
     for _ in range(len(upgrades)):
-        with open(f'./save/gamesaveUpgrade{_}.txt', 'w') as file2:
-            file2.write(f"{upgrades[_]["cost"]}\n{upgrades[_]["startcost"]}\n{upgrades[_]["costcoefficient"]}\n{upgrades[_]["bought"]}")
+        tempsavelist2.append(
+            [[Decimal(upgrades[_]["cost"])],
+            [Decimal(upgrades[_]["startcost"])],
+            [Decimal(upgrades[_]["costcoefficient"])],
+            [Decimal(upgrades[_]["bought"])]]
+        )
+    with open(f'./save/gamesaveUpgrade.txt', 'w') as file2:
+        file2.write(f"{tempsavelist2}")
     open('./save/gamesaveGems.txt', 'w').write(str(gems))
     open('./save/gamesaveScore.txt', 'w').write(str(score))
     open('./save/gamesaveGameTimeStuff1.txt', 'w').write(f"{start_time}")
@@ -987,7 +1015,13 @@ while running:
     #clock.tick(24)
     keys = pygame.key.get_pressed()
     if not pygame.mixer.music.get_busy():
-        pygame.mixer.music.load(musicfilepath)
+        original_music = AudioSegment.from_file(musicfilepath)
+        pitched_music = change_pitch_in_memory(original_music, 3)
+        audio_buffer2 = BytesIO()
+        pitched_music.export(audio_buffer2, format="wav")
+        audio_buffer2.seek(0)
+        #pygame.mixer.music.load(musicfilepath)
+        pygame.mixer.music.load(audio_buffer2)
         pygame.mixer.music.play(-1)
     if keys[pygame.K_a]:
         CamPos = [1280, 0]
