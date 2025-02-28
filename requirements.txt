@@ -10,7 +10,6 @@ pickle-mixin
 numpy
 asyncio
 PyInstaller
-pyaudio
 pydub
 audioop-lts
 ffprobe
