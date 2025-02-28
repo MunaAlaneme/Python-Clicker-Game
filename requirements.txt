@@ -13,3 +13,4 @@ PyInstaller
 pydub
 audioop-lts
 ffprobe
+pytest
