@@ -590,84 +590,45 @@ Hovering_Buttons = [0,0,0,0,0,0,0,0,0,0]
 framestofixload = 0
 offlineOldTime = time.time()
 offlineCurrentTime = time.time()
-offlineProgressCheck = False
 gemboost = 1
+GameStuff = []
+GameStuff2 = []
 def save_game():
-    global offlineTime, offlineProgressCheck
-    tempsavelist1, tempsavelist2 = [], []
-    with open('./save/gamesaveSettings.pickle', 'wb') as file1:
-        pickle.dump(Settings, file1, protocol=pickle.HIGHEST_PROTOCOL)
-    #for _ in range(len(Settings)):
-        #tempsavelist1.append(Settings[_]["value"])
-    #with open(f'./save/gamesaveSettings.txt', 'w') as file1:
-        #file1.write(f"{tempsavelist1}")
-    for _ in range(len(upgrades)):
-        tempsavelist2.append(
-            [[Decimal(upgrades[_]["cost"])],
-            [Decimal(upgrades[_]["startcost"])],
-            [Decimal(upgrades[_]["costcoefficient"])],
-            [Decimal(upgrades[_]["bought"])]]
-        )
-    with open(f'./save/gamesaveUpgrade.txt', 'w') as file2:
-        file2.write(f"{tempsavelist2}")
-    open('./save/gamesaveGems.txt', 'w').write(str(gems))
-    open('./save/gamesaveScore.txt', 'w').write(str(score))
-    open('./save/gamesaveGameTimeStuff1.txt', 'w').write(f"{start_time}")
+    global offlineTime
     offlineTime = time.time()
-    open('./save/gamesaveGameTimeStuff3.txt', 'w').write(f"{offlineProgressCheck}")
-    if not offlineProgressCheck:
-        offlineProgressCheck = True
-    open('./save/gamesaveGameTimeStuff2.txt', 'w').write(f"{offlineTime}")
-
+    GameStuff = [gems, score, start_time, offlineTime, bulkbuy]
+    GameStuff2 = [Settings, upgrades, GameStuff]
+    with open(f'./SaveData.pickle', 'wb') as fileSave:
+        pickle.dump(GameStuff2, fileSave, protocol=pickle.HIGHEST_PROTOCOL)
 def load_game():
     try:
-        global Settings, upgrades, gems, score, start_time, game_time, offlineCurrentTime, offlineOldTime, delta_time, offlineTime, offlineProgressCheck, framestofixload, auto_click_rate, auto_click_value, click_value, click_value_multi, cps_to_cpc, offlineBoxAlpha, differenceTimeOffline, offlineCurrentTime, offlineOldTime, gemboost
-        score = Decimal(open('./save/gamesaveScore.txt', 'r').read())
-        with open('./save/gamesaveSettings.pickle', 'rb') as file1:
-            Settings = pickle.load(file1)
-        #file1 = open(f'./save/gamesaveSettings.txt', 'r')
-        #for _ in range(len(Settings)):
-            #file1a = file1[_]
-            #if not frozenset(file1a).isdisjoint(frozenset("Decimal")):
-            #    Settings[_]["value"] = Decimal(file1a.read())
-            #else:
-            #    Settings[_]["value"] = file1a.read()
-        for _ in range(len(upgrades)):
-            file2 = open(f'./save/gamesaveUpgrade{_}.txt', 'r')
-            file2a = file2.read().split('\n')
-            upgrades[_]["cost"] = Decimal(file2a[0])
-            upgrades[_]["startcost"] = Decimal(file2a[1])
-            upgrades[_]["costcoefficient"] = Decimal(file2a[2])
-            upgrades[_]["bought"] = Decimal(file2a[3])
+        global Settings, upgrades, gems, score, start_time, game_time, offlineCurrentTime, offlineOldTime, delta_time, offlineTime, framestofixload, auto_click_rate, auto_click_value, click_value, click_value_multi, cps_to_cpc, offlineBoxAlpha, differenceTimeOffline, offlineCurrentTime, offlineOldTime, gemboost, GameStuff, bulkbuy, GameStuff2
+        with open('./SaveData.pickle', 'rb') as fileSave:
+            GameStuff2 = pickle.load(fileSave)
+            GameStuff = GameStuff2[2]
+            upgrades = GameStuff2[1]
+            Settings = GameStuff2[0]
+        score = GameStuff[1]
+        bulkbuy = GameStuff[4]
         click_value = Decimal(upgrades[0]["bought"]) + (Decimal(upgrades[7]["bought"])*Decimal(10))
         auto_click_value = (Decimal(upgrades[1]["bought"])*Decimal(0.1)) + Decimal(upgrades[4]["bought"]) + (Decimal(upgrades[6]["bought"])*Decimal(10))
         cps_to_cpc = (Decimal(upgrades[9]["bought"])*Decimal(0.01))
         auto_click_rate = 1 + ((Decimal(upgrades[2]["bought"])*Decimal(0.1)) * (Decimal(2)**Decimal(upgrades[5]["bought"])) * (Decimal(3)**Decimal(upgrades[8]["bought"])))
         click_value_multi = (Decimal(2)**Decimal(upgrades[3]["bought"]))
-        start_time = float(open(f'./save/gamesaveGameTimeStuff1.txt', 'r').read())
-        gems = Decimal(open('./save/gamesaveGems.txt', 'r').read())
+        start_time = GameStuff[2]
+        gems = GameStuff[0]
         gemboost = Decimal((50+gems)/50)
         #delta_time = (time.time() - start_time) - game_time
         game_time = time.time() - start_time
-        tempOfflineTime = float(open(f'./save/gamesaveGameTimeStuff2.txt', 'r').read())
+        tempOfflineTime = GameStuff[3]
         offlineOldTime = tempOfflineTime
         offlineCurrentTime = time.time()
         differenceTimeOffline = (offlineCurrentTime - offlineOldTime) * .1
         framestofixload = 0
-        offlineProgressCheck = False
         offlineBoxAlpha = 255
         score += (Decimal(differenceTimeOffline) * Decimal(auto_click_value) * Decimal(auto_click_rate) * Decimal(gemboost))
     except FileNotFoundError:
         save_game()
-try:
-    offlineTime = float(open(f'./save/gamesaveGameTimeStuff2.txt', 'r').read())
-except FileNotFoundError:
-    open('./save/gamesaveGameTimeStuff1.txt', 'w').write(f"{start_time}")
-    offlineTime = time.time()
-    open('./save/gamesaveGameTimeStuff3.txt', 'w').write(f"{offlineProgressCheck}")
-    if not offlineProgressCheck:
-        offlineProgressCheck = True
-    open('./save/gamesaveGameTimeStuff2.txt', 'w').write(f"{offlineTime}")
 
 """
     if event.button == 1:
