@@ -595,10 +595,12 @@ gemboost = 1
 def save_game():
     global offlineTime, offlineProgressCheck
     tempsavelist1, tempsavelist2 = [], []
-    for _ in range(len(Settings)):
-        tempsavelist1.append(Settings[_]["value"])
-    with open(f'./save/gamesaveSettings.txt', 'w') as file1:
-        file1.write(f"{tempsavelist1}")
+    with open('./save/gamesaveSettings.pickle', 'wb') as file1:
+        pickle.dump(Settings, file1, protocol=pickle.HIGHEST_PROTOCOL)
+    #for _ in range(len(Settings)):
+        #tempsavelist1.append(Settings[_]["value"])
+    #with open(f'./save/gamesaveSettings.txt', 'w') as file1:
+        #file1.write(f"{tempsavelist1}")
     for _ in range(len(upgrades)):
         tempsavelist2.append(
             [[Decimal(upgrades[_]["cost"])],
@@ -621,12 +623,15 @@ def load_game():
     try:
         global Settings, upgrades, gems, score, start_time, game_time, offlineCurrentTime, offlineOldTime, delta_time, offlineTime, offlineProgressCheck, framestofixload, auto_click_rate, auto_click_value, click_value, click_value_multi, cps_to_cpc, offlineBoxAlpha, differenceTimeOffline, offlineCurrentTime, offlineOldTime, gemboost
         score = Decimal(open('./save/gamesaveScore.txt', 'r').read())
-        for _ in range(len(Settings)):
-            file1 = open(f'./save/gamesaveSettings{_}.txt', 'r')
-            if (_ == 0 or _ == 1):
-                Settings[_]["value"] = Decimal(file1.read())
-            else:
-                Settings[_]["value"] = file1.read()
+        with open('./save/gamesaveSettings.pickle', 'rb') as file1:
+            Settings = pickle.load(file1)
+        #file1 = open(f'./save/gamesaveSettings.txt', 'r')
+        #for _ in range(len(Settings)):
+            #file1a = file1[_]
+            #if not frozenset(file1a).isdisjoint(frozenset("Decimal")):
+            #    Settings[_]["value"] = Decimal(file1a.read())
+            #else:
+            #    Settings[_]["value"] = file1a.read()
         for _ in range(len(upgrades)):
             file2 = open(f'./save/gamesaveUpgrade{_}.txt', 'r')
             file2a = file2.read().split('\n')
