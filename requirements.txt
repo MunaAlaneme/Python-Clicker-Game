@@ -3,7 +3,6 @@ PySDL2
 PySDL3
 cython
 pygame
-pygame-ce
 wheel
 toml
 datetime
