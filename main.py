@@ -4,7 +4,6 @@
 # (YT) Python Simplified - Python to .app
 # jay3332 - Number Abbreviation
 # Cryptogrounds / Considera Core
-# https://www.reddit.com/r/pygame/comments/ehbbr9/comment/fchsd94/?utm_source=share&utm_medium=web3x&utm_name=web3xcss&utm_term=1&utm_content=share_button
 
 import pygame
 import random
