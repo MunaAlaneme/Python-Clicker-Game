@@ -1,8 +1,10 @@
 #!/usr/bin/env python
 # Credits!!!
 # (YT) Clear Code - Particle System
+# (YT) Python Simplified - Python to .app
 # jay3332 - Number Abbreviation
 # Cryptogrounds / Considera Core
+# https://www.reddit.com/r/pygame/comments/ehbbr9/comment/fchsd94/?utm_source=share&utm_medium=web3x&utm_name=web3xcss&utm_term=1&utm_content=share_button
 
 import pygame
 import random
@@ -25,6 +27,17 @@ from io import BytesIO
 #pynanosvg
 
 GameFPS = 60
+
+def resource_path(relative_path):
+    """ Get absolute path to resource, works for dev and for PyInstaller """
+    try:
+        #https://stackoverflow.com/a/13790741
+        # PyInstaller creates a temp folder and stores path in _MEIPASS
+        base_path = sys._MEIPASS2
+    except Exception:
+        base_path = os.path.abspath(".")
+
+    return os.path.join(base_path, relative_path)
 
 class ParticlePrinciple:
     def __init__(self):
@@ -253,7 +266,7 @@ PARTICLE_EVENT = pygame.USEREVENT + 1
 # pygame.time.set_timer(PARTICLE_EVENT, 20)
 
 # Font
-font = pygame.font.Font("./assets/fonts/Lato/Lato-Bold.ttf", 24)
+font = pygame.font.Font(resource_path("./assets/fonts/Lato/Lato-Bold.ttf"), 24)
 
 # Colors
 WHITE = (255, 255, 255)
@@ -480,10 +493,10 @@ Settings_button_y = [70, 140, 210, 280, 350, 420, 490, 560]
 Settings_Button_Y_scroll = 0
 Settings_Button_Y_scroll_vel = 0
 # Clicker button
-clicker_button_image = pygame.image.load("./assets/img/copilot.png").convert_alpha()
+clicker_button_image = pygame.image.load(resource_path("./assets/img/copilot.png")).convert_alpha()
 # clicker_button_rect = clicker_button_image.get_rect(center=(screen_width // 2, screen_height // 2))
-arrow_down_img1 = pygame.image.load("./assets/img/Arrow1-c.png").convert_alpha()
-arrow_up_img1 = pygame.image.load("./assets/img/Arrow1-d.png").convert_alpha()
+arrow_down_img1 = pygame.image.load(resource_path("./assets/img/Arrow1-c.png")).convert_alpha()
+arrow_up_img1 = pygame.image.load(resource_path("./assets/img/Arrow1-d.png")).convert_alpha()
 
 # Upgrade button setup
 for i, upgrade in enumerate(upgrades):
@@ -569,7 +582,6 @@ def PlayMusic(musNum):
         pymusictype = "wav"
         musicfilepath = "./assets/audio/INOSSI - Got you-loop 44100.wav"
         musicintrofilepath = "./assets/audio/INOSSI - Got you-start 44100.wav"
-    print(musicintrofilepath)
     original_musicintro = AudioSegment.from_file(musicintrofilepath)
     pitched_musicintro = change_pitch_in_memory(original_musicintro, 3)
     audio_buffer1 = BytesIO()
@@ -582,9 +594,9 @@ def PlayMusic(musNum):
 
 PlayMusic(random.randint(1,6))
 pygame.mixer.music.set_volume(Decimal(pygamemixermusic) * (Settings[1]["value"] / 100))
-click_sound = pygame.mixer.Sound("./assets/audio/Click mouse - Fugitive Simulator - The-Nick-of-Time.wav")
-hover_sound = pygame.mixer.Sound("./assets/audio/251389__deadsillyrabbit__button_hover-wav.wav")
-upgrade_sound = pygame.mixer.Sound("./assets/audio/Upgrade SOund 0001.wav")
+click_sound = pygame.mixer.Sound(resource_path("./assets/audio/Click mouse - Fugitive Simulator - The-Nick-of-Time.wav"))
+hover_sound = pygame.mixer.Sound(resource_path("./assets/audio/251389__deadsillyrabbit__button_hover-wav.wav"))
+upgrade_sound = pygame.mixer.Sound(resource_path("./assets/audio/Upgrade SOund 0001.wav"))
 
 Hovering_Buttons = [0,0,0,0,0,0,0,0,0,0]
 framestofixload = 0
@@ -598,12 +610,12 @@ def save_game():
     offlineTime = time.time()
     GameStuff = [gems, score, start_time, offlineTime, bulkbuy]
     GameStuff2 = [Settings, upgrades, GameStuff]
-    with open(f'./SaveData.pickle', 'wb') as fileSave:
+    with open (resource_path("save/SaveData.pickle"), 'wb') as fileSave:
         pickle.dump(GameStuff2, fileSave, protocol=pickle.HIGHEST_PROTOCOL)
 def load_game():
     try:
         global Settings, upgrades, gems, score, start_time, game_time, offlineCurrentTime, offlineOldTime, delta_time, offlineTime, framestofixload, auto_click_rate, auto_click_value, click_value, click_value_multi, cps_to_cpc, offlineBoxAlpha, differenceTimeOffline, offlineCurrentTime, offlineOldTime, gemboost, GameStuff, bulkbuy, GameStuff2
-        with open('./SaveData.pickle', 'rb') as fileSave:
+        with open (resource_path("save/SaveData.pickle"), 'rb') as fileSave:
             GameStuff2 = pickle.load(fileSave)
             GameStuff = GameStuff2[2]
             upgrades = GameStuff2[1]
@@ -864,7 +876,7 @@ while running:
     screen.fill((30, 30, 30))
     screen.blit(smalclicrimg, (button_rect_x[0]-(scale_x[0]/2)*WindowScale2, button_rect_y[0]-(scale_y[0]/2)*WindowScale2))
     # Draw text
-    font = pygame.font.Font("./assets/fonts/Lato/Lato-Bold.ttf", int(24*WindowScale2))
+    font = pygame.font.Font(resource_path("./assets/fonts/Lato/Lato-Bold.ttf"), int(24*WindowScale2))
     def draw_text(text, font, color, x, y, align, alpha):
         text_surface = font.render(text, True, color)
         text_surface.set_alpha(alpha)
@@ -927,9 +939,9 @@ while running:
             draw_text(f"{Settings[i]['name']}", font, WHITE, setx*WindowXscale + Settings_button_width[i]*WindowXscale/2, sety*WindowYscale + Settings_button_height[i]*WindowScale2/2, "center", 255)
     pygame.draw.rect(screen, (30, 30, 30), (900*WindowXscale + CamPos[0]*WindowXscale, WindowHeight*0.35 + CamPos[1]*WindowYscale, 380*WindowXscale, WindowHeight*1))
     pygame.draw.rect(screen, (30, 30, 30), (900*WindowXscale + CamPos[0]*WindowXscale, WindowHeight*0.0 + CamPos[1]*WindowYscale, 380*WindowXscale, WindowHeight*0.1))
-    draw_text(f"Options", pygame.font.Font("./assets/fonts/Lato/Lato-Bold.ttf", int(36*WindowScale2)), WHITE, 1110*WindowXscale + CamPos[0]*WindowXscale, 18 * WindowYscale + CamPos[1]*WindowYscale, "center", 255)
-    draw_text(f"Log", pygame.font.Font("./assets/fonts/Lato/Lato-Bold.ttf", int(36*WindowScale2)), WHITE, 1110*WindowXscale + CamPos[0]*WindowXscale, 318 * WindowYscale + CamPos[1]*WindowYscale, "center", 255) # IT'S CLONE RIGGY!
-    draw_text(f"Upgrades", pygame.font.Font("./assets/fonts/Lato/Lato-Bold.ttf", int(36*WindowScale2)), WHITE, 30*WindowXscale + CamPos[0]*WindowXscale, 540 * WindowYscale + CamPos[1]*WindowYscale, "left", 255)
+    draw_text(f"Options", pygame.font.Font(resource_path("./assets/fonts/Lato/Lato-Bold.ttf"), int(36*WindowScale2)), WHITE, 1110*WindowXscale + CamPos[0]*WindowXscale, 18 * WindowYscale + CamPos[1]*WindowYscale, "center", 255)
+    draw_text(f"Log", pygame.font.Font(resource_path("./assets/fonts/Lato/Lato-Bold.ttf"), int(36*WindowScale2)), WHITE, 1110*WindowXscale + CamPos[0]*WindowXscale, 318 * WindowYscale + CamPos[1]*WindowYscale, "center", 255) # IT'S CLONE RIGGY!
+    draw_text(f"Upgrades", pygame.font.Font(resource_path("./assets/fonts/Lato/Lato-Bold.ttf"), int(36*WindowScale2)), WHITE, 30*WindowXscale + CamPos[0]*WindowXscale, 540 * WindowYscale + CamPos[1]*WindowYscale, "left", 255)
     for i, button in enumerate(upgrade_buttons):
         def calcmax():
             return constrain(Decimal.__floor__( Decimal.log10( (Decimal(score) * (Decimal(upgrades[i]["costcoefficient"]) - 1)) / Decimal(upgrades[i]["startcost"] * (Decimal(upgrades[i]["costcoefficient"]) ** Decimal(upgrades[i]["bought"]))) + 1) / Decimal.log10(Decimal(upgrades[i]["costcoefficient"]))), Decimal(1), math.inf)
@@ -971,8 +983,8 @@ while running:
     offlineBox_rect_surface = pygame.Surface((960*WindowScale2, 360*WindowScale2), pygame.SRCALPHA)
     offlineBox_rect_surface.fill((0, 64, 128, offlineBoxAlpha))  # Fill with red and set alpha to 128 (50% transparent)
     screen.blit(offlineBox_rect_surface, ((640*WindowXscale) - (480*WindowScale2), (360*WindowYscale) - (180*WindowScale2)))
-    draw_text(f"While you were away for {abbreviate((Decimal(offlineCurrentTime) - Decimal(offlineOldTime)), "s", 3, 10000, False)} seconds,", pygame.font.Font("./assets/fonts/Lato/Lato-Bold.ttf", int(30*WindowScale2)), (255, 64, 128, offlineBoxAlpha), 640*WindowXscale, 330*WindowYscale, "center", offlineBoxAlpha)
-    draw_text(f"You earned {abbreviate(Decimal(differenceTimeOffline) * Decimal(auto_click_value) * Decimal(auto_click_rate) * Decimal(gemboost), "s", 3, 100000, False)} clicks.", pygame.font.Font("./assets/fonts/Lato/Lato-Bold.ttf", int(30*WindowScale2)), (255, 64, 128, offlineBoxAlpha), 640*WindowXscale, 390*WindowYscale, "center", offlineBoxAlpha)
+    draw_text(f"While you were away for {abbreviate((Decimal(offlineCurrentTime) - Decimal(offlineOldTime)), "s", 3, 10000, False)} seconds,", pygame.font.Font(resource_path("./assets/fonts/Lato/Lato-Bold.ttf"), int(30*WindowScale2)), (255, 64, 128, offlineBoxAlpha), 640*WindowXscale, 330*WindowYscale, "center", offlineBoxAlpha)
+    draw_text(f"You earned {abbreviate(Decimal(differenceTimeOffline) * Decimal(auto_click_value) * Decimal(auto_click_rate) * Decimal(gemboost), "s", 3, 100000, False)} clicks.", pygame.font.Font(resource_path("./assets/fonts/Lato/Lato-Bold.ttf"), int(30*WindowScale2)), (255, 64, 128, offlineBoxAlpha), 640*WindowXscale, 390*WindowYscale, "center", offlineBoxAlpha)
     offlineBoxAlpha = constrain(offlineBoxAlpha - 51*delta_time, 0, 255)
     YouWillNotUpgradeUnlessToldTo_Time -= delta_time
     # Update display

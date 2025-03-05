@@ -1,0 +1,47 @@
+language: python
+python:
+  - 3.6
+
+matrix:
+  include:
+  - os: osx
+    language: generic
+    env: PYTHON=3.6.0, BUTLER='https://dl.itch.ovh/butler/darwin-amd64/head/butler'
+  - os: linux
+    language: python
+    env: PYTHON=3.6.0, BUTLER='https://dl.itch.ovh/butler/linux-amd64/head/butler'
+
+before_install: |
+  if [ "${TRAVIS_OS_NAME}" == "osx" ]; then
+    brew update
+    brew install openssl readline
+    brew outdated pyenv || brew upgrade pyenv
+    brew install pyenv-virtualenv
+    env PYTHON_CONFIGURE_OPTS="--enable-framework" pyenv install ${PYTHON}
+    export PYENV_VERSION=${PYTHON}
+    export PATH="/Users/travis/.pyenv/shims:${PATH}"
+    pyenv-virtualenv venv
+    source venv/bin/activate
+    python --version
+  fi
+
+install:
+  - wget ${BUTLER} -o butler
+  - chmod +x butler
+  - ./butler login
+  - pip install -r requirements.txt
+
+script:
+  - pyinstaller -F -w -n lapyrinthe --clean lapyrinthe.spec
+  - mv dist/lapyrinthe dist/lapyrinthe_${TRAVIS_OS_NAME}
+
+after_script::
+  - butler push dist ashmonger/lapyrinthe:linux
+
+deploy:
+  provider: releases
+  api_key: "${GITHUB_TOKEN}"
+  file: "./dist/lapyrinthe_${TRAVIS_OS_NAME}"
+  skip_cleanup: true
+  on:
+    tags: true
