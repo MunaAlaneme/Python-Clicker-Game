@@ -14,3 +14,7 @@ pydub
 audioop-lts
 ffprobe
 pytest
+scipy
+soundfile
+sounddevice
+threading

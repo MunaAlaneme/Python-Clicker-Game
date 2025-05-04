@@ -72,7 +72,10 @@ class ParticlePrinciple:
 
 # Initialize Pygame
 pygame.init()
-
+def semitone_ratio(n):
+    return 2 ** (n / 12)
+def speed_ratio(n):
+    (math.log(math.e, n) / math.log(math.e, 2))*12
 # Long Suffixes Add
 for _ in range(1):
     LongSuffixes = ["", "thousand", "million", "billion", "trillion", "quadrillion", "quintillion", "sextillion", "septillion", "octillion", "nonillion", "decillion"]
@@ -540,13 +543,6 @@ pymusictype = ""
 original_musicintro = ""
 pitched_musicintro = ""
 audio_buffer = ""
-def change_pitch_in_memory(sound, semitones):
-    """ Change the pitch of a Pydub AudioSegment by modifying the frame rate. """
-    new_sample_rate = int(sound.frame_rate * (2 ** (semitones / 12.0)))
-    pitched_sound = sound._spawn(sound.raw_data, overrides={"frame_rate": new_sample_rate})
-    pitched_sound = pitched_sound.set_frame_rate(44100)  # Resample to standard 44100 Hz
-    return pitched_sound
-
 def PlayMusic(musNum):
     pygame.mixer.music.stop()
     global pygamemixermusic, musicfilepath, musicintrofilepath
@@ -581,13 +577,7 @@ def PlayMusic(musNum):
         pymusictype = "wav"
         musicfilepath = "./assets/audio/INOSSI - Got you-loop 44100.wav"
         musicintrofilepath = "./assets/audio/INOSSI - Got you-start 44100.wav"
-    original_musicintro = AudioSegment.from_file(musicintrofilepath)
-    pitched_musicintro = change_pitch_in_memory(original_musicintro, 3)
-    audio_buffer1 = BytesIO()
-    pitched_musicintro.export(audio_buffer1, format="wav")
-    audio_buffer1.seek(0)
-    #pygame.mixer.music.load(musicintrofilepath)
-    pygame.mixer.music.load(audio_buffer1)
+    pygame.mixer.music.load(musicintrofilepath)
     pygame.mixer.music.set_volume(Decimal(pygamemixermusic))
     pygame.mixer.music.play()
 
@@ -992,13 +982,7 @@ while running:
     #clock.tick(24)
     keys = pygame.key.get_pressed()
     if not pygame.mixer.music.get_busy():
-        original_music = AudioSegment.from_file(musicfilepath)
-        pitched_music = change_pitch_in_memory(original_music, 3)
-        audio_buffer2 = BytesIO()
-        pitched_music.export(audio_buffer2, format="wav")
-        audio_buffer2.seek(0)
-        #pygame.mixer.music.load(musicfilepath)
-        pygame.mixer.music.load(audio_buffer2)
+        pygame.mixer.music.load(musicfilepath)
         pygame.mixer.music.play(-1)
     if keys[pygame.K_a]:
         CamPos = [1280, 0]
