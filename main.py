@@ -22,7 +22,13 @@ import asyncio
 import pydub
 import audioop
 from pydub import AudioSegment
+import io
 from io import BytesIO
+import librosa
+import soundfile as sf
+from pydub.effects import speedup
+from pydub.playback import play
+import sounddevice as sd
 #pynanosvg
 
 GameFPS = 60
@@ -540,9 +546,7 @@ pygamemixermusic = 1
 musicfilepath = ""
 musicintrofilepath = ""
 pymusictype = ""
-original_musicintro = ""
-pitched_musicintro = ""
-audio_buffer = ""
+
 def PlayMusic(musNum):
     pygame.mixer.music.stop()
     global pygamemixermusic, musicfilepath, musicintrofilepath
@@ -577,10 +581,14 @@ def PlayMusic(musNum):
         pymusictype = "wav"
         musicfilepath = "./assets/audio/INOSSI - Got you-loop 44100.wav"
         musicintrofilepath = "./assets/audio/INOSSI - Got you-start 44100.wav"
+    # Load audio file
+    music1 = AudioSegment.from_file(musicintrofilepath)
+    music2 = AudioSegment.from_file(musicfilepath)
+    
     pygame.mixer.music.load(musicintrofilepath)
     pygame.mixer.music.set_volume(Decimal(pygamemixermusic))
+    pygame.mixer.music.set_volume(min(1.0, pygame.mixer.music.get_volume() * 1.1))
     pygame.mixer.music.play()
-
 PlayMusic(random.randint(1,6))
 pygame.mixer.music.set_volume(Decimal(pygamemixermusic) * (Settings[1]["value"] / 100))
 click_sound = pygame.mixer.Sound(resource_path("./assets/audio/Click mouse - Fugitive Simulator - The-Nick-of-Time.wav"))
