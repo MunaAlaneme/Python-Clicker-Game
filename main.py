@@ -26,7 +26,6 @@ import io
 from io import BytesIO
 import librosa
 import soundfile as sf
-from pydub.effects import speedup
 from pydub.playback import play
 import sounddevice as sd
 #pynanosvg
@@ -547,6 +546,11 @@ musicfilepath = ""
 musicintrofilepath = ""
 pymusictype = ""
 
+def pitch_shift(sound, semitones):
+    new_sample_rate = int(sound.frame_rate * (2.0 ** (semitones / 12.0)))
+    shifted = sound._spawn(sound.raw_data, overrides={'frame_rate': new_sample_rate})
+    return shifted.set_frame_rate(sound.frame_rate)
+
 def PlayMusic(musNum):
     pygame.mixer.music.stop()
     global pygamemixermusic, musicfilepath, musicintrofilepath
@@ -582,9 +586,13 @@ def PlayMusic(musNum):
         musicfilepath = "./assets/audio/INOSSI - Got you-loop 44100.wav"
         musicintrofilepath = "./assets/audio/INOSSI - Got you-start 44100.wav"
     # Load audio file
+    pygame.mixer.music.load(musicintrofilepath)
     music1 = AudioSegment.from_file(musicintrofilepath)
     music2 = AudioSegment.from_file(musicfilepath)
-    
+
+    shifted_sound1 = pitch_shift(music1, 3)  # 4 semitones up
+    shifted_sound2 = pitch_shift(music2, 3)  # 4 semitones up
+    play(shifted_sound1)
     pygame.mixer.music.load(musicintrofilepath)
     pygame.mixer.music.set_volume(Decimal(pygamemixermusic))
     pygame.mixer.music.set_volume(min(1.0, pygame.mixer.music.get_volume() * 1.1))
