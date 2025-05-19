@@ -608,6 +608,7 @@ framestofixload = 0
 offlineOldTime = time.time()
 offlineCurrentTime = time.time()
 gemboost = 1
+offlineTime = 0
 GameStuff = []
 GameStuff2 = []
 def save_game():
