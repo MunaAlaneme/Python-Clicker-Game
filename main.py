@@ -590,9 +590,9 @@ def PlayMusic(musNum):
     music1 = AudioSegment.from_file(musicintrofilepath)
     music2 = AudioSegment.from_file(musicfilepath)
 
-    shifted_sound1 = pitch_shift(music1, 3)  # 4 semitones up
-    shifted_sound2 = pitch_shift(music2, 3)  # 4 semitones up
-    play(shifted_sound1)
+    #shifted_sound1 = pitch_shift(music1, 3)  # 4 semitones up
+    #shifted_sound2 = pitch_shift(music2, 3)  # 4 semitones up
+    #play(shifted_sound1)
     pygame.mixer.music.load(musicintrofilepath)
     pygame.mixer.music.set_volume(Decimal(pygamemixermusic))
     pygame.mixer.music.set_volume(min(1.0, pygame.mixer.music.get_volume() * 1.1))
