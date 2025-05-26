@@ -1,0 +1,50 @@
+name: Build Python App
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  build:
+    name: Build on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        #os: [ubuntu-latest, windows-latest, macos-latest]
+        os: [macos-latest]
+        python-version: ["3.13.2"]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          brew install raylib
+          pip install -r requirements.txt
+          ln -s /opt/homebrew/lib/libraylib.5.5.0.dylib \
+            /Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/raylibpy/bin/64bit/
+
+      - name: Run tests
+        run: |
+          pytest
+
+      - name: Build application
+      #          python setup.py sdist bdist_wheel
+        run: |
+          python setup.py
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: built-package-${{ matrix.os }}-py${{ matrix.python-version }}
+          path: dist/

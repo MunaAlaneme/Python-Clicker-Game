@@ -3,6 +3,7 @@ PySDL2
 PySDL3
 cython
 pygame
+pygame-ce==2.5.4dev2
 wheel
 toml
 datetime
@@ -10,11 +11,7 @@ pickle-mixin
 numpy
 asyncio
 PyInstaller
-pydub
-audioop-lts
 ffprobe
 pytest
-librosa
-soundfile
 sounddevice
-simpleaudio
+librosa

@@ -9,29 +9,23 @@ import pygame
 import random
 from decimal import *
 import math
+import threading
 import sys
 import time
 import os
-import numpy as np
 #import svg
 import datetime
 import pickle
 import json
 import csv
 import asyncio
-import pydub
-import audioop
-from pydub import AudioSegment
 import io
 from io import BytesIO
-import librosa
-import soundfile as sf
-from pydub.playback import play
+import numpy as np
 import sounddevice as sd
+import librosa
 #pynanosvg
-
-GameFPS = 60
-
+GameFPS = 24
 def resource_path(relative_path):
     """ Get absolute path to resource, works for dev and for PyInstaller """
     try:
@@ -528,6 +522,7 @@ start_time = time.time()
 delta_time = 0.000001
 game_time = -0.000001
 GameFPS = 1/delta_time
+musicplays = 0
 bulkbuy = 1
 CamPos = [0, 0]
 CamPos2 = [0, 0]
@@ -545,7 +540,6 @@ pygamemixermusic = 1
 musicfilepath = ""
 musicintrofilepath = ""
 pymusictype = ""
-
 def pitch_shift(sound, semitones):
     new_sample_rate = int(sound.frame_rate * (2.0 ** (semitones / 12.0)))
     shifted = sound._spawn(sound.raw_data, overrides={'frame_rate': new_sample_rate})
@@ -553,12 +547,13 @@ def pitch_shift(sound, semitones):
 
 def PlayMusic(musNum):
     pygame.mixer.music.stop()
-    global pygamemixermusic, musicfilepath, musicintrofilepath
+    global pygamemixermusic, musicfilepath, musicintrofilepath, sr1, sr2, y1, y2
     pygamemixermusic = 1
     if musNum == 1:
         pygamemixermusic = 0.25
         pymusictype = "wav"
         musicfilepath = "./assets/audio/Debug Menu Unused   Paper Mario  The Thousand Year Door.wav"
+        #musicfilepath = "./assets/audio/Debug Menu Unused   Paper Mario  The Thousand Year Door.mp3"
         musicintrofilepath = "./assets/audio/nosound.wav"
     elif musNum == 2:
         pygamemixermusic = 1
@@ -569,6 +564,7 @@ def PlayMusic(musNum):
         pygamemixermusic = 0.7
         pymusictype = "wav"
         musicfilepath = "./assets/audio/Kevin MacLeod - Hep Cats.wav"
+        #musicfilepath = "./assets/audio/Kevin MacLeod - Hep Cats.mp3"
         musicintrofilepath = "./assets/audio/nosound.wav"
     elif musNum == 4:
         pygamemixermusic = 1
@@ -579,26 +575,45 @@ def PlayMusic(musNum):
         pygamemixermusic = .9
         pymusictype = "wav"
         musicfilepath = "./assets/audio/(radzlan - Miami Hotline Vol.3 (feat. Demonicity)) 673473_-Miami-Hotline--Vol3.wav"
+        #musicfilepath = "./assets/audio/(radzlan - Miami Hotline Vol.3 (feat. Demonicity)) 673473_-Miami-Hotline--Vol3.mp3"
         musicintrofilepath = "./assets/audio/nosound.wav"
     elif musNum == 6:
         pygamemixermusic = .9
         pymusictype = "wav"
-        musicfilepath = "./assets/audio/INOSSI - Got you-loop 44100.wav"
-        musicintrofilepath = "./assets/audio/INOSSI - Got you-start 44100.wav"
+        musicfilepath = "./assets/audio/INOSSI - Got you-loop.wav"
+        musicintrofilepath = "./assets/audio/INOSSI - Got you-start.wav"
     # Load audio file
+    y1, sr1 = librosa.load(musicintrofilepath, sr=None)
+    y2, sr2 = librosa.load(musicfilepath, sr=None)
     pygame.mixer.music.load(musicintrofilepath)
-    music1 = AudioSegment.from_file(musicintrofilepath)
-    music2 = AudioSegment.from_file(musicfilepath)
+    pygame.mixer.music.set_volume(pygamemixermusic)
+    #pygame.mixer.music.play()
 
-    #shifted_sound1 = pitch_shift(music1, 3)  # 4 semitones up
-    #shifted_sound2 = pitch_shift(music2, 3)  # 4 semitones up
-    #play(shifted_sound1)
-    pygame.mixer.music.load(musicintrofilepath)
-    pygame.mixer.music.set_volume(Decimal(pygamemixermusic))
-    pygame.mixer.music.set_volume(min(1.0, pygame.mixer.music.get_volume() * 1.1))
-    pygame.mixer.music.play()
+speed_factor = [1.2]
+stop_flag = [False]
+def play_audio():
+    index = 0
+    while not stop_flag[0]:
+        # Resample audio to new rate
+        new_sr = int(sr1 * speed_factor[0])
+        # Resample only a portion of the original audio to avoid long wait
+        chunk_len = sr1 // 2  # Half-second chunks
+        chunk = y1[index:index + chunk_len]
+        if len(chunk) == 0:
+            break
+
+        resampled = librosa.resample(chunk, orig_sr=sr1, target_sr=new_sr)
+
+        # Play resampled audio at the new sample rate
+        sd.play(resampled, new_sr)
+        sd.wait()
+
+        # Advance index based on original audio (not resampled)
+        index += chunk_len
+
 PlayMusic(random.randint(1,6))
-pygame.mixer.music.set_volume(Decimal(pygamemixermusic) * (Settings[1]["value"] / 100))
+play_audio()
+pygame.mixer.music.set_volume(pygamemixermusic * float(Settings[1]["value"] / 100))
 click_sound = pygame.mixer.Sound(resource_path("./assets/audio/Click mouse - Fugitive Simulator - The-Nick-of-Time.wav"))
 hover_sound = pygame.mixer.Sound(resource_path("./assets/audio/251389__deadsillyrabbit__button_hover-wav.wav"))
 upgrade_sound = pygame.mixer.Sound(resource_path("./assets/audio/Upgrade SOund 0001.wav"))
@@ -907,11 +922,12 @@ while running:
     draw_text(f"Total Clicks Per Click: {abbreviate((click_value*click_value_multi + cps_to_cpc*auto_click_value*auto_click_rate)*gemboost, "s", 3, 100000, False)}", font, WHITE, 10*WindowScale2 + CamPos[0]*WindowXscale, 280*WindowScale2 + CamPos[1]*WindowYscale, "left", 255)
 
     def prestige():
-        global score, gems
+        global score, gems, musicplays
         score = 0
         resetupgrades()
         PlayMusic(random.randint(1,6))
-        pygame.mixer.music.set_volume(Decimal(pygamemixermusic) * (Settings[1]["value"] / 100))
+        musicplays = 0
+        pygame.mixer.music.set_volume(pygamemixermusic * float(Settings[1]["value"] / 100))
         gems += gemstoget
 
     # Draw upgrade buttons
@@ -978,7 +994,7 @@ while running:
     screen.blit(realarrowupimg1, (1100*WindowXscale + CamPos[0]*WindowXscale, (34*WindowYscale) + mos_y/40 + CamPos[1]*WindowYscale))
 
     if not isinstance(Settings[1]["value"], str):
-        pygame.mixer.music.set_volume(Decimal(pygamemixermusic) * (Decimal(Settings[1]["value"]) / 100))
+        pygame.mixer.music.set_volume(pygamemixermusic * float(Settings[1]["value"] / 100))
     if not isinstance(Settings[0]["value"], str):
         upgrade_sound.set_volume(Decimal(Settings[0]["value"]/100))
         hover_sound.set_volume(Decimal(Settings[0]["value"]/100))
@@ -998,9 +1014,7 @@ while running:
     pygame.display.flip()
     #clock.tick(24)
     keys = pygame.key.get_pressed()
-    if not pygame.mixer.music.get_busy():
-        pygame.mixer.music.load(musicfilepath)
-        pygame.mixer.music.play(-1)
+    musicplays += 1
     if keys[pygame.K_a]:
         CamPos = [1280, 0]
     if keys[pygame.K_s]:
