@@ -56,7 +56,7 @@ def stop_audio():
 
 # Main loop
 def play_loop():
-    global start_frame
+    global start_frame, playing
     while playing and start_frame < len(audio_data):
         semitone_step = semitone_slider.get()
         pitch_factor = 2 ** (semitone_step / 12)
@@ -87,7 +87,7 @@ load_btn.pack()
 stop_btn = tk.Button(root, text="Stop", command=stop_audio)
 stop_btn.pack()
 
-semitone_slider = tk.Scale(root, from_=-12, to=12, orient=tk.HORIZONTAL, label="Semitone Shift")
+semitone_slider = tk.Scale(root, from_=-24, to=24, orient=tk.HORIZONTAL, label="Semitone Shift")
 semitone_slider.pack()
 
 status_label = tk.Label(root, text="No audio loaded.")
