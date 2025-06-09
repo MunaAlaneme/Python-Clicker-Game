@@ -17,3 +17,4 @@ sounddevice
 librosa
 raylib==5.5.0.2
 pyray
+raylib-py
