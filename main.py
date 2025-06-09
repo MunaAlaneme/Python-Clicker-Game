@@ -25,6 +25,11 @@ import numpy as np
 import sounddevice as sd
 import librosa
 #pynanosvg
+import raylibpy as rl
+from pathlib import Path
+
+THIS_DIR = Path(__file__).resolve().parent
+rl.init_audio_device()
 GameFPS = 24
 def resource_path(relative_path):
     """ Get absolute path to resource, works for dev and for PyInstaller """
@@ -267,7 +272,7 @@ PARTICLE_EVENT = pygame.USEREVENT + 1
 # pygame.time.set_timer(PARTICLE_EVENT, 20)
 
 # Font
-font = pygame.font.Font(resource_path("./assets/fonts/Lato/Lato-Bold.ttf"), 24)
+font = pygame.font.Font(resource_path(str(THIS_DIR / "./assets/fonts/Lato/Lato-Bold.ttf")), 24)
 
 # Colors
 WHITE = (255, 255, 255)
@@ -494,10 +499,10 @@ Settings_button_y = [70, 140, 210, 280, 350, 420, 490, 560]
 Settings_Button_Y_scroll = 0
 Settings_Button_Y_scroll_vel = 0
 # Clicker button
-clicker_button_image = pygame.image.load(resource_path("./assets/img/copilot.png")).convert_alpha()
+clicker_button_image = pygame.image.load(resource_path(str(THIS_DIR / "./assets/img/copilot.png"))).convert_alpha()
 # clicker_button_rect = clicker_button_image.get_rect(center=(screen_width // 2, screen_height // 2))
-arrow_down_img1 = pygame.image.load(resource_path("./assets/img/Arrow1-c.png")).convert_alpha()
-arrow_up_img1 = pygame.image.load(resource_path("./assets/img/Arrow1-d.png")).convert_alpha()
+arrow_down_img1 = pygame.image.load(resource_path(str(THIS_DIR / "./assets/img/Arrow1-c.png"))).convert_alpha()
+arrow_up_img1 = pygame.image.load(resource_path(str(THIS_DIR / "./assets/img/Arrow1-d.png"))).convert_alpha()
 
 # Upgrade button setup
 for i, upgrade in enumerate(upgrades):
@@ -547,7 +552,7 @@ def pitch_shift(sound, semitones):
 
 def PlayMusic(musNum):
     pygame.mixer.music.stop()
-    global pygamemixermusic, musicfilepath, musicintrofilepath, sr1, sr2, y1, y2
+    global pygamemixermusic, musicfilepath, musicintrofilepath, sr1, sr2, y1, y2, music1, music2
     pygamemixermusic = 1
     if musNum == 1:
         pygamemixermusic = 0.25
@@ -583,40 +588,21 @@ def PlayMusic(musNum):
         musicfilepath = "./assets/audio/INOSSI - Got you-loop.wav"
         musicintrofilepath = "./assets/audio/INOSSI - Got you-start.wav"
     # Load audio file
-    y1, sr1 = librosa.load(musicintrofilepath, sr=None)
-    y2, sr2 = librosa.load(musicfilepath, sr=None)
-    pygame.mixer.music.load(musicintrofilepath)
-    pygame.mixer.music.set_volume(pygamemixermusic)
+    if musicintrofilepath == "./assets/audio/nosound.wav":
+        musicintrofilepath = musicfilepath
+    #pygame.mixer.music.load(str(THIS_DIR / musicintrofilepath))
+    music1 = rl.load_music_stream(str(THIS_DIR / musicintrofilepath))
+    music2 = rl.load_music_stream(str(THIS_DIR / musicfilepath))
+    #pygame.mixer.music.set_volume(pygamemixermusic)
     #pygame.mixer.music.play()
-
-speed_factor = [1.2]
-stop_flag = [False]
-def play_audio():
-    index = 0
-    while not stop_flag[0]:
-        # Resample audio to new rate
-        new_sr = int(sr1 * speed_factor[0])
-        # Resample only a portion of the original audio to avoid long wait
-        chunk_len = sr1 // 2  # Half-second chunks
-        chunk = y1[index:index + chunk_len]
-        if len(chunk) == 0:
-            break
-
-        resampled = librosa.resample(chunk, orig_sr=sr1, target_sr=new_sr)
-
-        # Play resampled audio at the new sample rate
-        sd.play(resampled, new_sr)
-        sd.wait()
-
-        # Advance index based on original audio (not resampled)
-        index += chunk_len
-
+    rl.stop_music_stream(music1)
+    rl.stop_music_stream(music2)
+    rl.play_music_stream(music1)
 PlayMusic(random.randint(1,6))
-play_audio()
 pygame.mixer.music.set_volume(pygamemixermusic * float(Settings[1]["value"] / 100))
-click_sound = pygame.mixer.Sound(resource_path("./assets/audio/Click mouse - Fugitive Simulator - The-Nick-of-Time.wav"))
-hover_sound = pygame.mixer.Sound(resource_path("./assets/audio/251389__deadsillyrabbit__button_hover-wav.wav"))
-upgrade_sound = pygame.mixer.Sound(resource_path("./assets/audio/Upgrade SOund 0001.wav"))
+click_sound = pygame.mixer.Sound(resource_path(str(THIS_DIR / "./assets/audio/Click mouse - Fugitive Simulator - The-Nick-of-Time.wav")))
+hover_sound = pygame.mixer.Sound(resource_path(str(THIS_DIR / "./assets/audio/251389__deadsillyrabbit__button_hover-wav.wav")))
+upgrade_sound = pygame.mixer.Sound(resource_path(str(THIS_DIR / "./assets/audio/Upgrade SOund 0001.wav")))
 
 Hovering_Buttons = [0,0,0,0,0,0,0,0,0,0]
 framestofixload = 0
@@ -631,12 +617,12 @@ def save_game():
     offlineTime = time.time()
     GameStuff = [gems, score, start_time, offlineTime, bulkbuy]
     GameStuff2 = [Settings, upgrades, GameStuff]
-    with open (resource_path("save/SaveData.pickle"), 'wb') as fileSave:
+    with open (resource_path(str(THIS_DIR / "./save/SaveData.pickle")), 'wb') as fileSave:
         pickle.dump(GameStuff2, fileSave, protocol=pickle.HIGHEST_PROTOCOL)
 def load_game():
     try:
         global Settings, upgrades, gems, score, start_time, game_time, offlineCurrentTime, offlineOldTime, framestofixload, auto_click_rate, auto_click_value, click_value, click_value_multi, cps_to_cpc, offlineBoxAlpha, differenceTimeOffline, offlineCurrentTime, offlineOldTime, gemboost, GameStuff, bulkbuy, GameStuff2
-        with open (resource_path("save/SaveData.pickle"), 'rb') as fileSave:
+        with open (resource_path(str(THIS_DIR / "./save/SaveData.pickle")), 'rb') as fileSave:
             GameStuff2 = pickle.load(fileSave)
             GameStuff = GameStuff2[2]
             upgrades = GameStuff2[1]
@@ -670,7 +656,17 @@ def load_game():
         print("You pressed the right mouse button")
 """
 YouWillNotUpgradeUnlessToldTo_Time = 0.3
+ClicksPerSecond = 0
+ClickSecondList = []
+MaxClicksPerSecond = 0
+TotalClicks = 0
+speedmusic = 1.0
 while running:
+    speedmusic = constrain(speedmusic + (1-speedmusic)/(0.75/delta_time), 1, 1.2)
+    rl.set_music_pitch(music1, speedmusic)
+    rl.set_music_pitch(music2, speedmusic)
+    rl.update_music_stream(music1)
+    rl.update_music_stream(music2)
     framestofixload += 1
     gemboost = Decimal((50+gems)/50)
     mos_x, mos_y = pygame.mouse.get_pos()
@@ -769,12 +765,21 @@ while running:
                         scale_x[0] = constrain(scale_x[0]-40, 200, math.inf)
                         score += Decimal(click_value)*Decimal(random.uniform(0.95, 1.05))*Decimal(click_value_multi)*Decimal(gemboost) + Decimal(cps_to_cpc)*Decimal(auto_click_value)*Decimal(auto_click_rate)*Decimal(gemboost)
                         click_sound.play()
+                        ClickSecondList.append(1)
+                        speedmusic += 0.012
                         for i in range(10):
                             particle1.add_particles(pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1], 10, random.randrange(-180, 180), 4)
             elif button_i == 1:
                 pass
         else:
             Hovering_Buttons[button_i] = 0
+    tempClickSecondList1 = len(ClickSecondList)
+    for i in range(len(ClickSecondList)):
+        if not i >= len(ClickSecondList):
+            ClickSecondList[i-1] -= delta_time
+            if ClickSecondList[i-1] <= 0:
+                ClickSecondList.remove(ClickSecondList[i-1])
+    ClicksPerSecond = len(ClickSecondList)
     # Handle events
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -897,7 +902,7 @@ while running:
     screen.fill((30, 30, 30))
     screen.blit(smalclicrimg, (button_rect_x[0]-(scale_x[0]/2)*WindowScale2, button_rect_y[0]-(scale_y[0]/2)*WindowScale2))
     # Draw text
-    font = pygame.font.Font(resource_path("./assets/fonts/Lato/Lato-Bold.ttf"), int(24*WindowScale2))
+    font = pygame.font.Font(resource_path(str(THIS_DIR / "./assets/fonts/Lato/Lato-Bold.ttf")), int(24*WindowScale2))
     def draw_text(text, font, color, x, y, align, alpha):
         text_surface = font.render(text, True, color)
         text_surface.set_alpha(alpha)
@@ -907,10 +912,10 @@ while running:
         elif align == "center":
             text_rect.center = (x, y)
             screen.blit(text_surface, text_rect)
-    draw_text(f"Clicks: {abbreviate(score, "s", 3, 100000, False)}", font, WHITE, 10*WindowScale2 + CamPos[0]*WindowXscale, 10*WindowScale2 + CamPos[1]*WindowYscale, "left", 255)
-    draw_text(f"Clicks Per Click: {abbreviate(click_value + (cps_to_cpc*auto_click_value*auto_click_rate), "s", 3, 100000, False)}", font, WHITE, 10*WindowScale2 + CamPos[0]*WindowXscale, 40*WindowScale2 + CamPos[1]*WindowYscale, "left", 255)
+    draw_text(f"Score: {abbreviate(score, "s", 3, 100000, False)}", font, WHITE, 10*WindowScale2 + CamPos[0]*WindowXscale, 10*WindowScale2 + CamPos[1]*WindowYscale, "left", 255)
+    draw_text(f"Score Per Click: {abbreviate(click_value + (cps_to_cpc*auto_click_value*auto_click_rate), "s", 3, 100000, False)}", font, WHITE, 10*WindowScale2 + CamPos[0]*WindowXscale, 40*WindowScale2 + CamPos[1]*WindowYscale, "left", 255)
     draw_text(f"Click Value Multiplier: x{abbreviate(click_value_multi, "s", 3, 100000, False)}", font, WHITE, 10*WindowScale2 + CamPos[0]*WindowXscale, 70*WindowScale2 + CamPos[1]*WindowYscale, "left", 255)
-    draw_text(f"Clicks Per Second: {abbreviate(auto_click_value, "s", 3, 100000, False)}/s", font, WHITE, 10*WindowScale2 + CamPos[0]*WindowXscale, 100*WindowScale2 + CamPos[1]*WindowYscale, "left", 255)
+    draw_text(f"Score Per Second: {abbreviate(auto_click_value, "s", 3, 100000, False)}/s", font, WHITE, 10*WindowScale2 + CamPos[0]*WindowXscale, 100*WindowScale2 + CamPos[1]*WindowYscale, "left", 255)
     if delta_time > 0:
         draw_text(f"FPS: {Decimal(1/delta_time):.2f}", font, WHITE, 10*WindowScale2 + CamPos[0]*WindowXscale, 130*WindowScale2 + CamPos[1]*WindowYscale, "left", 255)
     else:
@@ -918,8 +923,9 @@ while running:
     draw_text(f"Seconds Per Second: {abbreviate(auto_click_rate, "s", 3, 1000, False)}/s", font, WHITE, 10*WindowScale2 + CamPos[0]*WindowXscale, 160*WindowScale2 + CamPos[1]*WindowYscale, "left", 255)
     draw_text(f"Gems: {abbreviate(gems, "s", 3, 100000, True)} (+ {abbreviate(gemstoget, "s", 3, 100000, True)})", font, WHITE, 10*WindowScale2 + CamPos[0]*WindowXscale, 190*WindowScale2 + CamPos[1]*WindowYscale, "left", 255)
     draw_text(f"{abbreviate(Decimal(gemboost), "s", 3, 100000, False)}x boost (+{abbreviate(Decimal(gemboosttoget), "s", 3, 100000, False)})", font, WHITE, 10*WindowScale2 + CamPos[0]*WindowXscale, 220*WindowScale2 + CamPos[1]*WindowYscale, "left", 255)
-    draw_text(f"Total Clicks Per Second: {abbreviate(auto_click_value * auto_click_rate * gemboost, "s", 3, 1000, False)}/s", font, WHITE, 10*WindowScale2 + CamPos[0]*WindowXscale, 250*WindowScale2 + CamPos[1]*WindowYscale, "left", 255)
-    draw_text(f"Total Clicks Per Click: {abbreviate((click_value*click_value_multi + cps_to_cpc*auto_click_value*auto_click_rate)*gemboost, "s", 3, 100000, False)}", font, WHITE, 10*WindowScale2 + CamPos[0]*WindowXscale, 280*WindowScale2 + CamPos[1]*WindowYscale, "left", 255)
+    draw_text(f"Total Score Per Second: {abbreviate(auto_click_value * auto_click_rate * gemboost, "s", 3, 1000, False)}/s", font, WHITE, 10*WindowScale2 + CamPos[0]*WindowXscale, 250*WindowScale2 + CamPos[1]*WindowYscale, "left", 255)
+    draw_text(f"Total Score Per Click: {abbreviate((click_value*click_value_multi + cps_to_cpc*auto_click_value*auto_click_rate)*gemboost, "s", 3, 100000, False)}", font, WHITE, 10*WindowScale2 + CamPos[0]*WindowXscale, 280*WindowScale2 + CamPos[1]*WindowYscale, "left", 255)
+    draw_text(f"Clicks Per Second: {ClicksPerSecond}", font, WHITE, 10*WindowScale2 + CamPos[0]*WindowXscale, 310*WindowScale2 + CamPos[1]*WindowYscale, "left", 255)
 
     def prestige():
         global score, gems, musicplays
@@ -961,9 +967,9 @@ while running:
             draw_text(f"{Settings[i]['name']}", font, WHITE, setx*WindowXscale + Settings_button_width[i]*WindowXscale/2, sety*WindowYscale + Settings_button_height[i]*WindowScale2/2, "center", 255)
     pygame.draw.rect(screen, (30, 30, 30), (900*WindowXscale + CamPos[0]*WindowXscale, WindowHeight*0.35 + CamPos[1]*WindowYscale, 380*WindowXscale, WindowHeight*1))
     pygame.draw.rect(screen, (30, 30, 30), (900*WindowXscale + CamPos[0]*WindowXscale, WindowHeight*0.0 + CamPos[1]*WindowYscale, 380*WindowXscale, WindowHeight*0.1))
-    draw_text(f"Options", pygame.font.Font(resource_path("./assets/fonts/Lato/Lato-Bold.ttf"), int(36*WindowScale2)), WHITE, 1110*WindowXscale + CamPos[0]*WindowXscale, 18 * WindowYscale + CamPos[1]*WindowYscale, "center", 255)
-    draw_text(f"Log", pygame.font.Font(resource_path("./assets/fonts/Lato/Lato-Bold.ttf"), int(36*WindowScale2)), WHITE, 1110*WindowXscale + CamPos[0]*WindowXscale, 318 * WindowYscale + CamPos[1]*WindowYscale, "center", 255) # IT'S CLONE RIGGY!
-    draw_text(f"Upgrades", pygame.font.Font(resource_path("./assets/fonts/Lato/Lato-Bold.ttf"), int(36*WindowScale2)), WHITE, 30*WindowXscale + CamPos[0]*WindowXscale, 540 * WindowYscale + CamPos[1]*WindowYscale, "left", 255)
+    draw_text(f"Options", pygame.font.Font(resource_path(str(THIS_DIR / "./assets/fonts/Lato/Lato-Bold.ttf")), int(36*WindowScale2)), WHITE, 1110*WindowXscale + CamPos[0]*WindowXscale, 18 * WindowYscale + CamPos[1]*WindowYscale, "center", 255)
+    draw_text(f"Log", pygame.font.Font(resource_path(str(THIS_DIR / "./assets/fonts/Lato/Lato-Bold.ttf")), int(36*WindowScale2)), WHITE, 1110*WindowXscale + CamPos[0]*WindowXscale, 318 * WindowYscale + CamPos[1]*WindowYscale, "center", 255) # IT'S CLONE RIGGY!
+    draw_text(f"Upgrades", pygame.font.Font(resource_path(str(THIS_DIR / "./assets/fonts/Lato/Lato-Bold.ttf")), int(36*WindowScale2)), WHITE, 30*WindowXscale + CamPos[0]*WindowXscale, 540 * WindowYscale + CamPos[1]*WindowYscale, "left", 255)
     for i, button in enumerate(upgrade_buttons):
         def calcmax():
             return constrain(Decimal.__floor__( Decimal.log10( (Decimal(score) * (Decimal(upgrades[i]["costcoefficient"]) - 1)) / Decimal(upgrades[i]["startcost"] * (Decimal(upgrades[i]["costcoefficient"]) ** Decimal(upgrades[i]["bought"]))) + 1) / Decimal.log10(Decimal(upgrades[i]["costcoefficient"]))), Decimal(1), math.inf)
@@ -1005,8 +1011,8 @@ while running:
     offlineBox_rect_surface = pygame.Surface((960*WindowScale2, 360*WindowScale2), pygame.SRCALPHA)
     offlineBox_rect_surface.fill((0, 64, 128, offlineBoxAlpha))  # Fill with red and set alpha to 128 (50% transparent)
     screen.blit(offlineBox_rect_surface, ((640*WindowXscale) - (480*WindowScale2), (360*WindowYscale) - (180*WindowScale2)))
-    draw_text(f"While you were away for {abbreviate((Decimal(offlineCurrentTime) - Decimal(offlineOldTime)), "s", 3, 10000, False)} seconds,", pygame.font.Font(resource_path("./assets/fonts/Lato/Lato-Bold.ttf"), int(30*WindowScale2)), (255, 64, 128, offlineBoxAlpha), 640*WindowXscale, 330*WindowYscale, "center", offlineBoxAlpha)
-    draw_text(f"You earned {abbreviate(Decimal(differenceTimeOffline) * Decimal(auto_click_value) * Decimal(auto_click_rate) * Decimal(gemboost), "s", 3, 100000, False)} clicks.", pygame.font.Font(resource_path("./assets/fonts/Lato/Lato-Bold.ttf"), int(30*WindowScale2)), (255, 64, 128, offlineBoxAlpha), 640*WindowXscale, 390*WindowYscale, "center", offlineBoxAlpha)
+    draw_text(f"While you were away for {abbreviate((Decimal(offlineCurrentTime) - Decimal(offlineOldTime)), "s", 3, 10000, False)} seconds,", pygame.font.Font(resource_path(str(THIS_DIR / "./assets/fonts/Lato/Lato-Bold.ttf")), int(30*WindowScale2)), (255, 64, 128, offlineBoxAlpha), 640*WindowXscale, 330*WindowYscale, "center", offlineBoxAlpha)
+    draw_text(f"You earned {abbreviate(Decimal(differenceTimeOffline) * Decimal(auto_click_value) * Decimal(auto_click_rate) * Decimal(gemboost), "s", 3, 100000, False)} clicks.", pygame.font.Font(resource_path(str(THIS_DIR / "./assets/fonts/Lato/Lato-Bold.ttf")), int(30*WindowScale2)), (255, 64, 128, offlineBoxAlpha), 640*WindowXscale, 390*WindowYscale, "center", offlineBoxAlpha)
     offlineBoxAlpha = constrain(offlineBoxAlpha - 51*delta_time, 0, 255)
     YouWillNotUpgradeUnlessToldTo_Time -= delta_time
     # Update display
@@ -1014,7 +1020,6 @@ while running:
     pygame.display.flip()
     #clock.tick(24)
     keys = pygame.key.get_pressed()
-    musicplays += 1
     if keys[pygame.K_a]:
         CamPos = [1280, 0]
     if keys[pygame.K_s]:
@@ -1033,5 +1038,12 @@ while running:
         CamPos = [0, -720]
     if keys[pygame.K_c]:
         CamPos = [-1280, -720]
+    if (rl.get_music_time_played(music1) >= rl.get_music_time_length(music1)-0.1) and musicplays == 0:
+        rl.stop_music_stream(music1)
+        rl.play_music_stream(music2)
+        musicplays = 1
+rl.unload_music_stream(music1)
+rl.unload_music_stream(music2)
+rl.close_audio_device()
 # Quit Pygame
 pygame.quit()

@@ -1,96 +1,99 @@
-#./assets/audio/(radzlan - Miami Hotline Vol.3 (feat. Demonicity)) 673473_-Miami-Hotline--Vol3.mp3
-import tkinter as tk
-from tkinter import filedialog
-import pygame
-from pydub import AudioSegment
+import librosa
 import numpy as np
-from scipy.signal import resample
+import sounddevice as sd
 import threading
+import tkinter as tk
+from tkinter import ttk
+from queue import Queue
 import time
 
-# Init Pygame
-sample_rate = 44100
-pygame.mixer.init(frequency=sample_rate, size=-16, channels=1)
+# Load audio file (mp3, wav, etc.)
+audio_path = "./assets/audio/Kevin MacLeod - Hep Cats.mp3"
+y, sr = librosa.load(audio_path, sr=None)
 
-# Globals
-audio_data = None
-playing = False
-start_frame = 0
-frame_count = int(sample_rate * 0.1)  # smaller chunks for smoother updates
-semitone_ratio = 2 ** (1 / 12)
+# Playback controls
+playback_rate = [1.0]
+playing = [True]
 
-# Load audio
-def load_audio():
-    global audio_data, start_frame
-    file_path = filedialog.askopenfilename(filetypes=[("WAV files", "*.wav")])
-    if not file_path:
-        return
-    audio = AudioSegment.from_file(file_path).set_channels(1).set_frame_rate(sample_rate)
-    raw = np.array(audio.get_array_of_samples()).astype(np.float32)
-    audio_data = raw
-    start_frame = 0
-    status_label.config(text=f"Loaded: {file_path.split('/')[-1]}")
-    start_playback()
+chunk_duration = 1/24  # seconds
+chunk_samples = int(sr * chunk_duration)
+max_queue_size = 1
+audio_queue = Queue(maxsize=max_queue_size)
 
-# Resample chunk with pitch shift
-def resample_audio(data, pitch_factor):
-    new_len = int(len(data) / pitch_factor)
-    return resample(data, new_len)
+def producer_thread():
+    start = 0
+    while start < len(y) and playing[0]:
+        if audio_queue.full():
+            time.sleep(0.01)
+            continue
+        end = start + int(chunk_samples/playback_rate[0])
+        chunk = y[start:end]
 
-# Start playback
-def start_playback():
-    global playing
-    if audio_data is None:
-        status_label.config(text="No audio loaded.")
-        return
+        # Zero-pad input chunk to fixed length
+        chunk = librosa.util.fix_length(chunk, size=int(chunk_samples/playback_rate[0]))
 
-    if not playing:
-        playing = True
-        threading.Thread(target=play_loop, daemon=True).start()
+        # Resample based on playback rate
+        rate = playback_rate[0]
+        new_sr = int(sr * rate)
+        resampled = librosa.resample(chunk, orig_sr=sr, target_sr=new_sr)
 
-# Stop playback
-def stop_audio():
-    global playing
-    playing = False
-    pygame.mixer.stop()
+        # Fix output length to constant size (based on original sample rate)
+        target_output_len = chunk_samples
+        resampled = librosa.util.fix_length(resampled, size=target_output_len)
 
-# Main loop
-def play_loop():
-    global start_frame, playing
-    while playing and start_frame < len(audio_data):
-        semitone_step = semitone_slider.get()
-        pitch_factor = 2 ** (semitone_step / 12)
+        # Normalize safely
+        max_val = np.max(np.abs(resampled))
+        if max_val > 0:
+            resampled = resampled / max_val
 
-        chunk = audio_data[start_frame:start_frame + frame_count]
-        if len(chunk) == 0:
-            break
+        resampled = np.clip(resampled, -1.0, 1.0)
 
-        # Resample for pitch
-        pitched = resample_audio(chunk, 1 / pitch_factor)
-        pitched = np.clip(pitched, -32768, 32767).astype(np.int16)
+        audio_queue.put(resampled.astype(np.float32))
+        start += int(chunk_samples/playback_rate[0])
 
-        sound = pygame.mixer.Sound(buffer=pitched.tobytes())
-        sound.play()
+def audio_callback(outdata, frames, time_info, status):
+    if not audio_queue.empty():
+        chunk = audio_queue.get()
+        outdata[:] = chunk.reshape(-1, 1)
+    else:
+        outdata.fill(0)  # silence if buffer underrun
 
-        time.sleep(len(pitched) / sample_rate)
-        start_frame += frame_count
+def update_rate(val):
+    playback_rate[0] = float(val)
 
-    playing = False
+def update_gui():
+    if y is not None:
+        fill = int((audio_queue.qsize() / max_queue_size) * 100)
+        buffer_bar['value'] = fill
+    if playing[0]:
+        root.after(100, update_gui)
 
-# GUI
+# GUI Setup
 root = tk.Tk()
-root.title("Live Pitch Shift Player")
+root.title("Smooth Audio Player with Pitch & Speed Control")
 
-load_btn = tk.Button(root, text="Load Audio", command=load_audio)
-load_btn.pack()
+ttk.Label(root, text="Playback Rate (Pitch & Speed):").pack(pady=5)
+slider = ttk.Scale(root, from_=0.5, to=2.0, value=1.0, orient="horizontal", command=update_rate)
+slider.pack(fill='x', padx=10)
 
-stop_btn = tk.Button(root, text="Stop", command=stop_audio)
-stop_btn.pack()
+ttk.Label(root, text="Buffer Fill:").pack(pady=5)
+buffer_bar = ttk.Progressbar(root, length=200, mode='determinate')
+buffer_bar.pack(fill='x', padx=10, pady=(0, 10))
 
-semitone_slider = tk.Scale(root, from_=-24, to=24, orient=tk.HORIZONTAL, label="Semitone Shift")
-semitone_slider.pack()
+ttk.Button(root, text="Stop", command=lambda: (playing.__setitem__(0, False), root.destroy())).pack(pady=10)
 
-status_label = tk.Label(root, text="No audio loaded.")
-status_label.pack()
+# Start producer thread
+threading.Thread(target=producer_thread, daemon=True).start()
 
+# Start audio stream
+stream = sd.OutputStream(channels=1, samplerate=sr, dtype='float32',
+                         callback=audio_callback, blocksize=chunk_samples)
+stream.start()
+
+update_gui()
 root.mainloop()
+
+# Cleanup on exit
+playing[0] = False
+stream.stop()
+stream.close()
