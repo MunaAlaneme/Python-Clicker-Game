@@ -22,8 +22,6 @@ import asyncio
 import io
 from io import BytesIO
 import numpy as np
-import sounddevice as sd
-import librosa
 #pynanosvg
 import raylibpy as rl
 from pathlib import Path
@@ -552,7 +550,7 @@ def pitch_shift(sound, semitones):
 
 def PlayMusic(musNum):
     pygame.mixer.music.stop()
-    global pygamemixermusic, musicfilepath, musicintrofilepath, sr1, sr2, y1, y2, music1, music2
+    global pygamemixermusic, musicfilepath, musicintrofilepath, music1, music2
     pygamemixermusic = 1
     if musNum == 1:
         pygamemixermusic = 0.25
