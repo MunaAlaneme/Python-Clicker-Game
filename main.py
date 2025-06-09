@@ -594,11 +594,15 @@ def PlayMusic(musNum):
     music2 = rl.load_music_stream(str(THIS_DIR / musicfilepath))
     #pygame.mixer.music.set_volume(pygamemixermusic)
     #pygame.mixer.music.play()
+    rl.set_music_volume(music1, pygamemixermusic)
+    rl.set_music_volume(music2, pygamemixermusic)
     rl.stop_music_stream(music1)
     rl.stop_music_stream(music2)
     rl.play_music_stream(music1)
 PlayMusic(random.randint(1,6))
-pygame.mixer.music.set_volume(pygamemixermusic * float(Settings[1]["value"] / 100))
+#pygame.mixer.music.set_volume(pygamemixermusic * float(Settings[1]["value"] / 100))
+rl.set_music_volume(music1, pygamemixermusic * float(Settings[1]["value"] / 100))
+rl.set_music_volume(music2, pygamemixermusic * float(Settings[1]["value"] / 100))
 click_sound = pygame.mixer.Sound(resource_path(str(THIS_DIR / "./assets/audio/Click mouse - Fugitive Simulator - The-Nick-of-Time.wav")))
 hover_sound = pygame.mixer.Sound(resource_path(str(THIS_DIR / "./assets/audio/251389__deadsillyrabbit__button_hover-wav.wav")))
 upgrade_sound = pygame.mixer.Sound(resource_path(str(THIS_DIR / "./assets/audio/Upgrade SOund 0001.wav")))
@@ -932,7 +936,9 @@ while running:
         resetupgrades()
         PlayMusic(random.randint(1,6))
         musicplays = 0
-        pygame.mixer.music.set_volume(pygamemixermusic * float(Settings[1]["value"] / 100))
+        #pygame.mixer.music.set_volume(pygamemixermusic * float(Settings[1]["value"] / 100))
+        rl.set_music_volume(music1, pygamemixermusic * float(Settings[1]["value"] / 100))
+        rl.set_music_volume(music2, pygamemixermusic * float(Settings[1]["value"] / 100))
         gems += gemstoget
 
     # Draw upgrade buttons
@@ -999,7 +1005,9 @@ while running:
     screen.blit(realarrowupimg1, (1100*WindowXscale + CamPos[0]*WindowXscale, (34*WindowYscale) + mos_y/40 + CamPos[1]*WindowYscale))
 
     if not isinstance(Settings[1]["value"], str):
-        pygame.mixer.music.set_volume(pygamemixermusic * float(Settings[1]["value"] / 100))
+        #pygame.mixer.music.set_volume(pygamemixermusic * float(Settings[1]["value"] / 100))
+        rl.set_music_volume(music1, pygamemixermusic * float(Settings[1]["value"] / 100))
+        rl.set_music_volume(music2, pygamemixermusic * float(Settings[1]["value"] / 100))
     if not isinstance(Settings[0]["value"], str):
         upgrade_sound.set_volume(Decimal(Settings[0]["value"]/100))
         hover_sound.set_volume(Decimal(Settings[0]["value"]/100))
