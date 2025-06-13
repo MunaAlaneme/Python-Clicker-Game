@@ -15,9 +15,9 @@ y, sr = librosa.load(audio_path, sr=None)
 playback_rate = [1.0]
 playing = [True]
 
-chunk_duration = 1/24  # seconds
+chunk_duration = 1/60  # seconds, if put at 1/4410, bitcrush
 chunk_samples = int(sr * chunk_duration)
-max_queue_size = 1
+max_queue_size = 5 #if put at 100, bitcrush also
 audio_queue = Queue(maxsize=max_queue_size)
 
 def producer_thread():
@@ -50,6 +50,7 @@ def producer_thread():
 
         audio_queue.put(resampled.astype(np.float32))
         start += int(chunk_samples/playback_rate[0])
+        #start += int(chunk_samples/1)
 
 def audio_callback(outdata, frames, time_info, status):
     if not audio_queue.empty():
@@ -59,7 +60,7 @@ def audio_callback(outdata, frames, time_info, status):
         outdata.fill(0)  # silence if buffer underrun
 
 def update_rate(val):
-    playback_rate[0] = float(val)
+    playback_rate[0] = .5**float(val)
 
 def update_gui():
     if y is not None:
@@ -73,7 +74,7 @@ root = tk.Tk()
 root.title("Smooth Audio Player with Pitch & Speed Control")
 
 ttk.Label(root, text="Playback Rate (Pitch & Speed):").pack(pady=5)
-slider = ttk.Scale(root, from_=0.5, to=2.0, value=1.0, orient="horizontal", command=update_rate)
+slider = ttk.Scale(root, from_=-3, to=3, value=0, orient="horizontal", command=update_rate)
 slider.pack(fill='x', padx=10)
 
 ttk.Label(root, text="Buffer Fill:").pack(pady=5)
