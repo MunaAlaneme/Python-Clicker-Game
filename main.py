@@ -33,6 +33,7 @@ from pathlib import Path
 
 THIS_DIR = Path(__file__).resolve().parent
 rl.init_audio_device()
+rl.set_target_fps(0)
 GameFPS = 24
 def resource_path(relative_path):
     """ Get absolute path to resource, works for dev and for PyInstaller """
@@ -64,7 +65,9 @@ class ParticlePrinciple:
                 particle[0][0] += particle[3] * math.sin(particle[2]) * 60/GameFPS * WindowScale2
                 particle[0][1] += particle[3] * math.cos(particle[2]) * 60/GameFPS * WindowScale2
                 particle[1] -= 24/GameFPS
-                pygame.draw.circle(screen, pygame.Color('White'), particle[0], particle[1]*WindowScale2)
+                particle_surface = pygame.Surface((constrain(particle[1], 0, math.inf)*WindowScale2 * 2, constrain(particle[1], 0, math.inf)*WindowScale2 * 2), pygame.SRCALPHA)
+                pygame.draw.circle(particle_surface, (255, 255, 255, constrain(constrain(particle[1], 0, math.inf)*25.6, 0, 255)), (constrain(particle[1], 0, math.inf)*WindowScale2,particle[1]*WindowScale2), constrain(particle[1], 0, math.inf)*WindowScale2)
+                screen.blit(particle_surface, (particle[0][0] - constrain(particle[1], 0, math.inf)*WindowScale2, particle[0][1] - constrain(particle[1], 0, math.inf)*WindowScale2))
     def add_particles(self, posx, posy, radiuss, directionn, sped):
         pos_x = posx
         pos_y = posy
@@ -674,7 +677,7 @@ def PlayMusic(musNum):
     elif musNum == 12:
         pygamemixermusic = 1.1
         pymusictype = "wav"
-        musicfilepath = "./assets/audio/Sakurasou No Pet Na Kanojo - Im Gonna Send You A Virus.wav"
+        musicfilepath = "./assets/audio/Sakurasou Pet na Kanojo Original Sountrack - 17. Virus toka Okucchauzo (Warai) (I'm Gonna Send You A Virus).wav"
         musicintrofilepath = "./assets/audio/nosound.wav"
     elif musNum == 13:
         pygamemixermusic = 1
