@@ -269,12 +269,31 @@ def abbreviate(number, suffixes, decimals, greaterthan, rounda):
             if Decimal(fexp(Decimal(number)))%3 == 2:
                 return str(str(Decimal.__round__(Decimal(fman(Decimal(number)))*(Decimal(10)**Decimal(decimals+2)))/Decimal(Decimal(10)**Decimal(decimals))) + "e" + str(fexp(Decimal(number/100))))
     elif Decimal.__abs__(Decimal(fexp(Decimal(number)))) < 10**6:
-        return (str(round(fman(Decimal(number)), decimals)) + "e" + str(fexp(Decimal(number))))
+        if suffixes == "sci":
+            return str(str(Decimal.__round__(Decimal(fman(Decimal(number)))*(Decimal(10)**Decimal(decimals)))/Decimal(Decimal(10)**Decimal(decimals))) + "e" + str(fexp(Decimal(number))))
+        elif suffixes == "eng":
+            if Decimal(fexp(Decimal(number)))%3 == 0:
+                return str(str(Decimal.__round__(Decimal(fman(Decimal(number)))*(Decimal(10)**Decimal(decimals)))/Decimal(Decimal(10)**Decimal(decimals))) + "e" + str(fexp(Decimal(number))))
+            if Decimal(fexp(Decimal(number)))%3 == 1:
+                return str(str(Decimal.__round__(Decimal(fman(Decimal(number)))*(Decimal(10)**Decimal(decimals+1)))/Decimal(Decimal(10)**Decimal(decimals))) + "e" + str(fexp(Decimal(number/10))))
+            if Decimal(fexp(Decimal(number)))%3 == 2:
+                return str(str(Decimal.__round__(Decimal(fman(Decimal(number)))*(Decimal(10)**Decimal(decimals+2)))/Decimal(Decimal(10)**Decimal(decimals))) + "e" + str(fexp(Decimal(number/100))))
+        else:
+            return (str(round(fman(Decimal(number)), decimals)) + "e" + str(fexp(Decimal(number))))
     elif Decimal.__abs__(Decimal(fexp(Decimal(number)))) < 10**10002 * 3:
         if suffixes == "l":
             return (str(round(fman(Decimal(number)), decimals)) + "e" + str(round(fexp(Decimal(number)) / 10**(Decimal.__floor__(Decimal.log10(Decimal.__abs__(Decimal(fexp(Decimal(number)))))/3)*3), 3)) + LongSuffixes[Decimal.__floor__(Decimal.log10(Decimal.__abs__(Decimal(fexp(Decimal(number)))))/3)+0])
         elif suffixes == "s":
             return (str(round(fman(Decimal(number)), decimals)) + "e" + str(round(fexp(Decimal(number)) / 10**(Decimal.__floor__(Decimal.log10(Decimal.__abs__(Decimal(fexp(Decimal(number)))))/3)*3), 3)) + ShortSuffixes[Decimal.__floor__(Decimal.log10(Decimal.__abs__(Decimal(fexp(Decimal(number)))))/3)+0])
+        elif suffixes == "sci":
+            return str(str(Decimal.__round__(Decimal(fman(Decimal(number)))*(Decimal(10)**Decimal(decimals)))/Decimal(Decimal(10)**Decimal(decimals))) + "e" + str(fexp(Decimal(number))))
+        elif suffixes == "eng":
+            if Decimal(fexp(Decimal(number)))%3 == 0:
+                return str(str(Decimal.__round__(Decimal(fman(Decimal(number)))*(Decimal(10)**Decimal(decimals)))/Decimal(Decimal(10)**Decimal(decimals))) + "e" + str(fexp(Decimal(number))))
+            if Decimal(fexp(Decimal(number)))%3 == 1:
+                return str(str(Decimal.__round__(Decimal(fman(Decimal(number)))*(Decimal(10)**Decimal(decimals+1)))/Decimal(Decimal(10)**Decimal(decimals))) + "e" + str(fexp(Decimal(number/10))))
+            if Decimal(fexp(Decimal(number)))%3 == 2:
+                return str(str(Decimal.__round__(Decimal(fman(Decimal(number)))*(Decimal(10)**Decimal(decimals+2)))/Decimal(Decimal(10)**Decimal(decimals))) + "e" + str(fexp(Decimal(number/100))))
     else:
         return (str(round(fman(Decimal(number)), decimals)) + "e" + str(round(fexp(Decimal(number)) / 10**(Decimal.__floor__(Decimal.log10(Decimal.__abs__(Decimal(fexp(Decimal(number))))))), 3)) + "e" + Decimal.__floor__(Decimal.log10(Decimal.__abs__(Decimal(fexp(Decimal(number)))))))
 
@@ -842,6 +861,7 @@ click_damage = Decimal(1)
 buttonshake = [0,0]
 buttonshake2 = [0,0]
 notation = "s"
+enemyhealthsmoothper = 1.0
 while running:
     click_damage = Decimal(click_value)*Decimal(click_value_multi) + Decimal(cps_to_cpc)*Decimal(auto_click_value)*Decimal(auto_click_rate)
     def checkenemyded():
@@ -849,31 +869,31 @@ while running:
         while Decimal(enemy_hp) <= 0:
             monsterskilled += Decimal(1)
             score += Decimal(random.uniform(.5, 1.5))*Decimal(enemy_max_hp)
-            enemy_max_hp = Decimal(10) * Decimal(Decimal(1.1)**Decimal(monsterskilled // 5))
+            enemy_max_hp = Decimal(10) * Decimal(Decimal.__pow__(Decimal(1.1),Decimal(Decimal(monsterskilled) // Decimal(5))))
             enemy_hp += Decimal(enemy_max_hp)
             punch_sound_death.play()
             while Decimal((Decimal(click_value)*Decimal(random.uniform(0.95, 1.05))*Decimal(click_value_multi) + Decimal(cps_to_cpc)*Decimal(auto_click_value)*Decimal(auto_click_rate))*Decimal(gemboost)) / (Decimal(1.1**100)) >= Decimal(enemy_max_hp):
                 monsterskilled += Decimal(500)
-                score += Decimal(random.uniform(.5, 1.5))*Decimal(10) * Decimal(Decimal(1.1)**Decimal(Decimal(monsterskilled)-1 // 5))
-                enemy_max_hp = Decimal(10) * Decimal(Decimal(1.1)**Decimal(monsterskilled // 5))
+                score += Decimal(random.uniform(.5, 1.5))*Decimal(10) * Decimal(Decimal(1.1)**Decimal(Decimal(monsterskilled-1) // Decimal(5)))
+                enemy_max_hp = Decimal(10) * Decimal(Decimal.__pow__(Decimal(1.1),Decimal(Decimal(monsterskilled) // Decimal(5))))
                 enemy_hp += Decimal(enemy_max_hp)
                 punch_sound_death.play()
                 while Decimal((Decimal(click_value)*Decimal(random.uniform(0.95, 1.05))*Decimal(click_value_multi) + Decimal(cps_to_cpc)*Decimal(auto_click_value)*Decimal(auto_click_rate))*Decimal(gemboost)) / (Decimal(1.1**1000)) >= Decimal(enemy_max_hp):
                     monsterskilled += Decimal(5000)
-                    score += Decimal(random.uniform(.5, 1.5))*Decimal(10) * Decimal(Decimal(1.1)**Decimal(Decimal(monsterskilled)-1 // 5))
-                    enemy_max_hp = Decimal(10) * Decimal(Decimal(1.1)**Decimal(monsterskilled // 5))
+                    score += Decimal(random.uniform(.5, 1.5))*Decimal(10) * Decimal(Decimal(1.1)**Decimal(Decimal(monsterskilled-1) // Decimal(5)))
+                    enemy_max_hp = Decimal(10) * Decimal(Decimal.__pow__(Decimal(1.1),Decimal(Decimal(monsterskilled) // Decimal(5))))
                     enemy_hp += Decimal(enemy_max_hp)
                     punch_sound_death.play()
                     while Decimal((Decimal(click_value)*Decimal(random.uniform(0.95, 1.05))*Decimal(click_value_multi) + Decimal(cps_to_cpc)*Decimal(auto_click_value)*Decimal(auto_click_rate))*Decimal(gemboost)) / Decimal.__pow__(Decimal(1.1),Decimal(10000)) >= Decimal(enemy_max_hp):
                         monsterskilled += Decimal(50000)
-                        score += Decimal(random.uniform(.5, 1.5))*Decimal(10) * Decimal(Decimal(1.1)**Decimal(Decimal(monsterskilled)-1 // 5))
-                        enemy_max_hp = Decimal(10) * Decimal(Decimal(1.1)**Decimal(monsterskilled // 5))
+                        score += Decimal(random.uniform(.5, 1.5))*Decimal(10) * Decimal(Decimal(1.1)**Decimal(Decimal(monsterskilled-1) // Decimal(5)))
+                        enemy_max_hp = Decimal(10) * Decimal(Decimal.__pow__(Decimal(1.1),Decimal(monsterskilled) // Decimal(5)))
                         enemy_hp += Decimal(enemy_max_hp)
                         punch_sound_death.play()
                         while Decimal((Decimal(click_value)*Decimal(random.uniform(0.95, 1.05))*Decimal(click_value_multi) + Decimal(cps_to_cpc)*Decimal(auto_click_value)*Decimal(auto_click_rate))*Decimal(gemboost)) / Decimal.__pow__(Decimal(1.1),Decimal(100000)) >= Decimal(enemy_max_hp):
                             monsterskilled += Decimal(500000)
-                            score += Decimal(random.uniform(.5, 1.5))*Decimal(10) * Decimal(Decimal(1.1)**Decimal(Decimal(monsterskilled)-1 // 5))
-                            enemy_max_hp = Decimal(10) * Decimal(Decimal(1.1)**Decimal(monsterskilled // 5))
+                            score += Decimal(random.uniform(.5, 1.5))*Decimal(10) * Decimal.__pow__(Decimal(1.1),Decimal(Decimal(monsterskilled-1) // Decimal(5)))
+                            enemy_max_hp = Decimal(10) * Decimal(Decimal.__pow__(Decimal(1.1),Decimal(monsterskilled) // Decimal(5)))
                             enemy_hp += Decimal(enemy_max_hp)
                             punch_sound_death.play()
     speedmusic = constrain(speedmusic + (1-speedmusic)/(0.75/delta_time), 1, 3)
@@ -1246,8 +1266,13 @@ while running:
         draw_text(f"Clicks Per Second: {ClicksPerSecond}", font, WHITE, 10*WindowScale2 + CamPos[0]*WindowXscale, 220*WindowScale2 + CamPos[1]*WindowYscale, "left", 255)
         draw_text(f"Max Clicks Per Second: {MaxClicksPerSecond}", font, WHITE, 10*WindowScale2 + CamPos[0]*WindowXscale, 250*WindowScale2 + CamPos[1]*WindowYscale, "left", 255)
         draw_text(f"Total Clicks: {TotalClicks}", font, WHITE, 10*WindowScale2 + CamPos[0]*WindowXscale, 280*WindowScale2 + CamPos[1]*WindowYscale, "left", 255)
+        enemyhealthsmoothper += (float(Decimal(enemy_hp)/Decimal(enemy_max_hp))-enemyhealthsmoothper)/(0.15/delta_time)
+        enemyhealthsmoothper = constrain(enemyhealthsmoothper, 0, 1)
+        smoothhealthbarenemy_rect_surface = pygame.Surface((constrain(300*enemyhealthsmoothper, 0, 300)*WindowScale2, 40*WindowScale2), pygame.SRCALPHA)
+        smoothhealthbarenemy_rect_surface.fill((int(constrain(math.cos((math.pi/2)*constrain(enemyhealthsmoothper, 0, 1))*256, 0, 255)), int(constrain(math.sin((math.pi/2)*constrain(enemyhealthsmoothper, 0, 1))*256, 0, 255)), 0, 192))  # Fill with white and set alpha to 128 (50% transparent)
         pygame.draw.rect(screen, (0, 0, 0), (10*WindowScale2 + CamPos[0]*WindowXscale, 310*WindowScale2 + CamPos[1]*WindowYscale, 300*WindowScale2, 40*WindowScale2))
         pygame.draw.rect(screen, (constrain(math.cos((math.pi/2)*constrain(float(Decimal(enemy_hp)/Decimal(enemy_max_hp)), 0, 1))*256, 0, 255), constrain(math.sin((math.pi/2)*constrain(float(Decimal(enemy_hp)/Decimal(enemy_max_hp)), 0, 1))*256, 0, 255), 0), (10*WindowScale2 + CamPos[0]*WindowXscale, 310*WindowScale2 + CamPos[1]*WindowYscale, (float(Decimal(enemy_hp)/Decimal(enemy_max_hp)))*300*WindowScale2, 40*WindowScale2))
+        screen.blit(smoothhealthbarenemy_rect_surface, (10*WindowScale2 + CamPos[0]*WindowXscale, 310*WindowScale2 + CamPos[1]*WindowYscale))
     def prestige():
         global score, gems, musicplays, musicplays2, enemy_hp, enemy_max_hp, monsterskilled, click_damage
         score = 0
@@ -1266,7 +1291,7 @@ while running:
 
     # Draw upgrade buttons
     for i, button in enumerate(Settings_buttons):
-        setx = Settings_button_x[i] + CamPos[0]*WindowXscale
+        setx = Settings_button_x[i] + CamPos[0]*WindowXscale/WindowScale2
         sety = constrain(Settings_button_y[i] + Settings_Button_Y_scroll + Settings_Button_Y_scroll_vel, screen_height*-3, screen_height*0.8) + CamPos[1]*WindowYscale/WindowYscale
         if isinstance(Settings[i]["value"], Decimal):
             if Settings[i]["held"] and Settings[i]["holdable"]:
@@ -1291,8 +1316,8 @@ while running:
             draw_text(f"{Settings[i]['name']}", font, WHITE, setx*WindowXscale + Settings_button_width[i]*WindowXscale/2, sety*WindowYscale + (Settings_button_height[i]*WindowScale2)/2, "center", 255)
     #pygame.draw.rect(screen, (30, 30, 30), (900*WindowXscale + CamPos[0]*WindowXscale, WindowHeight*0.35 + CamPos[1]*WindowYscale, 380*WindowXscale, WindowHeight*1))
     for i, button in enumerate(Buy_buttons):
-        setx = Buy_button_X[i] + CamPos[0]*WindowXscale
-        sety = Buy_button_Y[i] + CamPos[1]*WindowYscale/WindowYscale
+        setx = Buy_button_X[i] + CamPos[0]*WindowXscale/WindowScale2
+        sety = Buy_button_Y[i] + CamPos[1]*WindowYscale
         if isinstance(BuyThing[i]["value"], Decimal):
             if BuyThing[i]["held"] and BuyThing[i]["holdable"]:
                 if mos_x/WindowXscale <= setx + Buy_button_Width[i]/2:
@@ -1340,11 +1365,11 @@ while running:
         pygame.draw.rect(screen, (UpgradeButtonColorRed[i], UpgradeButtonColorGreen[i], UpgradeButtonColorBlue[i]), (upgx*WindowScale2, upgy, upgrade_button_width[i]*WindowScale2, upgrade_button_height[i]*WindowScale2))
         draw_text(f"{upgrades[i]['name']} - {abbreviate(upgrades[i]['cost'], notation, 3, 10000, False)}", font, WHITE, upgx*WindowScale2 + upgrade_button_width[i]*WindowScale2/2, upgy + upgrade_button_height[i]*WindowScale2/2, "center", 255)
         if bulkbuy == "Max":
-            draw_text(f"{abbreviate(upgrades[i]["bought"], notation, 3, 100000, True)} + Max ({Decimal(calcmax())})", font, WHITE, upgx*WindowScale2, upgy - 38*WindowScale2, "left", 255)
+            draw_text(f"{abbreviate(upgrades[i]["bought"], notation, 3, 1000, True)} + Max ({abbreviate(Decimal(calcmax()), notation, 3, 1000, True)})", font, WHITE, upgx*WindowScale2, upgy - 38*WindowScale2, "left", 255)
         elif BuyThing[1]["value"] == "ON":
-            draw_text(f"{abbreviate(upgrades[i]["bought"], notation, 3, 100000, True)} + {Decimal(upgrades[i]["bought"]) - Decimal(upgrades[i]["bought"]) % Decimal(bulkbuy) + Decimal(bulkbuy) - Decimal(upgrades[i]["bought"])}", font, WHITE, upgx*WindowScale2, upgy - 38*WindowScale2, "left", 255)
+            draw_text(f"{abbreviate(upgrades[i]["bought"], notation, 3, 1000, True)} + {Decimal(upgrades[i]["bought"]) - Decimal(upgrades[i]["bought"]) % Decimal(bulkbuy) + Decimal(bulkbuy) - Decimal(upgrades[i]["bought"])}", font, WHITE, upgx*WindowScale2, upgy - 38*WindowScale2, "left", 255)
         else:
-            draw_text(f"{abbreviate(upgrades[i]["bought"], notation, 3, 100000, True)} + {bulkbuy}", font, WHITE, upgx*WindowScale2, upgy - 38*WindowScale2, "left", 255)
+            draw_text(f"{abbreviate(upgrades[i]["bought"], notation, 3, 1000, True)} + {bulkbuy}", font, WHITE, upgx*WindowScale2, upgy - 38*WindowScale2, "left", 255)
     def distance_to(ax, ay, bx, by):
         return math.sqrt((ax - bx)**2 + (ay - by)**2)
     """realarrowdownimg1.set_alpha(200 - distance_to(mos_x, mos_y, 1100*WindowXscale + CamPos[0]*WindowXscale, 252*WindowYscale + CamPos[1]*WindowYscale))
@@ -1409,7 +1434,7 @@ while running:
     buttonshake[0] = random.uniform(-buttonshake2[0], buttonshake2[0])
     buttonshake[1] = random.uniform(-buttonshake2[1], buttonshake2[1])
     CamPos = [CamPos[0] + (CamPos2[0]-CamPos[0])/(0.15/delta_time), CamPos[1] + (CamPos2[1]-CamPos[1])/(0.15/delta_time)]
-    Settings_button_x = [490 + 1280*WindowXscale, 490 + 1280*WindowXscale, 490 + 1280*WindowXscale, 490 + 1280*WindowXscale, 490 + 1280*WindowXscale, 490 + 1280*WindowXscale, 490 + 1280*WindowXscale]
+    Settings_button_x = [490 + 1280*WindowXscale/WindowScale2, 490 + 1280*WindowXscale/WindowScale2, 490 + 1280*WindowXscale/WindowScale2, 490 + 1280*WindowXscale/WindowScale2, 490 + 1280*WindowXscale/WindowScale2, 490 + 1280*WindowXscale/WindowScale2, 490 + 1280*WindowXscale/WindowScale2]
     if (rl.get_music_time_played(music1) >= rl.get_music_time_length(music1)-.03) and musicplays2 == 0:
         musicplays2 = 1
     if musicplays >= 0.03:
