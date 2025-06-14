@@ -864,38 +864,70 @@ notation = "s"
 enemyhealthsmoothper = 1.0
 while running:
     click_damage = Decimal(click_value)*Decimal(click_value_multi) + Decimal(cps_to_cpc)*Decimal(auto_click_value)*Decimal(auto_click_rate)
-    def checkenemyded():
+    def checkenemyded(clickorwait):
         global enemy_hp, enemy_max_hp, score, monsterskilled
-        while Decimal(enemy_hp) <= 0:
-            monsterskilled += Decimal(1)
-            score += Decimal(random.uniform(.5, 1.5))*Decimal(enemy_max_hp)
-            enemy_max_hp = Decimal(10) * Decimal(Decimal.__pow__(Decimal(1.1),Decimal(Decimal(monsterskilled) // Decimal(5))))
-            enemy_hp += Decimal(enemy_max_hp)
-            punch_sound_death.play()
-            while Decimal((Decimal(click_value)*Decimal(random.uniform(0.95, 1.05))*Decimal(click_value_multi) + Decimal(cps_to_cpc)*Decimal(auto_click_value)*Decimal(auto_click_rate))*Decimal(gemboost)) / (Decimal(1.1**100)) >= Decimal(enemy_max_hp):
-                monsterskilled += Decimal(500)
-                score += Decimal(random.uniform(.5, 1.5))*Decimal(10) * Decimal(Decimal(1.1)**Decimal(Decimal(monsterskilled-1) // Decimal(5)))
+        if clickorwait == "click":
+            while Decimal(enemy_hp) <= 0:
+                monsterskilled += Decimal(1)
+                score += Decimal(random.uniform(.5, 1.5))*Decimal(enemy_max_hp)
                 enemy_max_hp = Decimal(10) * Decimal(Decimal.__pow__(Decimal(1.1),Decimal(Decimal(monsterskilled) // Decimal(5))))
                 enemy_hp += Decimal(enemy_max_hp)
                 punch_sound_death.play()
-                while Decimal((Decimal(click_value)*Decimal(random.uniform(0.95, 1.05))*Decimal(click_value_multi) + Decimal(cps_to_cpc)*Decimal(auto_click_value)*Decimal(auto_click_rate))*Decimal(gemboost)) / (Decimal(1.1**1000)) >= Decimal(enemy_max_hp):
-                    monsterskilled += Decimal(5000)
+                while Decimal((Decimal(click_value)*Decimal(random.uniform(0.95, 1.05))*Decimal(click_value_multi) + Decimal(cps_to_cpc)*Decimal(auto_click_value)*Decimal(auto_click_rate))*Decimal(gemboost)) / (Decimal(1.1**100)) >= Decimal(enemy_max_hp):
+                    monsterskilled += Decimal(500)
                     score += Decimal(random.uniform(.5, 1.5))*Decimal(10) * Decimal(Decimal(1.1)**Decimal(Decimal(monsterskilled-1) // Decimal(5)))
                     enemy_max_hp = Decimal(10) * Decimal(Decimal.__pow__(Decimal(1.1),Decimal(Decimal(monsterskilled) // Decimal(5))))
                     enemy_hp += Decimal(enemy_max_hp)
                     punch_sound_death.play()
-                    while Decimal((Decimal(click_value)*Decimal(random.uniform(0.95, 1.05))*Decimal(click_value_multi) + Decimal(cps_to_cpc)*Decimal(auto_click_value)*Decimal(auto_click_rate))*Decimal(gemboost)) / Decimal.__pow__(Decimal(1.1),Decimal(10000)) >= Decimal(enemy_max_hp):
-                        monsterskilled += Decimal(50000)
+                    while Decimal((Decimal(click_value)*Decimal(random.uniform(0.95, 1.05))*Decimal(click_value_multi) + Decimal(cps_to_cpc)*Decimal(auto_click_value)*Decimal(auto_click_rate))*Decimal(gemboost)) / (Decimal(1.1**1000)) >= Decimal(enemy_max_hp):
+                        monsterskilled += Decimal(5000)
                         score += Decimal(random.uniform(.5, 1.5))*Decimal(10) * Decimal(Decimal(1.1)**Decimal(Decimal(monsterskilled-1) // Decimal(5)))
-                        enemy_max_hp = Decimal(10) * Decimal(Decimal.__pow__(Decimal(1.1),Decimal(monsterskilled) // Decimal(5)))
+                        enemy_max_hp = Decimal(10) * Decimal(Decimal.__pow__(Decimal(1.1),Decimal(Decimal(monsterskilled) // Decimal(5))))
                         enemy_hp += Decimal(enemy_max_hp)
                         punch_sound_death.play()
-                        while Decimal((Decimal(click_value)*Decimal(random.uniform(0.95, 1.05))*Decimal(click_value_multi) + Decimal(cps_to_cpc)*Decimal(auto_click_value)*Decimal(auto_click_rate))*Decimal(gemboost)) / Decimal.__pow__(Decimal(1.1),Decimal(100000)) >= Decimal(enemy_max_hp):
-                            monsterskilled += Decimal(500000)
-                            score += Decimal(random.uniform(.5, 1.5))*Decimal(10) * Decimal.__pow__(Decimal(1.1),Decimal(Decimal(monsterskilled-1) // Decimal(5)))
+                        while Decimal((Decimal(click_value)*Decimal(random.uniform(0.95, 1.05))*Decimal(click_value_multi) + Decimal(cps_to_cpc)*Decimal(auto_click_value)*Decimal(auto_click_rate))*Decimal(gemboost)) / Decimal.__pow__(Decimal(1.1),Decimal(10000)) >= Decimal(enemy_max_hp):
+                            monsterskilled += Decimal(50000)
+                            score += Decimal(random.uniform(.5, 1.5))*Decimal(10) * Decimal(Decimal(1.1)**Decimal(Decimal(monsterskilled-1) // Decimal(5)))
                             enemy_max_hp = Decimal(10) * Decimal(Decimal.__pow__(Decimal(1.1),Decimal(monsterskilled) // Decimal(5)))
                             enemy_hp += Decimal(enemy_max_hp)
                             punch_sound_death.play()
+                            while Decimal((Decimal(click_value)*Decimal(random.uniform(0.95, 1.05))*Decimal(click_value_multi) + Decimal(cps_to_cpc)*Decimal(auto_click_value)*Decimal(auto_click_rate))*Decimal(gemboost)) / Decimal.__pow__(Decimal(1.1),Decimal(100000)) >= Decimal(enemy_max_hp):
+                                monsterskilled += Decimal(500000)
+                                score += Decimal(random.uniform(.5, 1.5))*Decimal(10) * Decimal.__pow__(Decimal(1.1),Decimal(Decimal(monsterskilled-1) // Decimal(5)))
+                                enemy_max_hp = Decimal(10) * Decimal(Decimal.__pow__(Decimal(1.1),Decimal(monsterskilled) // Decimal(5)))
+                                enemy_hp += Decimal(enemy_max_hp)
+                                punch_sound_death.play()
+        if clickorwait == "wait":
+            while Decimal(enemy_hp) <= 0:
+                monsterskilled += Decimal(1)
+                score += Decimal(random.uniform(.5, 1.5))*Decimal(enemy_max_hp)
+                enemy_max_hp = Decimal(10) * Decimal(Decimal.__pow__(Decimal(1.1),Decimal(Decimal(monsterskilled) // Decimal(5))))
+                enemy_hp += Decimal(enemy_max_hp)
+                punch_sound_death.play()
+                while Decimal(auto_click_value) * Decimal(auto_click_rate) * Decimal(delta_time) * Decimal(gemboost) / (Decimal(1.1**100)) >= Decimal(enemy_max_hp):
+                    monsterskilled += Decimal(500)
+                    score += Decimal(random.uniform(.5, 1.5))*Decimal(10) * Decimal(Decimal(1.1)**Decimal(Decimal(monsterskilled-1) // Decimal(5)))
+                    enemy_max_hp = Decimal(10) * Decimal(Decimal.__pow__(Decimal(1.1),Decimal(Decimal(monsterskilled) // Decimal(5))))
+                    enemy_hp += Decimal(enemy_max_hp)
+                    punch_sound_death.play()
+                    while Decimal(auto_click_value) * Decimal(auto_click_rate) * Decimal(delta_time) * Decimal(gemboost) / (Decimal(1.1**1000)) >= Decimal(enemy_max_hp):
+                        monsterskilled += Decimal(5000)
+                        score += Decimal(random.uniform(.5, 1.5))*Decimal(10) * Decimal(Decimal(1.1)**Decimal(Decimal(monsterskilled-1) // Decimal(5)))
+                        enemy_max_hp = Decimal(10) * Decimal(Decimal.__pow__(Decimal(1.1),Decimal(Decimal(monsterskilled) // Decimal(5))))
+                        enemy_hp += Decimal(enemy_max_hp)
+                        punch_sound_death.play()
+                        while Decimal(auto_click_value) * Decimal(auto_click_rate) * Decimal(delta_time) * Decimal(gemboost) / Decimal.__pow__(Decimal(1.1),Decimal(10000)) >= Decimal(enemy_max_hp):
+                            monsterskilled += Decimal(50000)
+                            score += Decimal(random.uniform(.5, 1.5))*Decimal(10) * Decimal(Decimal(1.1)**Decimal(Decimal(monsterskilled-1) // Decimal(5)))
+                            enemy_max_hp = Decimal(10) * Decimal(Decimal.__pow__(Decimal(1.1),Decimal(monsterskilled) // Decimal(5)))
+                            enemy_hp += Decimal(enemy_max_hp)
+                            punch_sound_death.play()
+                            while Decimal(auto_click_value) * Decimal(auto_click_rate) * Decimal(delta_time) * Decimal(gemboost) / Decimal.__pow__(Decimal(1.1),Decimal(100000)) >= Decimal(enemy_max_hp):
+                                monsterskilled += Decimal(500000)
+                                score += Decimal(random.uniform(.5, 1.5))*Decimal(10) * Decimal.__pow__(Decimal(1.1),Decimal(Decimal(monsterskilled-1) // Decimal(5)))
+                                enemy_max_hp = Decimal(10) * Decimal(Decimal.__pow__(Decimal(1.1),Decimal(monsterskilled) // Decimal(5)))
+                                enemy_hp += Decimal(enemy_max_hp)
+                                punch_sound_death.play()
     speedmusic = constrain(speedmusic + (1-speedmusic)/(0.75/delta_time), 1, 3)
     rl.set_music_pitch(music1, speedmusic)
     rl.set_music_pitch(music2, speedmusic)
@@ -1022,7 +1054,7 @@ while running:
                             speedmusic += 0.025/(speedmusic**5)
                         elif BuyThing[2]["value"] == "Fight":
                             enemy_hp -= (Decimal(click_value)*Decimal(random.uniform(0.95, 1.05))*Decimal(click_value_multi) + Decimal(cps_to_cpc)*Decimal(auto_click_value)*Decimal(auto_click_rate))*Decimal(gemboost)
-                            checkenemyded()
+                            checkenemyded("click")
                             soundipunch = random.randint(1,4)
                             if soundipunch == 1:
                                 punch_sound1.play()
@@ -1443,7 +1475,7 @@ while running:
         musicplays2 = -1
         musicplays = 0
     musicplays += delta_time*musicplays2*speedmusic
-    checkenemyded()
+    checkenemyded("wait")
 rl.unload_music_stream(music1)
 rl.unload_music_stream(music2)
 rl.close_audio_device()
