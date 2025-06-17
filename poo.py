@@ -8,16 +8,17 @@ from queue import Queue
 import time
 
 # Load audio file (mp3, wav, etc.)
-audio_path = "./assets/audio/Kevin MacLeod - Hep Cats.mp3"
+#audio_path = "./assets/audio/Kevin MacLeod - Hep Cats.mp3"
+audio_path = "./assets/audio/Move Forward 111bpm FULL MIX.wav"
 y, sr = librosa.load(audio_path, sr=None)
 
 # Playback controls
 playback_rate = [1.0]
 playing = [True]
 
-chunk_duration = 1/60  # seconds, if put at 1/4410, bitcrush
+chunk_duration = 1/48  # seconds, if put at 1/4410, bitcrush
 chunk_samples = int(sr * chunk_duration)
-max_queue_size = 5 #if put at 100, bitcrush also
+max_queue_size = 30 #if put at 100, bitcrush also
 audio_queue = Queue(maxsize=max_queue_size)
 
 def producer_thread():
@@ -49,8 +50,8 @@ def producer_thread():
         resampled = np.clip(resampled, -1.0, 1.0)
 
         audio_queue.put(resampled.astype(np.float32))
-        start += int(chunk_samples/playback_rate[0])
-        #start += int(chunk_samples/1)
+        #start += int(chunk_samples/playback_rate[0])
+        start += int(chunk_samples/1)
 
 def audio_callback(outdata, frames, time_info, status):
     if not audio_queue.empty():

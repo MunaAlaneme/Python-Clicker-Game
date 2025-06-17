@@ -7,8 +7,8 @@
 # https://github.com/Gooodgis/dont-touch-my-presents
 
 # To Do List:
-# Make Clicker Heroes after 1k score
 # 2nd layer prestige
+# crit
 
 import pygame
 import random
@@ -513,13 +513,23 @@ Settings = [
     "held": False,
     "min": "",
     "max": ""},
+
+    {"num": 8,
+    "name": "Automation",
+    "value": Decimal(0),
+    "percent": True,
+    "round": True,
+    "holdable": False,
+    "held": False,
+    "min": Decimal(0),
+    "max": Decimal(100)},
 ]
 Settings_buttons = []
 NoSettings_buttons = []
-Settings_button_width = [300, 300, 300, 300, 300, 300, 300]
-Settings_button_height = [50, 50, 50, 50, 50, 50, 50]
-Settings_button_x = [490, 490, 490, 490, 490, 490, 490]
-Settings_button_y = [70, 140, 210, 280, 350, 420, 490]
+Settings_button_width = [300, 300, 300, 300, 300, 300, 300, 300]
+Settings_button_height = [50, 50, 50, 50, 50, 50, 50, 50]
+Settings_button_x = [490, 490, 490, 490, 490, 490, 490, 810]
+Settings_button_y = [70, 140, 210, 280, 350, 420, 490, 70]
 BuyThing = [
     {"num": 1,
     "name": "Buy",
@@ -635,9 +645,9 @@ musicplays2 = 0
 bulkbuy = 1
 CamPos = [float(0.0), float(0.0)]
 CamPos2 = [float(0.0), float(0.0)]
-gems = Decimal(0)
-gemstoget = Decimal(0)
-gemboosttoget = Decimal(0)
+diamonds = Decimal(0)
+diamondstoget = Decimal(0)
+diamondboosttoget = Decimal(0)
 differenceTimeOffline = 0
 def constrain(val, min_val, max_val):
     if val < min_val: return min_val
@@ -732,6 +742,16 @@ def PlayMusic(musNum):
         pymusictype = "wav"
         musicfilepath = "./assets/audio/vibingleaf - Infinite Money Glitch Trojan Extended Loop-loop.wav"
         musicintrofilepath = "./assets/audio/vibingleaf - Infinite Money Glitch Trojan Extended Loop-start.wav"
+    elif musNum == 16:
+        pygamemixermusic = 1.2
+        pymusictype = "wav"
+        musicfilepath = "./assets/audio/Move Forward 111bpm FULL MIX.wav"
+        musicintrofilepath = "./assets/audio/nosound.wav"
+    elif musNum == 17:
+        pygamemixermusic = 1.2
+        pymusictype = "wav"
+        musicfilepath = "./assets/audio/Move Forward 124bpm Backing Only.mp3"
+        musicintrofilepath = "./assets/audio/nosound.wav"
     # Load audio file
     if musicintrofilepath == "./assets/audio/nosound.wav":
         musicintrofilepath = musicfilepath
@@ -747,7 +767,7 @@ def PlayMusic(musNum):
     rl.stop_music_stream(music1)
     rl.stop_music_stream(music2)
     rl.play_music_stream(music1)
-PlayMusic(random.randint(1,15))
+PlayMusic(random.randint(1,17))
 #pygame.mixer.music.set_volume(pygamemixermusic * float(Settings[1]["value"] / 100))
 rl.set_music_volume(music1, pygamemixermusic * float(Settings[1]["value"] / 100))
 rl.set_music_volume(music2, pygamemixermusic * float(Settings[1]["value"] / 100))
@@ -768,20 +788,20 @@ Hovering_Buttons = [0,0,0,0,0,0,0,0,0,0]
 framestofixload = 0
 offlineOldTime = time.time()
 offlineCurrentTime = time.time()
-gemboost = 1
+diamondboost = 1
 offlineTime = 0
 GameStuff = []
 GameStuff2 = []
 def save_game():
     global offlineTime
     offlineTime = time.time()
-    GameStuff = [gems, score, start_time, offlineTime, bulkbuy, ClickSecondList, MaxClicksPerSecond, TotalClicks, enemy_hp, monsterskilled, enemy_max_hp, click_damage]
+    GameStuff = [diamonds, score, start_time, offlineTime, bulkbuy, ClickSecondList, MaxClicksPerSecond, TotalClicks, enemy_hp, monsterskilled, enemy_max_hp, click_damage]
     GameStuff2 = [Settings, upgrades, GameStuff, BuyThing]
     with open (resource_path(str(THIS_DIR / "./save/SaveData.pickle")), 'wb') as fileSave:
         pickle.dump(GameStuff2, fileSave, protocol=pickle.HIGHEST_PROTOCOL)
 def load_game():
     try:
-        global Settings, upgrades, gems, score, start_time, game_time, offlineCurrentTime, offlineOldTime, framestofixload, auto_click_rate, auto_click_value, click_value, click_value_multi, cps_to_cpc, offlineBoxAlpha, differenceTimeOffline, offlineCurrentTime, offlineOldTime, gemboost, GameStuff, bulkbuy, GameStuff2, ClickSecondList, MaxClicksPerSecond, TotalClicks, BuyThing, enemy_hp, monsterskilled, enemy_max_hp, click_damage
+        global Settings, upgrades, diamonds, score, start_time, game_time, offlineCurrentTime, offlineOldTime, framestofixload, auto_click_rate, auto_click_value, click_value, click_value_multi, cps_to_cpc, offlineBoxAlpha, differenceTimeOffline, offlineCurrentTime, offlineOldTime, diamondboost, GameStuff, bulkbuy, GameStuff2, ClickSecondList, MaxClicksPerSecond, TotalClicks, BuyThing, enemy_hp, monsterskilled, enemy_max_hp, click_damage
         with open (resource_path(str(THIS_DIR / "./save/SaveData.pickle")), 'rb') as fileSave:
             GameStuff2 = pickle.load(fileSave)
             GameStuff = GameStuff2[2]
@@ -803,8 +823,8 @@ def load_game():
         auto_click_rate = 1 + ((Decimal(upgrades[2]["bought"])*Decimal(0.1)) * (Decimal(2)**Decimal(upgrades[5]["bought"])) * (Decimal(3)**Decimal(upgrades[8]["bought"])))
         click_value_multi = (Decimal(2)**Decimal(upgrades[3]["bought"]))
         start_time = GameStuff[2]
-        gems = GameStuff[0]
-        gemboost = Decimal((50+gems)/50)
+        diamonds = GameStuff[0]
+        diamondboost = Decimal((50+diamonds)/50)
         #delta_time = (time.time() - start_time) - game_time
         game_time = time.time() - start_time
         tempOfflineTime = GameStuff[3]
@@ -813,14 +833,14 @@ def load_game():
         differenceTimeOffline = (offlineCurrentTime - offlineOldTime) * .1
         framestofixload = 0
         offlineBoxAlpha = 255
-        score += (Decimal(differenceTimeOffline) * Decimal(auto_click_value) * Decimal(auto_click_rate) * Decimal(gemboost))
+        score += (Decimal(differenceTimeOffline) * Decimal(auto_click_value) * Decimal(auto_click_rate) * Decimal(diamondboost))
     except FileNotFoundError:
         save_game()
 def reset():
-    global gems, gemboost, score, bulkbuy, ClickSecondList, MaxClicksPerSecond, TotalClicks, YouWillNotUpgradeUnlessToldTo_Time, ClicksPerSecond, speedmusic
+    global diamonds, diamondboost, score, bulkbuy, ClickSecondList, MaxClicksPerSecond, TotalClicks, YouWillNotUpgradeUnlessToldTo_Time, ClicksPerSecond, speedmusic
     prestige()
-    gems = Decimal(0)
-    gemboost = Decimal(0)
+    diamonds = Decimal(0)
+    diamondboost = Decimal(0)
     score = Decimal(0)
     bulkbuy = 1
     YouWillNotUpgradeUnlessToldTo_Time = 0.3
@@ -873,25 +893,25 @@ while running:
                 enemy_max_hp = Decimal(10) * Decimal(Decimal.__pow__(Decimal(1.1),Decimal(Decimal(monsterskilled) // Decimal(5))))
                 enemy_hp += Decimal(enemy_max_hp)
                 punch_sound_death.play()
-                while Decimal((Decimal(click_value)*Decimal(random.uniform(0.95, 1.05))*Decimal(click_value_multi) + Decimal(cps_to_cpc)*Decimal(auto_click_value)*Decimal(auto_click_rate))*Decimal(gemboost)) / (Decimal(1.1**100)) >= Decimal(enemy_max_hp):
+                while Decimal((Decimal(click_value)*Decimal(random.uniform(0.95, 1.05))*Decimal(click_value_multi) + Decimal(cps_to_cpc)*Decimal(auto_click_value)*Decimal(auto_click_rate))*Decimal(diamondboost)) / (Decimal(1.1**100)) >= Decimal(enemy_max_hp):
                     monsterskilled += Decimal(500)
                     score += Decimal(random.uniform(.5, 1.5))*Decimal(10) * Decimal(Decimal(1.1)**Decimal(Decimal(monsterskilled-1) // Decimal(5)))
                     enemy_max_hp = Decimal(10) * Decimal(Decimal.__pow__(Decimal(1.1),Decimal(Decimal(monsterskilled) // Decimal(5))))
                     enemy_hp += Decimal(enemy_max_hp)
                     punch_sound_death.play()
-                    while Decimal((Decimal(click_value)*Decimal(random.uniform(0.95, 1.05))*Decimal(click_value_multi) + Decimal(cps_to_cpc)*Decimal(auto_click_value)*Decimal(auto_click_rate))*Decimal(gemboost)) / (Decimal(1.1**1000)) >= Decimal(enemy_max_hp):
+                    while Decimal((Decimal(click_value)*Decimal(random.uniform(0.95, 1.05))*Decimal(click_value_multi) + Decimal(cps_to_cpc)*Decimal(auto_click_value)*Decimal(auto_click_rate))*Decimal(diamondboost)) / (Decimal(1.1**1000)) >= Decimal(enemy_max_hp):
                         monsterskilled += Decimal(5000)
                         score += Decimal(random.uniform(.5, 1.5))*Decimal(10) * Decimal(Decimal(1.1)**Decimal(Decimal(monsterskilled-1) // Decimal(5)))
                         enemy_max_hp = Decimal(10) * Decimal(Decimal.__pow__(Decimal(1.1),Decimal(Decimal(monsterskilled) // Decimal(5))))
                         enemy_hp += Decimal(enemy_max_hp)
                         punch_sound_death.play()
-                        while Decimal((Decimal(click_value)*Decimal(random.uniform(0.95, 1.05))*Decimal(click_value_multi) + Decimal(cps_to_cpc)*Decimal(auto_click_value)*Decimal(auto_click_rate))*Decimal(gemboost)) / Decimal.__pow__(Decimal(1.1),Decimal(10000)) >= Decimal(enemy_max_hp):
+                        while Decimal((Decimal(click_value)*Decimal(random.uniform(0.95, 1.05))*Decimal(click_value_multi) + Decimal(cps_to_cpc)*Decimal(auto_click_value)*Decimal(auto_click_rate))*Decimal(diamondboost)) / Decimal.__pow__(Decimal(1.1),Decimal(10000)) >= Decimal(enemy_max_hp):
                             monsterskilled += Decimal(50000)
                             score += Decimal(random.uniform(.5, 1.5))*Decimal(10) * Decimal(Decimal(1.1)**Decimal(Decimal(monsterskilled-1) // Decimal(5)))
                             enemy_max_hp = Decimal(10) * Decimal(Decimal.__pow__(Decimal(1.1),Decimal(monsterskilled) // Decimal(5)))
                             enemy_hp += Decimal(enemy_max_hp)
                             punch_sound_death.play()
-                            while Decimal((Decimal(click_value)*Decimal(random.uniform(0.95, 1.05))*Decimal(click_value_multi) + Decimal(cps_to_cpc)*Decimal(auto_click_value)*Decimal(auto_click_rate))*Decimal(gemboost)) / Decimal.__pow__(Decimal(1.1),Decimal(100000)) >= Decimal(enemy_max_hp):
+                            while Decimal((Decimal(click_value)*Decimal(random.uniform(0.95, 1.05))*Decimal(click_value_multi) + Decimal(cps_to_cpc)*Decimal(auto_click_value)*Decimal(auto_click_rate))*Decimal(diamondboost)) / Decimal.__pow__(Decimal(1.1),Decimal(100000)) >= Decimal(enemy_max_hp):
                                 monsterskilled += Decimal(500000)
                                 score += Decimal(random.uniform(.5, 1.5))*Decimal(10) * Decimal.__pow__(Decimal(1.1),Decimal(Decimal(monsterskilled-1) // Decimal(5)))
                                 enemy_max_hp = Decimal(10) * Decimal(Decimal.__pow__(Decimal(1.1),Decimal(monsterskilled) // Decimal(5)))
@@ -904,25 +924,25 @@ while running:
                 enemy_max_hp = Decimal(10) * Decimal(Decimal.__pow__(Decimal(1.1),Decimal(Decimal(monsterskilled) // Decimal(5))))
                 enemy_hp += Decimal(enemy_max_hp)
                 punch_sound_death.play()
-                while Decimal(auto_click_value) * Decimal(auto_click_rate) * Decimal(delta_time) * Decimal(gemboost) / (Decimal(1.1**100)) >= Decimal(enemy_max_hp):
+                while Decimal(auto_click_value) * Decimal(auto_click_rate) * Decimal(delta_time) * Decimal(diamondboost) / (Decimal(1.1**100)) >= Decimal(enemy_max_hp):
                     monsterskilled += Decimal(500)
                     score += Decimal(random.uniform(.5, 1.5))*Decimal(10) * Decimal(Decimal(1.1)**Decimal(Decimal(monsterskilled-1) // Decimal(5)))
                     enemy_max_hp = Decimal(10) * Decimal(Decimal.__pow__(Decimal(1.1),Decimal(Decimal(monsterskilled) // Decimal(5))))
                     enemy_hp += Decimal(enemy_max_hp)
                     punch_sound_death.play()
-                    while Decimal(auto_click_value) * Decimal(auto_click_rate) * Decimal(delta_time) * Decimal(gemboost) / (Decimal(1.1**1000)) >= Decimal(enemy_max_hp):
+                    while Decimal(auto_click_value) * Decimal(auto_click_rate) * Decimal(delta_time) * Decimal(diamondboost) / (Decimal(1.1**1000)) >= Decimal(enemy_max_hp):
                         monsterskilled += Decimal(5000)
                         score += Decimal(random.uniform(.5, 1.5))*Decimal(10) * Decimal(Decimal(1.1)**Decimal(Decimal(monsterskilled-1) // Decimal(5)))
                         enemy_max_hp = Decimal(10) * Decimal(Decimal.__pow__(Decimal(1.1),Decimal(Decimal(monsterskilled) // Decimal(5))))
                         enemy_hp += Decimal(enemy_max_hp)
                         punch_sound_death.play()
-                        while Decimal(auto_click_value) * Decimal(auto_click_rate) * Decimal(delta_time) * Decimal(gemboost) / Decimal.__pow__(Decimal(1.1),Decimal(10000)) >= Decimal(enemy_max_hp):
+                        while Decimal(auto_click_value) * Decimal(auto_click_rate) * Decimal(delta_time) * Decimal(diamondboost) / Decimal.__pow__(Decimal(1.1),Decimal(10000)) >= Decimal(enemy_max_hp):
                             monsterskilled += Decimal(50000)
                             score += Decimal(random.uniform(.5, 1.5))*Decimal(10) * Decimal(Decimal(1.1)**Decimal(Decimal(monsterskilled-1) // Decimal(5)))
                             enemy_max_hp = Decimal(10) * Decimal(Decimal.__pow__(Decimal(1.1),Decimal(monsterskilled) // Decimal(5)))
                             enemy_hp += Decimal(enemy_max_hp)
                             punch_sound_death.play()
-                            while Decimal(auto_click_value) * Decimal(auto_click_rate) * Decimal(delta_time) * Decimal(gemboost) / Decimal.__pow__(Decimal(1.1),Decimal(100000)) >= Decimal(enemy_max_hp):
+                            while Decimal(auto_click_value) * Decimal(auto_click_rate) * Decimal(delta_time) * Decimal(diamondboost) / Decimal.__pow__(Decimal(1.1),Decimal(100000)) >= Decimal(enemy_max_hp):
                                 monsterskilled += Decimal(500000)
                                 score += Decimal(random.uniform(.5, 1.5))*Decimal(10) * Decimal.__pow__(Decimal(1.1),Decimal(Decimal(monsterskilled-1) // Decimal(5)))
                                 enemy_max_hp = Decimal(10) * Decimal(Decimal.__pow__(Decimal(1.1),Decimal(monsterskilled) // Decimal(5)))
@@ -934,7 +954,7 @@ while running:
     rl.update_music_stream(music1)
     rl.update_music_stream(music2)
     framestofixload += 1
-    gemboost = Decimal((50+gems)/50)
+    diamondboost = Decimal((50+diamonds)/50)
     mos_x, mos_y = pygame.mouse.get_pos()
     frames += 1
     (WindowWidth, WindowHeight) = pygame.display.get_surface().get_size()
@@ -991,8 +1011,8 @@ while running:
     for i, setting in enumerate(Settings):
         x = Settings_button_x[i]
         y = Settings_button_y[i] + Settings_Button_Y_scroll + Settings_Button_Y_scroll_vel
-        Settings_buttons[i] = pygame.Rect(x*WindowScale2, y*WindowYscale, Settings_button_width[i]*WindowScale2, Settings_button_height[i]*WindowScale2)
-        NoSettings_buttons[i] = pygame.Rect((Settings_button_x[i] + CamPos[0]*WindowXscale)*WindowXscale, (constrain(Settings_button_y[i] + Settings_Button_Y_scroll + Settings_Button_Y_scroll_vel, screen_height*0.05, screen_height*0.8) + CamPos[1]*WindowYscale/WindowYscale)*WindowYscale, Settings_button_width[i]*WindowXscale, Settings_button_height[i]*WindowYscale)
+        Settings_buttons[i] = pygame.Rect(x + CamPos[0]*WindowXscale/WindowYscale, y*WindowYscale + CamPos[1]*WindowYscale/WindowYscale, Settings_button_width[i]*WindowScale2, Settings_button_height[i]*WindowScale2)
+        NoSettings_buttons[i] = pygame.Rect(x + CamPos[0]*WindowXscale/WindowYscale, y*WindowYscale + CamPos[1]*WindowYscale/WindowYscale, Settings_button_width[i]*WindowXscale, Settings_button_height[i]*WindowYscale)
         SettingsButtonColorRed[i] += (SettingsTargetButtonColorRed[i] - SettingsButtonColorRed[i])/(0.15/delta_time)
         SettingsButtonColorGreen[i] += (SettingsTargetButtonColorGreen[i] - SettingsButtonColorGreen[i])/(0.15/delta_time)
         SettingsButtonColorBlue[i] += (SettingsTargetButtonColorBlue[i] - SettingsButtonColorBlue[i])/(0.15/delta_time)
@@ -1047,13 +1067,13 @@ while running:
                         target_scale_x[0] = 350
                         scale_x[0] = constrain(scale_x[0]-40, 200, math.inf)
                         if BuyThing[2]["value"] == "Clicker":
-                            score += Decimal(click_value)*Decimal(random.uniform(0.95, 1.05))*Decimal(click_value_multi)*Decimal(gemboost) + Decimal(cps_to_cpc)*Decimal(auto_click_value)*Decimal(auto_click_rate)*Decimal(gemboost)
+                            score += Decimal(click_value)*Decimal(random.uniform(0.95, 1.05))*Decimal(click_value_multi)*Decimal(diamondboost) + Decimal(cps_to_cpc)*Decimal(auto_click_value)*Decimal(auto_click_rate)*Decimal(diamondboost)
                             click_sound.play()
                             ClickSecondList.append(1)
                             TotalClicks+=1
                             speedmusic += 0.025/(speedmusic**5)
                         elif BuyThing[2]["value"] == "Fight":
-                            enemy_hp -= (Decimal(click_value)*Decimal(random.uniform(0.95, 1.05))*Decimal(click_value_multi) + Decimal(cps_to_cpc)*Decimal(auto_click_value)*Decimal(auto_click_rate))*Decimal(gemboost)
+                            enemy_hp -= (Decimal(click_value)*Decimal(random.uniform(0.95, 1.05))*Decimal(click_value_multi) + Decimal(cps_to_cpc)*Decimal(auto_click_value)*Decimal(auto_click_rate))*Decimal(diamondboost)
                             checkenemyded("click")
                             soundipunch = random.randint(1,4)
                             if soundipunch == 1:
@@ -1189,6 +1209,15 @@ while running:
                             Settings[6]["value"] = "Engineering"
                         elif Settings[6]["value"] == "Engineering":
                             Settings[6]["value"] = "Short"
+                    if i == 7:
+                        if Settings[7]["value"] == Decimal(0):
+                            Settings[7]["value"] = Decimal(10)
+                        elif Settings[7]["value"] == Decimal(10):
+                            Settings[7]["value"] = Decimal(50)
+                        elif Settings[7]["value"] == Decimal(50):
+                            Settings[7]["value"] = Decimal(100)
+                        elif Settings[7]["value"] == Decimal(100):
+                            Settings[7]["value"] = Decimal(0)
             for i, button in enumerate(NoBuy_buttons):
                 if button.collidepoint(event.pos):
                     click_sound.play()
@@ -1248,11 +1277,11 @@ while running:
     auto_click_rate = 1 + ((Decimal(upgrades[2]["bought"])*Decimal(0.1)) * (Decimal(2)**Decimal(upgrades[5]["bought"])) * (Decimal(3)**Decimal(upgrades[8]["bought"])))
     click_value_multi = (Decimal(2)**Decimal(upgrades[3]["bought"]))
     if framestofixload >= 1:
-        score += Decimal(auto_click_value) * Decimal(auto_click_rate) * Decimal(delta_time) * Decimal(gemboost)
+        score += Decimal(auto_click_value) * Decimal(auto_click_rate) * Decimal(delta_time) * Decimal(diamondboost)
         if BuyThing[2]["value"] == "Fight":
-            enemy_hp -= Decimal(auto_click_value) * Decimal(auto_click_rate) * Decimal(delta_time) * Decimal(gemboost)
-    gemstoget = (Decimal(100) * Decimal.sqrt(Decimal(score) / Decimal(1000000000000))) + Decimal(0)
-    gemboosttoget = Decimal(gemstoget/50)
+            enemy_hp -= Decimal(auto_click_value) * Decimal(auto_click_rate) * Decimal(delta_time) * Decimal(diamondboost)
+    diamondstoget = (Decimal(100) * Decimal.sqrt(Decimal(score) / Decimal(1000000000000))) + Decimal(0)
+    diamondboosttoget = Decimal(diamondstoget/50)
 
     # Draw screen
     screen.fill((30, 30, 30))
@@ -1278,10 +1307,10 @@ while running:
         else:
             draw_text(f"FPS: INFINITY", font, WHITE, 10*WindowScale2 + CamPos[0]*WindowXscale, 130*WindowScale2 + CamPos[1]*WindowYscale, "left", 255)
         draw_text(f"Seconds Per Second: {abbreviate(auto_click_rate, notation, 3, 1000, False)}/s", font, WHITE, 10*WindowScale2 + CamPos[0]*WindowXscale, 160*WindowScale2 + CamPos[1]*WindowYscale, "left", 255)
-        draw_text(f"Gems: {abbreviate(gems, notation, 3, 100000, True)} (+ {abbreviate(gemstoget, notation, 3, 100000, True)})", font, WHITE, 10*WindowScale2 + CamPos[0]*WindowXscale, 190*WindowScale2 + CamPos[1]*WindowYscale, "left", 255)
-        draw_text(f"{abbreviate(Decimal(gemboost), notation, 3, 100000, False)}x boost (+{abbreviate(Decimal(gemboosttoget), notation, 3, 100000, False)})", font, WHITE, 10*WindowScale2 + CamPos[0]*WindowXscale, 220*WindowScale2 + CamPos[1]*WindowYscale, "left", 255)
-        draw_text(f"Total Score Per Second: {abbreviate(auto_click_value * auto_click_rate * gemboost, notation, 3, 1000, False)}/s", font, WHITE, 10*WindowScale2 + CamPos[0]*WindowXscale, 250*WindowScale2 + CamPos[1]*WindowYscale, "left", 255)
-        draw_text(f"Total Score Per Click: {abbreviate((click_value*click_value_multi + cps_to_cpc*auto_click_value*auto_click_rate)*gemboost, notation, 3, 100000, False)}", font, WHITE, 10*WindowScale2 + CamPos[0]*WindowXscale, 280*WindowScale2 + CamPos[1]*WindowYscale, "left", 255)
+        draw_text(f"Diamonds: {abbreviate(diamonds, notation, 3, 100000, True)} (+{abbreviate(diamondstoget, notation, 3, 100000, True)})", font, WHITE, 10*WindowScale2 + CamPos[0]*WindowXscale, 190*WindowScale2 + CamPos[1]*WindowYscale, "left", 255)
+        draw_text(f"{abbreviate(Decimal(diamondboost), notation, 3, 100000, False)}x boost (+{abbreviate(Decimal(diamondboosttoget), notation, 3, 100000, False)})", font, WHITE, 10*WindowScale2 + CamPos[0]*WindowXscale, 220*WindowScale2 + CamPos[1]*WindowYscale, "left", 255)
+        draw_text(f"Total Score Per Second: {abbreviate(auto_click_value * auto_click_rate * diamondboost, notation, 3, 1000, False)}/s", font, WHITE, 10*WindowScale2 + CamPos[0]*WindowXscale, 250*WindowScale2 + CamPos[1]*WindowYscale, "left", 255)
+        draw_text(f"Total Score Per Click: {abbreviate((click_value*click_value_multi + cps_to_cpc*auto_click_value*auto_click_rate)*diamondboost, notation, 3, 100000, False)}", font, WHITE, 10*WindowScale2 + CamPos[0]*WindowXscale, 280*WindowScale2 + CamPos[1]*WindowYscale, "left", 255)
         draw_text(f"Clicks Per Second: {ClicksPerSecond}", font, WHITE, 10*WindowScale2 + CamPos[0]*WindowXscale, 310*WindowScale2 + CamPos[1]*WindowYscale, "left", 255)
         draw_text(f"Max Clicks Per Second: {MaxClicksPerSecond}", font, WHITE, 10*WindowScale2 + CamPos[0]*WindowXscale, 340*WindowScale2 + CamPos[1]*WindowYscale, "left", 255)
         draw_text(f"Total Clicks: {TotalClicks}", font, WHITE, 10*WindowScale2 + CamPos[0]*WindowXscale, 370*WindowScale2 + CamPos[1]*WindowYscale, "left", 255)
@@ -1290,32 +1319,33 @@ while running:
             draw_text(f"FPS: {Decimal(1/delta_time):.2f}", font, WHITE, 10*WindowScale2 + CamPos[0]*WindowXscale, 40*WindowScale2 + CamPos[1]*WindowYscale, "left", 255)
         else:
             draw_text(f"FPS: INFINITY", font, WHITE, 10*WindowScale2 + CamPos[0]*WindowXscale, 40*WindowScale2 + CamPos[1]*WindowYscale, "left", 255)
-        draw_text(f"Gems: {abbreviate(gems, notation, 3, 100000, True)} (+ {abbreviate(gemstoget, notation, 3, 100000, True)})", font, WHITE, 10*WindowScale2 + CamPos[0]*WindowXscale, 70*WindowScale2 + CamPos[1]*WindowYscale, "left", 255)
-        draw_text(f"{abbreviate(Decimal(gemboost), notation, 3, 100000, False)}x boost (+{abbreviate(Decimal(gemboosttoget), notation, 3, 100000, False)})", font, WHITE, 10*WindowScale2 + CamPos[0]*WindowXscale, 100*WindowScale2 + CamPos[1]*WindowYscale, "left", 255)
+        draw_text(f"Diamonds: {abbreviate(diamonds, notation, 3, 100000, True)} (+{abbreviate(diamondstoget, notation, 3, 100000, True)})", font, WHITE, 10*WindowScale2 + CamPos[0]*WindowXscale, 70*WindowScale2 + CamPos[1]*WindowYscale, "left", 255)
+        draw_text(f"{abbreviate(Decimal(diamondboost), notation, 3, 100000, False)}x boost (+{abbreviate(Decimal(diamondboosttoget), notation, 3, 100000, False)})", font, WHITE, 10*WindowScale2 + CamPos[0]*WindowXscale, 100*WindowScale2 + CamPos[1]*WindowYscale, "left", 255)
         draw_text(f"Click Damage: {abbreviate(click_damage, notation, 3, 1000, False)}", font, WHITE, 10*WindowScale2 + CamPos[0]*WindowXscale, 130*WindowScale2 + CamPos[1]*WindowYscale, "left", 255)
-        draw_text(f"HP: {abbreviate(enemy_hp, notation, 3, 100000, False)} / {abbreviate(enemy_max_hp, notation, 3, 100000, False)}", font, WHITE, 10*WindowScale2 + CamPos[0]*WindowXscale, 160*WindowScale2 + CamPos[1]*WindowYscale, "left", 255)
-        draw_text(f"Killed Monsters: {abbreviate(monsterskilled, notation, 3, 100000, True)}", font, WHITE, 10*WindowScale2 + CamPos[0]*WindowXscale, 190*WindowScale2 + CamPos[1]*WindowYscale, "left", 255)
-        draw_text(f"Clicks Per Second: {ClicksPerSecond}", font, WHITE, 10*WindowScale2 + CamPos[0]*WindowXscale, 220*WindowScale2 + CamPos[1]*WindowYscale, "left", 255)
-        draw_text(f"Max Clicks Per Second: {MaxClicksPerSecond}", font, WHITE, 10*WindowScale2 + CamPos[0]*WindowXscale, 250*WindowScale2 + CamPos[1]*WindowYscale, "left", 255)
-        draw_text(f"Total Clicks: {TotalClicks}", font, WHITE, 10*WindowScale2 + CamPos[0]*WindowXscale, 280*WindowScale2 + CamPos[1]*WindowYscale, "left", 255)
+        draw_text(f"Damage Per Second: {abbreviate(Decimal(auto_click_value) * Decimal(auto_click_rate), notation, 3, 100000, False)}/s", font, WHITE, 10*WindowScale2 + CamPos[0]*WindowXscale, 160*WindowScale2 + CamPos[1]*WindowYscale, "left", 255)
+        draw_text(f"HP: {abbreviate(enemy_hp, notation, 3, 100000, False)} / {abbreviate(enemy_max_hp, notation, 3, 100000, False)}", font, WHITE, 10*WindowScale2 + CamPos[0]*WindowXscale, 190*WindowScale2 + CamPos[1]*WindowYscale, "left", 255)
+        draw_text(f"Killed Monsters: {abbreviate(monsterskilled, notation, 3, 100000, True)}", font, WHITE, 10*WindowScale2 + CamPos[0]*WindowXscale, 220*WindowScale2 + CamPos[1]*WindowYscale, "left", 255)
+        draw_text(f"Clicks Per Second: {ClicksPerSecond}", font, WHITE, 10*WindowScale2 + CamPos[0]*WindowXscale, 250*WindowScale2 + CamPos[1]*WindowYscale, "left", 255)
+        draw_text(f"Max Clicks Per Second: {MaxClicksPerSecond}", font, WHITE, 10*WindowScale2 + CamPos[0]*WindowXscale, 280*WindowScale2 + CamPos[1]*WindowYscale, "left", 255)
+        draw_text(f"Total Clicks: {TotalClicks}", font, WHITE, 10*WindowScale2 + CamPos[0]*WindowXscale, 310*WindowScale2 + CamPos[1]*WindowYscale, "left", 255)
         enemyhealthsmoothper += (float(Decimal(enemy_hp)/Decimal(enemy_max_hp))-enemyhealthsmoothper)/(0.15/delta_time)
         enemyhealthsmoothper = constrain(enemyhealthsmoothper, 0, 1)
         smoothhealthbarenemy_rect_surface = pygame.Surface((constrain(300*enemyhealthsmoothper, 0, 300)*WindowScale2, 40*WindowScale2), pygame.SRCALPHA)
         smoothhealthbarenemy_rect_surface.fill((int(constrain(math.cos((math.pi/2)*constrain(enemyhealthsmoothper, 0, 1))*256, 0, 255)), int(constrain(math.sin((math.pi/2)*constrain(enemyhealthsmoothper, 0, 1))*256, 0, 255)), 0, 192))  # Fill with white and set alpha to 128 (50% transparent)
-        pygame.draw.rect(screen, (0, 0, 0), (10*WindowScale2 + CamPos[0]*WindowXscale, 310*WindowScale2 + CamPos[1]*WindowYscale, 300*WindowScale2, 40*WindowScale2))
-        pygame.draw.rect(screen, (constrain(math.cos((math.pi/2)*constrain(float(Decimal(enemy_hp)/Decimal(enemy_max_hp)), 0, 1))*256, 0, 255), constrain(math.sin((math.pi/2)*constrain(float(Decimal(enemy_hp)/Decimal(enemy_max_hp)), 0, 1))*256, 0, 255), 0), (10*WindowScale2 + CamPos[0]*WindowXscale, 310*WindowScale2 + CamPos[1]*WindowYscale, (float(Decimal(enemy_hp)/Decimal(enemy_max_hp)))*300*WindowScale2, 40*WindowScale2))
-        screen.blit(smoothhealthbarenemy_rect_surface, (10*WindowScale2 + CamPos[0]*WindowXscale, 310*WindowScale2 + CamPos[1]*WindowYscale))
+        pygame.draw.rect(screen, (0, 0, 0), (10*WindowScale2 + CamPos[0]*WindowXscale, 340*WindowScale2 + CamPos[1]*WindowYscale, 300*WindowScale2, 40*WindowScale2))
+        pygame.draw.rect(screen, (constrain(math.cos((math.pi/2)*constrain(float(Decimal(enemy_hp)/Decimal(enemy_max_hp)), 0, 1))*256, 0, 255), constrain(math.sin((math.pi/2)*constrain(float(Decimal(enemy_hp)/Decimal(enemy_max_hp)), 0, 1))*256, 0, 255), 0), (10*WindowScale2 + CamPos[0]*WindowXscale, 340*WindowScale2 + CamPos[1]*WindowYscale, (float(Decimal(enemy_hp)/Decimal(enemy_max_hp)))*300*WindowScale2, 40*WindowScale2))
+        screen.blit(smoothhealthbarenemy_rect_surface, (10*WindowScale2 + CamPos[0]*WindowXscale, 340*WindowScale2 + CamPos[1]*WindowYscale))
     def prestige():
-        global score, gems, musicplays, musicplays2, enemy_hp, enemy_max_hp, monsterskilled, click_damage
+        global score, diamonds, musicplays, musicplays2, enemy_hp, enemy_max_hp, monsterskilled, click_damage
         score = 0
         resetupgrades()
-        PlayMusic(random.randint(1,15))
+        PlayMusic(random.randint(1,17))
         musicplays = 0
         musicplays2 = 0
         #pygame.mixer.music.set_volume(pygamemixermusic * float(Settings[1]["value"] / 100))
         rl.set_music_volume(music1, pygamemixermusic * float(Settings[1]["value"] / 100))
         rl.set_music_volume(music2, pygamemixermusic * float(Settings[1]["value"] / 100))
-        gems += gemstoget
+        diamonds += diamondstoget
         enemy_hp = Decimal(10)
         monsterskilled = Decimal(0)
         enemy_max_hp = Decimal(10)
@@ -1324,7 +1354,7 @@ while running:
     # Draw upgrade buttons
     for i, button in enumerate(Settings_buttons):
         setx = Settings_button_x[i] + CamPos[0]*WindowXscale/WindowScale2
-        sety = constrain(Settings_button_y[i] + Settings_Button_Y_scroll + Settings_Button_Y_scroll_vel, screen_height*-3, screen_height*0.8) + CamPos[1]*WindowYscale/WindowYscale
+        sety = Settings_button_y[i] + Settings_Button_Y_scroll + Settings_Button_Y_scroll_vel + CamPos[1]*WindowYscale/WindowYscale
         if isinstance(Settings[i]["value"], Decimal):
             if Settings[i]["held"] and Settings[i]["holdable"]:
                 if mos_x/WindowXscale <= setx + Settings_button_width[i]/2:
@@ -1383,12 +1413,18 @@ while running:
     for i, button in enumerate(upgrade_buttons):
         def calcmax():
             return constrain(Decimal.__floor__( Decimal.log10( (Decimal(score) * (Decimal(upgrades[i]["costcoefficient"]) - 1)) / Decimal(upgrades[i]["startcost"] * (Decimal(upgrades[i]["costcoefficient"]) ** Decimal(upgrades[i]["bought"]))) + 1) / Decimal.log10(Decimal(upgrades[i]["costcoefficient"]))), Decimal(1), math.inf)
+        def calcmax0(e):
+            return constrain(Decimal.__floor__( Decimal.log10( (Decimal(e) * (Decimal(upgrades[i]["costcoefficient"]) - 1)) / Decimal(upgrades[i]["startcost"] * (Decimal(upgrades[i]["costcoefficient"]) ** Decimal(upgrades[i]["bought"]))) + 1) / Decimal.log10(Decimal(upgrades[i]["costcoefficient"]))), Decimal(0), math.inf)
         if bulkbuy == "Max":
             upgrades[i]["cost"] = Decimal(upgrades[i]["startcost"]) * (((Decimal(upgrades[i]["costcoefficient"])**Decimal(upgrades[i]["bought"])) * (Decimal(upgrades[i]["costcoefficient"])**Decimal(calcmax()) - Decimal(1))) / (Decimal(upgrades[i]["costcoefficient"])-Decimal(1)))
         elif BuyThing[1]["value"] == "ON":
             upgrades[i]["cost"] = Decimal(upgrades[i]["startcost"]) * (((Decimal(upgrades[i]["costcoefficient"])**Decimal(upgrades[i]["bought"])) * (Decimal(upgrades[i]["costcoefficient"])**Decimal(Decimal(upgrades[i]["bought"]) - Decimal(upgrades[i]["bought"]) % Decimal(bulkbuy) + Decimal(bulkbuy) - Decimal(upgrades[i]["bought"])) - Decimal(1))) / (Decimal(upgrades[i]["costcoefficient"])-Decimal(1)))
         else:
             upgrades[i]["cost"] = Decimal(upgrades[i]["startcost"]) * (((Decimal(upgrades[i]["costcoefficient"])**Decimal(upgrades[i]["bought"])) * (Decimal(upgrades[i]["costcoefficient"])**Decimal(bulkbuy) - Decimal(1))) / (Decimal(upgrades[i]["costcoefficient"])-Decimal(1)))
+        if (Decimal(score))*Decimal(Settings[7]["value"])/Decimal(100) >= Decimal(upgrades[i]["startcost"]) * (((Decimal(upgrades[i]["costcoefficient"])**Decimal(upgrades[i]["bought"])) * (Decimal(upgrades[i]["costcoefficient"])**Decimal(calcmax0((Decimal(score))*Decimal(Settings[7]["value"])/Decimal(100))) - Decimal(1))) / (Decimal(upgrades[i]["costcoefficient"])-Decimal(1))):
+            buy00001 = calcmax0((Decimal(score))*Decimal(Settings[7]["value"])/Decimal(100))
+            score -= Decimal(upgrades[i]["startcost"]) * (((Decimal(upgrades[i]["costcoefficient"])**Decimal(upgrades[i]["bought"])) * (Decimal(upgrades[i]["costcoefficient"])**Decimal(calcmax0((Decimal(score))*Decimal(Settings[7]["value"])/Decimal(100))) - Decimal(1))) / (Decimal(upgrades[i]["costcoefficient"])-Decimal(1)))
+            upgrades[i]["bought"] += Decimal(buy00001)
         upgx = upgrade_button_x[i] + Upgrade_Button_X_scroll + Upgrade_Button_X_scroll_vel + CamPos[0]*WindowXscale/WindowScale2
         upgy = (screen_height - upgrade_button_height[i])*WindowYscale - 20*WindowYscale + CamPos[1]*WindowYscale
         upgrade_buttons[i] = pygame.Rect(upgx*WindowScale2, upgy, upgrade_button_width[i]*WindowScale2, upgrade_button_height[i]*WindowScale2)
@@ -1397,7 +1433,7 @@ while running:
         pygame.draw.rect(screen, (UpgradeButtonColorRed[i], UpgradeButtonColorGreen[i], UpgradeButtonColorBlue[i]), (upgx*WindowScale2, upgy, upgrade_button_width[i]*WindowScale2, upgrade_button_height[i]*WindowScale2))
         draw_text(f"{upgrades[i]['name']} - {abbreviate(upgrades[i]['cost'], notation, 3, 10000, False)}", font, WHITE, upgx*WindowScale2 + upgrade_button_width[i]*WindowScale2/2, upgy + upgrade_button_height[i]*WindowScale2/2, "center", 255)
         if bulkbuy == "Max":
-            draw_text(f"{abbreviate(upgrades[i]["bought"], notation, 3, 1000, True)} + Max ({abbreviate(Decimal(calcmax()), notation, 3, 1000, True)})", font, WHITE, upgx*WindowScale2, upgy - 38*WindowScale2, "left", 255)
+            draw_text(f"{abbreviate(upgrades[i]["bought"], notation, 3, 1000, True)} + {abbreviate(Decimal(calcmax()), notation, 3, 1000, True)}", font, WHITE, upgx*WindowScale2, upgy - 38*WindowScale2, "left", 255)
         elif BuyThing[1]["value"] == "ON":
             draw_text(f"{abbreviate(upgrades[i]["bought"], notation, 3, 1000, True)} + {Decimal(upgrades[i]["bought"]) - Decimal(upgrades[i]["bought"]) % Decimal(bulkbuy) + Decimal(bulkbuy) - Decimal(upgrades[i]["bought"])}", font, WHITE, upgx*WindowScale2, upgy - 38*WindowScale2, "left", 255)
         else:
@@ -1435,7 +1471,7 @@ while running:
         offlineBox_rect_surface.fill((0, 64, 128, offlineBoxAlpha))  # Fill with red and set alpha to 128 (50% transparent)
         screen.blit(offlineBox_rect_surface, ((640*WindowXscale) - (480*WindowScale2), (360*WindowYscale) - (180*WindowScale2)))
         draw_text(f"While you were away for {abbreviate((Decimal(offlineCurrentTime) - Decimal(offlineOldTime)), notation, 3, 10000, False)} seconds,", pygame.font.Font(resource_path(str(THIS_DIR / "./assets/fonts/Lato/Lato-Bold.ttf")), int(30*WindowScale2)), (255, 64, 128, offlineBoxAlpha), 640*WindowXscale, 330*WindowYscale, "center", offlineBoxAlpha)
-        draw_text(f"You earned {abbreviate(Decimal(differenceTimeOffline) * Decimal(auto_click_value) * Decimal(auto_click_rate) * Decimal(gemboost), notation, 3, 100000, False)} points.", pygame.font.Font(resource_path(str(THIS_DIR / "./assets/fonts/Lato/Lato-Bold.ttf")), int(30*WindowScale2)), (255, 64, 128, offlineBoxAlpha), 640*WindowXscale, 390*WindowYscale, "center", offlineBoxAlpha)
+        draw_text(f"You earned {abbreviate(Decimal(differenceTimeOffline) * Decimal(auto_click_value) * Decimal(auto_click_rate) * Decimal(diamondboost), notation, 3, 100000, False)} points.", pygame.font.Font(resource_path(str(THIS_DIR / "./assets/fonts/Lato/Lato-Bold.ttf")), int(30*WindowScale2)), (255, 64, 128, offlineBoxAlpha), 640*WindowXscale, 390*WindowYscale, "center", offlineBoxAlpha)
     offlineBoxAlpha = constrain(offlineBoxAlpha - 51*delta_time, 0, 255)
     YouWillNotUpgradeUnlessToldTo_Time -= delta_time
     # Update display
@@ -1466,7 +1502,7 @@ while running:
     buttonshake[0] = random.uniform(-buttonshake2[0], buttonshake2[0])
     buttonshake[1] = random.uniform(-buttonshake2[1], buttonshake2[1])
     CamPos = [CamPos[0] + (CamPos2[0]-CamPos[0])/(0.15/delta_time), CamPos[1] + (CamPos2[1]-CamPos[1])/(0.15/delta_time)]
-    Settings_button_x = [490 + 1280*WindowXscale/WindowScale2, 490 + 1280*WindowXscale/WindowScale2, 490 + 1280*WindowXscale/WindowScale2, 490 + 1280*WindowXscale/WindowScale2, 490 + 1280*WindowXscale/WindowScale2, 490 + 1280*WindowXscale/WindowScale2, 490 + 1280*WindowXscale/WindowScale2]
+    Settings_button_x = [490 + 1280*WindowXscale/WindowScale2, 490 + 1280*WindowXscale/WindowScale2, 490 + 1280*WindowXscale/WindowScale2, 490 + 1280*WindowXscale/WindowScale2, 490 + 1280*WindowXscale/WindowScale2, 490 + 1280*WindowXscale/WindowScale2, 490 + 1280*WindowXscale/WindowScale2, 810 + 1280*WindowXscale/WindowScale2, ]
     if (rl.get_music_time_played(music1) >= rl.get_music_time_length(music1)-.03) and musicplays2 == 0:
         musicplays2 = 1
     if musicplays >= 0.03:
