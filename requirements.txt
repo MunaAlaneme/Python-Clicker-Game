@@ -1,4 +1,5 @@
 pyglet
+pyaudio
 PySDL2
 PySDL3
 cython
