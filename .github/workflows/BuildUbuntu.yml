@@ -38,7 +38,7 @@ jobs:
       - name: Build application
       #          python setup.py sdist bdist_wheel
         run: |
-          python setup.py
+          python UBUNTUsetup.py
 
       - name: create release
         id: create_release
