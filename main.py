@@ -1011,8 +1011,10 @@ while running:
     for i, setting in enumerate(Settings):
         x = Settings_button_x[i]
         y = Settings_button_y[i] + Settings_Button_Y_scroll + Settings_Button_Y_scroll_vel
-        Settings_buttons[i] = pygame.Rect(x + CamPos[0]*WindowXscale/WindowYscale, y*WindowYscale + CamPos[1]*WindowYscale/WindowYscale, Settings_button_width[i]*WindowScale2, Settings_button_height[i]*WindowScale2)
-        NoSettings_buttons[i] = pygame.Rect(x + CamPos[0]*WindowXscale/WindowYscale, y*WindowYscale + CamPos[1]*WindowYscale/WindowYscale, Settings_button_width[i]*WindowXscale, Settings_button_height[i]*WindowYscale)
+        setx = Settings_button_x[i] + CamPos[0]*WindowXscale/WindowScale2
+        sety = Settings_button_y[i] + Settings_Button_Y_scroll + Settings_Button_Y_scroll_vel + CamPos[1]*WindowYscale/WindowYscale
+        NoSettings_buttons[i] = pygame.Rect(setx*WindowXscale, sety*WindowYscale, Settings_button_width[i]*WindowXscale, Settings_button_height[i]*WindowYscale)
+        Settings_buttons[i] = pygame.Rect(setx*WindowXscale, sety*WindowYscale, Settings_button_width[i]*WindowXscale, Settings_button_height[i]*WindowYscale)
         SettingsButtonColorRed[i] += (SettingsTargetButtonColorRed[i] - SettingsButtonColorRed[i])/(0.15/delta_time)
         SettingsButtonColorGreen[i] += (SettingsTargetButtonColorGreen[i] - SettingsButtonColorGreen[i])/(0.15/delta_time)
         SettingsButtonColorBlue[i] += (SettingsTargetButtonColorBlue[i] - SettingsButtonColorBlue[i])/(0.15/delta_time)
@@ -1362,6 +1364,7 @@ while running:
                 if mos_x/WindowXscale >= setx + Settings_button_width[i]/2:
                     Settings[i]["value"] += Decimal(20*delta_time)
             Settings[i]["value"] = constrain(Decimal(Settings[i]["value"]), Decimal(Settings[i]["min"]), Decimal(Settings[i]["max"]))
+        NoSettings_buttons[i] = pygame.Rect(setx*WindowXscale, sety*WindowYscale, Settings_button_width[i]*WindowXscale, Settings_button_height[i]*WindowYscale)
         Settings_buttons[i] = pygame.Rect(setx*WindowXscale, sety*WindowYscale, Settings_button_width[i]*WindowXscale, Settings_button_height[i]*WindowYscale)
         pygame.draw.rect(screen, (SettingsButtonOutlineColorRed[i], SettingsButtonOutlineColorGreen[i], SettingsButtonOutlineColorBlue[i]), (setx*WindowXscale - 5*WindowScale2, sety*WindowYscale - 5*WindowScale2, Settings_button_width[i]*WindowXscale + 10*WindowScale2, Settings_button_height[i]*WindowYscale + 10*WindowScale2), 30)
         pygame.draw.rect(screen, (SettingsButtonColorRed[i], SettingsButtonColorGreen[i], SettingsButtonColorBlue[i]), (Settings_buttons[i]))

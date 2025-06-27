@@ -16,9 +16,9 @@ y, sr = librosa.load(audio_path, sr=None)
 playback_rate = [1.0]
 playing = [True]
 
-chunk_duration = 1/48  # seconds, if put at 1/4410, bitcrush
+chunk_duration = 1/120  # seconds, if put at 1/4410, bitcrush
 chunk_samples = int(sr * chunk_duration)
-max_queue_size = 30 #if put at 100, bitcrush also
+max_queue_size = 15 #if put at 100, bitcrush also
 audio_queue = Queue(maxsize=max_queue_size)
 
 def producer_thread():
