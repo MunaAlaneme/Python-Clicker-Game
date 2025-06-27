@@ -5,7 +5,6 @@ PyInstaller.__main__.run([
     '--name=MSCopilotClicker',
     '--windowed',
     '--noconsole',
-    #'--icon=copilot.ico',
     '--icon=copilot.icns',
     '--onefile',
     '--onedir'
