@@ -1,4 +1,4 @@
-name: [Ubuntu] Build Python App
+name: Ubuntu Build Python App
 
 on:
   push:

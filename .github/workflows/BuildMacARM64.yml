@@ -1,4 +1,4 @@
-name: [MacOS ARM64] Build Python App
+name: MacOS ARM64 Build Python App
 
 on:
   push:
