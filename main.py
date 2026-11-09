@@ -1,10 +1,14 @@
 #!/usr/bin/env python
+#export ENV_RAYLIB="/Library/Frameworks/Python.framework/Versions/3.16/lib/python3.16/site-packages/raylibpy/bin/arm64/libraylib.6.2.0.dylib"
+
 # Credits!!!
 # (YT) Clear Code - Particle System
 # (YT) Python Simplified - Python to .app
 # jay3332 - Number Abbreviation
 # Cryptogrounds / Considera Core
 # https://github.com/Gooodgis/dont-touch-my-presents
+
+
 
 # To Do List:
 # 2nd layer prestige
@@ -1011,7 +1015,7 @@ while running:
     for i, setting in enumerate(Settings):
         x = Settings_button_x[i]
         y = Settings_button_y[i] + Settings_Button_Y_scroll + Settings_Button_Y_scroll_vel
-        setx = Settings_button_x[i] + CamPos[0]*WindowXscale/WindowScale2
+        setx = Settings_button_x[i] + CamPos[0]
         sety = Settings_button_y[i] + Settings_Button_Y_scroll + Settings_Button_Y_scroll_vel + CamPos[1]*WindowYscale/WindowYscale
         NoSettings_buttons[i] = pygame.Rect(setx*WindowXscale, sety*WindowYscale, Settings_button_width[i]*WindowXscale, Settings_button_height[i]*WindowYscale)
         Settings_buttons[i] = pygame.Rect(setx*WindowXscale, sety*WindowYscale, Settings_button_width[i]*WindowXscale, Settings_button_height[i]*WindowYscale)
@@ -1355,13 +1359,13 @@ while running:
 
     # Draw upgrade buttons
     for i, button in enumerate(Settings_buttons):
-        setx = Settings_button_x[i] + CamPos[0]*WindowXscale/WindowScale2
-        sety = Settings_button_y[i] + Settings_Button_Y_scroll + Settings_Button_Y_scroll_vel + CamPos[1]*WindowYscale/WindowYscale
+        setx = Settings_button_x[i] + CamPos[0]
+        sety = Settings_button_y[i] + Settings_Button_Y_scroll + Settings_Button_Y_scroll_vel + CamPos[1]
         if isinstance(Settings[i]["value"], Decimal):
             if Settings[i]["held"] and Settings[i]["holdable"]:
-                if mos_x/WindowXscale <= setx + Settings_button_width[i]/2:
+                if mos_x <= setx + CamPos[0]*WindowXscale/WindowScale2 + Settings_button_width[i]/2:
                     Settings[i]["value"] -= Decimal(20*delta_time)
-                if mos_x/WindowXscale >= setx + Settings_button_width[i]/2:
+                if mos_x >= setx + CamPos[0]*WindowXscale/WindowScale2 + Settings_button_width[i]/2:
                     Settings[i]["value"] += Decimal(20*delta_time)
             Settings[i]["value"] = constrain(Decimal(Settings[i]["value"]), Decimal(Settings[i]["min"]), Decimal(Settings[i]["max"]))
         NoSettings_buttons[i] = pygame.Rect(setx*WindowXscale, sety*WindowYscale, Settings_button_width[i]*WindowXscale, Settings_button_height[i]*WindowYscale)
@@ -1381,8 +1385,8 @@ while running:
             draw_text(f"{Settings[i]['name']}", font, WHITE, setx*WindowXscale + Settings_button_width[i]*WindowXscale/2, sety*WindowYscale + (Settings_button_height[i]*WindowScale2)/2, "center", 255)
     #pygame.draw.rect(screen, (30, 30, 30), (900*WindowXscale + CamPos[0]*WindowXscale, WindowHeight*0.35 + CamPos[1]*WindowYscale, 380*WindowXscale, WindowHeight*1))
     for i, button in enumerate(Buy_buttons):
-        setx = Buy_button_X[i] + CamPos[0]*WindowXscale/WindowScale2
-        sety = Buy_button_Y[i] + CamPos[1]*WindowYscale
+        setx = Buy_button_X[i] + CamPos[0]
+        sety = Buy_button_Y[i] + CamPos[1]
         if isinstance(BuyThing[i]["value"], Decimal):
             if BuyThing[i]["held"] and BuyThing[i]["holdable"]:
                 if mos_x/WindowXscale <= setx + Buy_button_Width[i]/2:
@@ -1505,7 +1509,7 @@ while running:
     buttonshake[0] = random.uniform(-buttonshake2[0], buttonshake2[0])
     buttonshake[1] = random.uniform(-buttonshake2[1], buttonshake2[1])
     CamPos = [CamPos[0] + (CamPos2[0]-CamPos[0])/(0.15/delta_time), CamPos[1] + (CamPos2[1]-CamPos[1])/(0.15/delta_time)]
-    Settings_button_x = [490 + 1280*WindowXscale/WindowScale2, 490 + 1280*WindowXscale/WindowScale2, 490 + 1280*WindowXscale/WindowScale2, 490 + 1280*WindowXscale/WindowScale2, 490 + 1280*WindowXscale/WindowScale2, 490 + 1280*WindowXscale/WindowScale2, 490 + 1280*WindowXscale/WindowScale2, 810 + 1280*WindowXscale/WindowScale2, ]
+    Settings_button_x = [490 + 1280, 490 + 1280, 490 + 1280, 490 + 1280, 490 + 1280, 490 + 1280, 490 + 1280, 810 + 1280, ]
     if (rl.get_music_time_played(music1) >= rl.get_music_time_length(music1)-.03) and musicplays2 == 0:
         musicplays2 = 1
     if musicplays >= 0.03:
